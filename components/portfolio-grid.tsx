@@ -1,0 +1,140 @@
+"use client";
+
+import Image from "next/image";
+import { useCallback, useEffect, useState } from "react";
+import type { PortfolioItem } from "@/lib/types";
+import { AudioPlayer } from "./audio-player";
+
+export function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
+  const images = items.filter((i) => i.kind === "image");
+  const audio = items.filter((i) => i.kind === "audio");
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  const close = useCallback(() => setOpenIndex(null), []);
+
+  useEffect(() => {
+    if (openIndex === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+      if (e.key === "ArrowRight")
+        setOpenIndex((i) =>
+          i === null ? i : (i + 1) % images.length,
+        );
+      if (e.key === "ArrowLeft")
+        setOpenIndex((i) =>
+          i === null ? i : (i - 1 + images.length) % images.length,
+        );
+    };
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [openIndex, close, images.length]);
+
+  if (items.length === 0) {
+    return (
+      <p className="py-6 text-sm text-mist/60">
+        还没有作品。等有了第一张图或第一段声音，会出现在这里。
+      </p>
+    );
+  }
+
+  const active = openIndex === null ? null : images[openIndex];
+
+  return (
+    <div className="space-y-5">
+      {images.length > 0 ? (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {images.map((item, i) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setOpenIndex(i)}
+              className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-white/[0.07] bg-white/[0.02] text-left transition hover:border-white/20"
+            >
+              <Image
+                src={item.media_url}
+                alt={item.title ?? "作品图片"}
+                fill
+                sizes="(max-width: 640px) 100vw, 50vw"
+                className="object-cover transition duration-700 group-hover:scale-[1.03]"
+              />
+              <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/0 to-black/0" />
+              <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4">
+                <span className="min-w-0">
+                  <span className="block truncate text-sm text-white/90">
+                    {item.title ?? "未命名"}
+                  </span>
+                  {item.title_en || item.title_ja ? (
+                    <span className="sub mt-0.5 block truncate text-[9px] uppercase">
+                      {[item.title_en, item.title_ja]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </span>
+                  ) : null}
+                </span>
+                <span className="font-display text-[10px] text-white/35">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+              </span>
+            </button>
+          ))}
+        </div>
+      ) : null}
+
+      {audio.map((item) => (
+        <AudioPlayer key={item.id} item={item} />
+      ))}
+
+      {active ? (
+        <div
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#03040a]/90 p-4 backdrop-blur-md sm:p-8"
+          role="dialog"
+          aria-modal="true"
+          aria-label={active.title ?? "作品预览"}
+          onClick={close}
+        >
+          <button
+            type="button"
+            onClick={close}
+            className="absolute right-5 top-5 grid h-10 w-10 place-items-center rounded-full border border-white/15 text-mist transition hover:border-white/40 hover:text-white"
+            aria-label="关闭"
+          >
+            ✕
+          </button>
+
+          <div
+            className="relative w-full max-w-5xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="relative h-[68vh] w-full">
+              <Image
+                src={active.media_url}
+                alt={active.title ?? "作品图片"}
+                fill
+                sizes="90vw"
+                className="object-contain"
+                priority
+              />
+            </div>
+            <div className="mt-4 flex items-baseline justify-between gap-4">
+              <div>
+                <p className="text-sm text-paper">{active.title}</p>
+                {active.description ? (
+                  <p className="mt-1 text-xs text-mist/70">
+                    {active.description}
+                  </p>
+                ) : null}
+              </div>
+              <span className="font-display text-[10px] tracking-[0.2em] text-mist/40">
+                {(openIndex ?? 0) + 1} / {images.length}
+              </span>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
