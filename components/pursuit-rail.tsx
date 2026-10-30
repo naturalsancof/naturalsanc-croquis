@@ -80,9 +80,19 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
         nearestDist = dist;
         nearest = i;
       }
-      const scale = Math.max(0.84, 1 - dist * 0.045);
-      const rotY = Math.max(-11, Math.min(11, -pos * 6));
-      const opacity = Math.max(0.55, 1 - dist * 0.085);
+      const scale = Math.max(0.78, 1 - dist * 0.06);
+      const rotY = Math.max(-14, Math.min(14, -pos * 8));
+      const opacity = Math.max(0.5, 1 - dist * 0.13);
+
+      // 越靠边越像隔着一层玻璃
+      const far = Math.max(0, dist - 1);
+      const blur = Math.min(6.5, far * 3.6);
+      const filterStr =
+        blur < 0.25
+          ? "none"
+          : `blur(${blur.toFixed(1)}px) saturate(${(1 - far * 0.18).toFixed(2)})`;
+      if (el.style.filter !== filterStr) el.style.filter = filterStr;
+      el.style.setProperty("--glass", String(Math.min(0.9, far * 0.85)));
       el.style.transform = `translate3d(calc(-50% + ${pos * step}px), -50%, 0) perspective(1400px) rotateY(${rotY}deg) scale(${scale})`;
       el.style.opacity = String(opacity);
       el.style.zIndex = String(100 - Math.round(dist * 10));
@@ -321,6 +331,7 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
                 ) : (
                   <span className="absolute inset-0 bg-gradient-to-br from-[#2a2a33] to-[#101014]" />
                 )}
+                <span className="glass-veil" />
                 <span className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-black/10" />
                 <span
                   className="absolute left-3 top-3 h-1.5 w-1.5 rounded-full"
