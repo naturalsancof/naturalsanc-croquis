@@ -422,142 +422,200 @@ export function WorksEditor({
 
 /* --------------------------------- 03 笔记 -------------------------------- */
 
+function plainExcerpt(md: string | null | undefined) {
+  if (!md) return "";
+  return md
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/[#>*_`|\-]+/g, " ")
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 90);
+}
+
 export function NotesEditor({
   pursuitId,
   items,
+  editId,
 }: {
   pursuitId: string;
   items: Note[];
+  editId?: string;
 }) {
+  const editing = items.find((n) => n.id === editId);
+
+  if (editing) {
+    return <NoteSheet pursuitId={pursuitId} note={editing} />;
+  }
+
   return (
     <div>
-      <div className="space-y-3">
-        {items.map((n) => (
-          <details
-            key={n.id}
-            className="group rounded-xl border border-[var(--line)] bg-white/50 transition hover:border-white/15"
+      <div className="mb-6 flex items-center justify-between">
+        <p className="font-display text-[9px] uppercase tracking-[0.22em] text-mist">
+          {items.length} 篇笔记
+        </p>
+        <form action={saveNote}>
+          <input type="hidden" name="pursuit_id" value={pursuitId} />
+          <input type="hidden" name="return_tab" value="notes" />
+          <button
+            type="submit"
+            name="intent"
+            value="save"
+            className="cursor-pointer rounded-full border border-[var(--line-strong)] px-4 py-1.5 text-[11px] text-ink transition hover:border-ink/50 hover:bg-white/60"
           >
-            <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-3.5">
-              <span className="font-display text-[10px] tracking-[0.12em] text-mist/45">
-                {formatDate(n.note_date)}
-              </span>
-              {n.is_pinned ? (
-                <span className="rounded-full border border-cyan/40 bg-cyan/10 px-2 py-0.5 font-display text-[8px] tracking-[0.12em] text-cyan/80">
-                  PINNED
-                </span>
-              ) : null}
-              {!n.is_published ? (
-                <span className="rounded-full border border-white/15 px-2 py-0.5 font-display text-[8px] tracking-[0.12em] text-mist/50">
-                  DRAFT
-                </span>
-              ) : null}
-              <span className="min-w-0 flex-1 truncate text-[13px] text-ink">
-                {n.title}
-              </span>
-              <span className="font-display text-[9px] tracking-[0.14em] text-mist/40 transition group-open:text-cyan/70">
-                展开编辑 ▾
-              </span>
-            </summary>
-
-            <form
-              action={saveNote}
-              className="border-t border-white/5 px-4 py-4"
-            >
-              <input type="hidden" name="id" value={n.id} />
-              <input type="hidden" name="pursuit_id" value={pursuitId} />
-              <input type="hidden" name="return_tab" value="notes" />
-
-              <div className="grid gap-3 sm:grid-cols-[2fr_1fr_1fr_auto] sm:items-end">
-                <Field label="标题" hint="中文">
-                  <Input name="title" defaultValue={n.title} />
-                </Field>
-                <Field label="标题" hint="EN / 日">
-                  <div className="flex gap-2">
-                    <Input name="title_en" defaultValue={n.title_en ?? ""} />
-                    <Input name="title_ja" defaultValue={n.title_ja ?? ""} />
-                  </div>
-                </Field>
-                <Field label="日期">
-                  <Input
-                    type="date"
-                    name="note_date"
-                    defaultValue={n.note_date}
-                  />
-                </Field>
-                <div className="flex gap-2 pb-0.5">
-                  <Btn type="submit" name="intent" value="save">
-                    保存
-                  </Btn>
-                  <Btn
-                    type="submit"
-                    name="intent"
-                    value="delete"
-                    variant="danger"
-                  >
-                    删除
-                  </Btn>
-                </div>
-              </div>
-
-              <div className="mt-3">
-                <Field
-                  label="正文"
-                  hint="Markdown · 标题 / 列表 / 引用 / 表格 / 代码"
-                >
-                  <Textarea
-                    name="content"
-                    defaultValue={n.content ?? ""}
-                    className="min-h-[180px] font-mono text-[12px]"
-                  />
-                </Field>
-              </div>
-
-              <div className="mt-3 flex flex-wrap items-center gap-5 text-[12px] text-mist">
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    name="is_pinned"
-                    defaultChecked={n.is_pinned}
-                    className="h-4 w-4 accent-[#2e7f8a]"
-                  />
-                  置顶
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    name="is_published"
-                    defaultChecked={n.is_published}
-                    className="h-4 w-4 accent-[#2e7f8a]"
-                  />
-                  公开
-                </label>
-              </div>
-            </form>
-          </details>
-        ))}
+            ＋ 新建一篇
+          </button>
+        </form>
       </div>
 
-      <form
-        action={saveNote}
-        className="mt-4 grid gap-3 rounded-xl border border-dashed border-[var(--line)] bg-white/30 p-4 sm:grid-cols-[2fr_1fr_auto] sm:items-end"
-      >
+      {items.length === 0 ? (
+        <p className="py-20 text-center text-[13px] text-mist">
+          还没有笔记。点上面「新建一篇」开始写。
+        </p>
+      ) : (
+        <div className="divide-y divide-[var(--line)]">
+          {items.map((n) => (
+            <Link
+              key={n.id}
+              href={`?tab=notes&edit=${n.id}`}
+              className="group grid grid-cols-[78px_minmax(0,1fr)] items-start gap-4 py-5 transition sm:grid-cols-[96px_minmax(0,1fr)] sm:gap-6"
+            >
+              <span className="pt-1.5 font-display text-[9px] uppercase tracking-[0.12em] text-mist/70">
+                {formatDate(n.note_date)}
+              </span>
+              <span className="min-w-0">
+                <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                  <span className="truncate text-[17px] leading-snug text-ink transition group-hover:text-ink/60">
+                    {n.title}
+                  </span>
+                  {n.is_pinned ? (
+                    <span className="rounded-full bg-ink/5 px-1.5 py-0.5 font-display text-[8px] tracking-[0.14em] text-mist">
+                      置顶
+                    </span>
+                  ) : null}
+                  {!n.is_published ? (
+                    <span className="rounded-full bg-ink/5 px-1.5 py-0.5 font-display text-[8px] tracking-[0.14em] text-mist">
+                      草稿
+                    </span>
+                  ) : null}
+                </span>
+                <span className="mt-1.5 block truncate text-[12px] text-mist">
+                  {plainExcerpt(n.content) || "（空白）"}
+                </span>
+              </span>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NoteSheet({ pursuitId, note }: { pursuitId: string; note: Note }) {
+  return (
+    <div className="rounded-2xl bg-white px-5 py-6 shadow-[0_30px_60px_-50px_rgba(20,20,25,0.45)] sm:px-10 sm:py-8">
+      <form action={saveNote} className="mx-auto max-w-2xl">
+        <input type="hidden" name="id" value={note.id} />
         <input type="hidden" name="pursuit_id" value={pursuitId} />
-              <input type="hidden" name="return_tab" value="notes" />
-        <Field label="新增笔记" hint="标题">
-          <Input name="title" placeholder="写点什么" />
-        </Field>
-        <Field label="正文" hint="可稍后再补">
-          <Input name="content" placeholder="支持 Markdown" />
-        </Field>
-        <Btn type="submit" name="intent" value="save">
-          添加
-        </Btn>
+        <input type="hidden" name="return_tab" value="notes" />
+
+        <div className="flex items-center justify-between">
+          <Link
+            href="?tab=notes"
+            className="font-display text-[9px] uppercase tracking-[0.18em] text-mist transition hover:text-ink"
+          >
+            ← 全部笔记
+          </Link>
+          <button
+            type="submit"
+            name="intent"
+            value="save"
+            className="cursor-pointer rounded-full bg-ink px-4 py-1.5 text-[11px] text-white transition hover:bg-ink/85"
+          >
+            完成
+          </button>
+        </div>
+
+        <input
+          type="date"
+          name="note_date"
+          defaultValue={note.note_date}
+          className="mt-9 block w-[9.5rem] border-0 bg-transparent font-display text-[10px] uppercase tracking-[0.16em] text-mist outline-none"
+        />
+
+        <input
+          name="title"
+          defaultValue={note.title === "无标题笔记" ? "" : note.title}
+          placeholder="标题"
+          className="mt-3 block w-full border-0 bg-transparent text-[34px] font-semibold leading-[1.12] tracking-[-0.02em] text-ink outline-none placeholder:text-mist/30"
+        />
+
+        <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <input
+            name="title_en"
+            defaultValue={note.title_en ?? ""}
+            placeholder="English"
+            className="min-w-0 max-w-[58%] border-0 bg-transparent font-display text-[10px] uppercase tracking-[0.14em] text-mist outline-none placeholder:text-mist/30 [field-sizing:content]"
+          />
+          <input
+            name="title_ja"
+            defaultValue={note.title_ja ?? ""}
+            placeholder="日本語"
+            className="min-w-0 border-0 bg-transparent text-[11px] text-mist outline-none placeholder:text-mist/30 [field-sizing:content]"
+          />
+        </div>
+
+        <textarea
+          name="content"
+          defaultValue={note.content ?? ""}
+          placeholder="开始写……"
+          className="mt-9 block min-h-[30vh] w-full resize-none border-0 bg-transparent text-[15px] leading-[1.95] text-ink/85 outline-none placeholder:text-mist/30 [field-sizing:content]"
+        />
+
+        <div className="mt-8 flex flex-wrap items-center gap-6 border-t border-[var(--line)] pt-5">
+          <label className="flex cursor-pointer items-center gap-2 text-[12px] text-mist">
+            <input
+              type="checkbox"
+              name="is_pinned"
+              defaultChecked={note.is_pinned}
+              className="h-3.5 w-3.5 cursor-pointer accent-[#2e7f8a]"
+            />
+            置顶
+          </label>
+          <label className="flex cursor-pointer items-center gap-2 text-[12px] text-mist">
+            <input
+              type="checkbox"
+              name="is_published"
+              defaultChecked={note.is_published}
+              className="h-3.5 w-3.5 cursor-pointer accent-[#2e7f8a]"
+            />
+            公开
+          </label>
+          <span className="ml-auto font-display text-[8px] uppercase tracking-[0.18em] text-mist/40">
+            Markdown
+          </span>
+        </div>
+      </form>
+
+      <form action={saveNote} className="mx-auto mt-6 max-w-2xl">
+        <input type="hidden" name="id" value={note.id} />
+        <input type="hidden" name="pursuit_id" value={pursuitId} />
+        <input type="hidden" name="return_tab" value="notes" />
+        <button
+          type="submit"
+          name="intent"
+          value="delete"
+          className="cursor-pointer font-display text-[9px] uppercase tracking-[0.16em] text-red-400/70 transition hover:text-red-500"
+        >
+          删除这篇笔记
+        </button>
       </form>
     </div>
   );
 }
 
 /* --------------------------------- 04 资料 -------------------------------- */
+
 
 const KIND_LABEL: Record<string, string> = {
   article: "文章",

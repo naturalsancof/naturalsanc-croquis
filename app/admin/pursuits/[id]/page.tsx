@@ -191,6 +191,7 @@ export default async function EditPursuitPage({
         <NotesEditor
           pursuitId={pursuit.id}
           items={(notes.data ?? []) as Note[]}
+          editId={edit}
         />
       ) : null}
 

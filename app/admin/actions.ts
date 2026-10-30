@@ -391,7 +391,15 @@ export async function saveNote(fd: FormData) {
     if (id) {
       await supabase.from("notes").update(patch).eq("id", id);
     } else {
-      await supabase.from("notes").insert(patch);
+      const { data } = await supabase
+        .from("notes")
+        .insert(patch)
+        .select("id")
+        .single();
+      refreshPublic(await slugOf(supabase, pursuitId));
+      redirect(
+        `/admin/pursuits/${pursuitId}?tab=notes&edit=${data?.id ?? ""}&saved=1`,
+      );
     }
   }
 
