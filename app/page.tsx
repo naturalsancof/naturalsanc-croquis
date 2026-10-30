@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { PursuitCard } from "@/components/pursuit-card";
-import { Reveal } from "@/components/reveal";
+import { PursuitRail } from "@/components/pursuit-rail";
 import { getPursuits } from "@/lib/queries";
 
 export const revalidate = 30;
@@ -9,7 +7,7 @@ export const revalidate = 30;
 export const metadata: Metadata = {
   title: "首页",
   description:
-    "Naturalsanc Croquis 是一个个人数字工作室，记录正在进行的追求：胶片摄影、界面实验与城市声音。",
+    "Naturalsanc Croquis 是一个个人数字工作室，记录正在进行的追求：胶片摄影、字体采集、界面考古与木工。",
 };
 
 export default async function HomePage() {
@@ -17,80 +15,30 @@ export default async function HomePage() {
 
   return (
     <div className="pb-6">
-      {/* ---------------- HERO ---------------- */}
-      <section className="relative pt-6 sm:pt-10">
-        <div className="rise flex items-baseline justify-between gap-4">
-          <p className="label">Personal Digital Studio — Est. 2026</p>
-          <p className="label hidden sm:block">東京 / Tokyo</p>
-        </div>
-
-        <h1 className="rise mt-8 text-[15.5vw] font-semibold leading-[0.82] tracking-[-0.05em] text-ink sm:text-[9vw] lg:text-[118px]">
-          NATURALSANC
-          <br />
-          CROQUIS
-        </h1>
-
-        <div className="rise mt-10 grid gap-8 border-t border-[var(--line)] pt-8 md:grid-cols-[1.1fr_0.9fr]">
-          <p className="text-[15px] leading-[1.95] text-ink/75 sm:text-base">
-            把正在学、正在做、正在卡住的事情，画成一张张草稿。
-            <br className="hidden sm:block" />
-            这里没有完成品，只有进行中的痕迹。
-          </p>
-
-          <div className="md:pl-8">
-            <p className="sub uppercase">A studio for unfinished things.</p>
-            <p className="sub-ja mt-1">未完成のものを記録するスタジオ。</p>
-            <div className="mt-5 flex flex-wrap gap-2">
-              <span className="chip">
-                <span className="h-1 w-1 rounded-full bg-ink/50" />
-                {pursuits.length} 个追求
-              </span>
-              <span className="chip">中文 / EN / 日本語</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-10 flex items-center gap-5">
-          <Link
-            href="#pursuits"
-            className="group inline-flex items-center gap-3 border border-ink bg-ink px-5 py-3 font-display text-[10px] tracking-[0.22em] text-white transition hover:bg-transparent hover:text-ink"
-          >
-            进入追求
-            <span className="transition group-hover:translate-x-1">→</span>
-          </Link>
-          <span className="font-display text-[9px] tracking-[0.22em] text-mist/70">
-            SCROLL
-          </span>
-        </div>
-      </section>
-
-      {/* ---------------- PURSUITS ---------------- */}
-      <section id="pursuits" className="scroll-mt-24 pt-20">
-        <div className="mb-10 flex items-end justify-between gap-4 border-b border-[var(--line)] pb-3">
-          <div className="flex items-baseline gap-4">
-            <span className="label">01</span>
-            <h2 className="text-lg text-ink">正在进行的追求</h2>
-          </div>
-          <span className="label">
-            Pursuits / {String(pursuits.length).padStart(2, "0")}
-          </span>
-        </div>
-
-        {pursuits.length === 0 ? (
-          <div className="panel p-10 text-center">
-            <p className="text-sm text-mist">
-              还没有已发布的追求。去后台添加第一条吧。
+      {/* ---------------- RAIL ---------------- */}
+      <section className="flex min-h-[calc(100svh-9rem)] flex-col justify-between pt-2">
+        <div className="flex items-start justify-between gap-6">
+          <div>
+            <p className="label">Personal Digital Studio</p>
+            <p className="label mt-1 text-mist/70">
+              把进行中的事情，一张一张摆出来
             </p>
           </div>
-        ) : (
-          <div className="stagger grid grid-cols-3 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
-            {pursuits.map((p, i) => (
-              <Reveal key={p.id} delay={(i % 4) * 80}>
-                <PursuitCard pursuit={p} index={i} />
-              </Reveal>
-            ))}
+          <div className="text-right">
+            <p className="label">Est. 2026</p>
+            <p className="label mt-1 text-mist/70">東京 / Tokyo</p>
           </div>
-        )}
+        </div>
+
+        <PursuitRail pursuits={pursuits} />
+
+        <div className="flex items-end justify-between border-t border-[var(--line)] pt-4">
+          <p className="label">Drag ←→ · Click to open</p>
+          <p className="label hidden sm:block">
+            {String(pursuits.length).padStart(2, "0")} Pursuits
+          </p>
+          <p className="label">©2026</p>
+        </div>
       </section>
 
       {/* ---------------- ABOUT ---------------- */}
