@@ -64,7 +64,7 @@ export function AudioPlayer({ item }: { item: PortfolioItem }) {
   const progress = duration > 0 ? Math.min(current / duration, 1) : 0;
 
   return (
-    <div className="border border-[var(--line)] bg-white/60 p-4 sm:p-5">
+    <div className="border-y border-[var(--line)] py-5">
       <audio ref={audioRef} src={item.media_url} preload="metadata" />
 
       <div className="flex items-center gap-4">

@@ -42,7 +42,7 @@ export default async function AccountPage({
           {user.email}
         </p>
 
-        <div className="panel mt-6 p-5 sm:p-7">
+        <div className="panel-solid mt-6 p-5 sm:p-7">
           <h2 className="text-[15px] text-ink">改密码</h2>
           <p className="mt-1 text-[12px] text-mist/50">
             改完立刻生效，下次登录用新密码。

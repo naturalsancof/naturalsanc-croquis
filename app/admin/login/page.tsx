@@ -20,7 +20,7 @@ export default async function LoginPage({
         ← 回到网站
       </Link>
 
-      <div className="panel p-7 sm:p-9">
+      <div className="panel-solid p-7 sm:p-9">
         <p className="kicker">Studio — Private</p>
         <h1 className="mt-4 font-display text-2xl tracking-tight text-ink">
           站长登录

@@ -44,24 +44,25 @@ export function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
   return (
     <div className="space-y-6">
       {images.length > 0 ? (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-6 sm:grid-cols-2">
           {images.map((item, i) => (
             <button
               key={item.id}
               type="button"
               onClick={() => setOpenIndex(i)}
-              className="group relative block bg-white p-2 text-left shadow-[0_18px_40px_-30px_rgba(20,20,25,0.6)] ring-1 ring-[var(--line)] transition hover:-translate-y-1 hover:shadow-[0_26px_50px_-30px_rgba(20,20,25,0.55)]"
+              className="group block text-left"
             >
-              <span className="relative block aspect-[4/3] overflow-hidden bg-[#101014]">
+              <span className="tile relative block aspect-[4/3]">
                 <Image
                   src={item.media_url}
                   alt={item.title ?? "作品图片"}
                   fill
                   sizes="(max-width: 640px) 100vw, 50vw"
-                  className="object-cover transition duration-700 group-hover:scale-[1.03]"
+                  className="object-cover"
                 />
+                <span className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent opacity-0 transition duration-500 group-hover:opacity-100" />
               </span>
-              <span className="mt-2 flex items-baseline justify-between gap-3 px-1 pb-1">
+              <span className="mt-2 flex items-baseline justify-between gap-3">
                 <span className="min-w-0">
                   <span className="block truncate text-[12px] text-ink">
                     {item.title ?? "未命名"}

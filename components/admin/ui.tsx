@@ -93,7 +93,7 @@ export function AdminCard({
   children: ReactNode;
 }) {
   return (
-    <section className="panel p-5 sm:p-7">
+    <section className="panel-solid p-5 sm:p-7">
       <div className="mb-5 flex items-baseline justify-between gap-3">
         <div className="flex items-baseline gap-3">
           <span className="font-display text-[10px] tracking-[0.28em] text-cyan/70">

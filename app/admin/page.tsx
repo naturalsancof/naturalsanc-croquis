@@ -90,7 +90,7 @@ export default async function AdminHome() {
         ) : null}
       </div>
 
-      <section className="panel mt-8 p-5 sm:p-7">
+      <section className="panel-solid mt-8 p-5 sm:p-7">
         <h2 className="text-[15px] text-ink">新建一个追求</h2>
         <p className="mt-1 text-[12px] text-mist/50">
           先只有名字也行，建完再慢慢补。默认是草稿，写完再勾「已发布」。

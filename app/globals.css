@@ -114,15 +114,13 @@ body {
 }
 
 /* ---------- 卡片 ---------- */
+/* 公开页的模块：不画白底、不描边，直接落在纸面上 */
 .panel {
   position: relative;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: rgb(255 255 255 / 0.72);
-  backdrop-filter: blur(6px);
-  box-shadow:
-    0 1px 0 rgb(255 255 255 / 0.8) inset,
-    0 24px 60px -46px rgb(20 20 25 / 0.5);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .panel::before {
@@ -130,9 +128,39 @@ body {
 }
 
 .panel-flat {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+/* 后台表单用的实心卡（只给 admin 用） */
+.panel-solid {
+  position: relative;
   border: 1px solid var(--line);
-  border-radius: 12px;
-  background: rgb(255 255 255 / 0.55);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 24px 50px -40px rgb(20 20 25 / 0.45);
+}
+
+/* 浮在纸面上的截图块：圆角 + 柔和投影，没有白底边框 */
+.tile {
+  display: block;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #101014;
+  box-shadow:
+    0 34px 60px -38px rgb(20 20 25 / 0.55),
+    0 6px 18px -12px rgb(20 20 25 / 0.3);
+  transition:
+    transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.tile:hover {
+  transform: translateY(-6px);
+  box-shadow:
+    0 46px 70px -40px rgb(20 20 25 / 0.55),
+    0 10px 24px -14px rgb(20 20 25 / 0.3);
 }
 
 /* 竖版海报卡 */
@@ -140,12 +168,12 @@ body {
   position: relative;
   display: block;
   overflow: hidden;
-  border-radius: 6px;
+  border-radius: 12px;
   background: #101014;
   transform: rotate(var(--tilt, 0deg));
   box-shadow:
-    0 2px 0 rgb(255 255 255 / 0.35) inset,
-    0 26px 50px -30px rgb(20 20 25 / 0.55);
+    0 34px 60px -38px rgb(20 20 25 / 0.5),
+    0 6px 16px -10px rgb(20 20 25 / 0.22);
   transition:
     transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1),
     box-shadow 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -154,7 +182,9 @@ body {
 
 .poster:hover {
   transform: rotate(0deg) translateY(-10px);
-  box-shadow: 0 40px 60px -34px rgb(20 20 25 / 0.55);
+  box-shadow:
+    0 48px 70px -38px rgb(20 20 25 / 0.55),
+    0 10px 22px -12px rgb(20 20 25 / 0.25);
 }
 
 .poster-cap {

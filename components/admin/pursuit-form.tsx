@@ -39,7 +39,7 @@ export function PursuitForm({ pursuit }: { pursuit: Pursuit }) {
 
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_290px] lg:items-start">
-      <form action={savePursuit} className="panel space-y-6 p-5 sm:p-7">
+      <form action={savePursuit} className="panel-solid space-y-6 p-5 sm:p-7">
         <input type="hidden" name="id" value={pursuit.id} />
 
         <fieldset className="space-y-4">

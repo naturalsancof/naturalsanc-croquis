@@ -189,7 +189,7 @@ export default async function PursuitPage({ params }: PageProps) {
         </div>
 
         <aside className="space-y-4 lg:sticky lg:top-24">
-          <div className="panel p-5">
+          <div className="border-t border-[var(--line)] pt-4">
             <p className="label">At a glance</p>
             <dl className="mt-4">
               {facts.map((f) => (
@@ -211,7 +211,7 @@ export default async function PursuitPage({ params }: PageProps) {
             </dl>
           </div>
 
-          <div className="panel p-5">
+          <div className="border-t border-[var(--line)] pt-4">
             <p className="label">Colophon</p>
             <p className="mt-3 text-[11px] leading-relaxed text-mist">
               页面从 Supabase 实时读取。内容会随追求推进而变，不保证稳定。
