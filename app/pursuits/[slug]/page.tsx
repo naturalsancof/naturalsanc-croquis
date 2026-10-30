@@ -18,8 +18,11 @@ export async function generateStaticParams() {
   return slugs.map((slug) => ({ slug }));
 }
 
+type TabKey = "progress" | "works" | "notes" | "materials";
+
 type PageProps = {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ tab?: string }>;
 };
 
 export async function generateMetadata({
@@ -48,8 +51,9 @@ export async function generateMetadata({
   };
 }
 
-export default async function PursuitPage({ params }: PageProps) {
+export default async function PursuitPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
+  const { tab: rawTab } = await searchParams;
   const pursuit = await getPursuitDetail(slug);
 
   if (!pursuit) notFound();
@@ -59,14 +63,26 @@ export default async function PursuitPage({ params }: PageProps) {
   const works = pursuit.portfolio_items.length;
   const notes = pursuit.notes.length;
   const materials = pursuit.materials_and_links.length;
+  const milestones = pursuit.milestones.length;
+
+  const TABS: { key: TabKey; label: string; en: string; count: number | null }[] = [
+    { key: "progress", label: "进展", en: "PROGRESS", count: milestones || null },
+    { key: "works", label: "作品", en: "WORKS", count: works },
+    { key: "notes", label: "笔记", en: "NOTES", count: notes },
+    { key: "materials", label: "资料", en: "MATERIALS", count: materials },
+  ];
+
+  const tab: TabKey = TABS.some((t) => t.key === rawTab)
+    ? (rawTab as TabKey)
+    : "progress";
 
   const facts = [
-    { label: "阶段", en: "Stage", value: stage.zh, sub: stage.en.toUpperCase() },
-    { label: "开始", en: "Started", value: formatDate(pursuit.started_at), sub: "" },
-    { label: "作品", en: "Works", value: String(works), sub: "" },
-    { label: "笔记", en: "Notes", value: String(notes), sub: "" },
-    { label: "资料", en: "Links", value: String(materials), sub: "" },
-    { label: "更新", en: "Updated", value: formatDate(pursuit.updated_at), sub: "" },
+    { label: "阶段", en: "Stage", value: stage.zh },
+    { label: "开始", en: "Started", value: formatDate(pursuit.started_at) },
+    { label: "作品", en: "Works", value: String(works) },
+    { label: "笔记", en: "Notes", value: String(notes) },
+    { label: "资料", en: "Links", value: String(materials) },
+    { label: "更新", en: "Updated", value: formatDate(pursuit.updated_at) },
   ];
 
   return (
@@ -148,91 +164,162 @@ export default async function PursuitPage({ params }: PageProps) {
         </div>
       </header>
 
+      {/* ---------------- TABS ---------------- */}
+      <div className="sticky top-16 z-40 -mx-5 mt-10 bg-[color-mix(in_oklab,#f5f0f4_88%,transparent)] px-5 py-3 backdrop-blur-md sm:-mx-8 sm:px-8">
+        <nav className="flex gap-1 overflow-x-auto rounded-xl border border-[var(--line)] bg-white/70 px-2 py-1">
+          {TABS.map((t) => {
+            const active = t.key === tab;
+            return (
+              <Link
+                key={t.key}
+                href={`/pursuits/${pursuit.slug}?tab=${t.key}`}
+                scroll={false}
+                className={`relative flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 font-display text-[10px] tracking-[0.16em] uppercase transition ${
+                  active
+                    ? "bg-ink text-white"
+                    : "text-mist hover:bg-ink/5 hover:text-ink"
+                }`}
+              >
+                {t.label}
+                <span
+                  className={`hidden text-[9px] tracking-normal sm:inline ${
+                    active ? "text-white/50" : "text-mist/50"
+                  }`}
+                >
+                  {t.en}
+                </span>
+                {t.count !== null && t.count > 0 ? (
+                  <span
+                    className={`rounded-full px-1.5 py-0.5 text-[8px] ${
+                      active ? "bg-white/20 text-white" : "bg-ink/5 text-mist"
+                    }`}
+                  >
+                    {t.count}
+                  </span>
+                ) : null}
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
+
       {/* ---------------- BODY ---------------- */}
-      <div className="mt-16 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_250px] lg:items-start">
+      <div
+        className={`mt-10 ${
+          tab === "progress"
+            ? "grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_250px] lg:items-start"
+            : ""
+        }`}
+      >
         <div className="space-y-6">
-          <Section
-            index="01"
-            title="进展与进度"
-            en="PROGRESS"
-            aside={
-              pursuit.description ? (
-                <p className="max-w-2xl text-sm leading-[1.9] text-ink/65">
-                  {pursuit.description}
+          {tab === "progress" ? (
+            <Section
+              index="01"
+              title="进展与进度"
+              en="PROGRESS"
+              aside={
+                pursuit.description ? (
+                  <p className="max-w-2xl text-sm leading-[1.9] text-ink/65">
+                    {pursuit.description}
+                  </p>
+                ) : undefined
+              }
+            >
+              <ProgressPanel pursuit={pursuit} milestones={pursuit.milestones} />
+            </Section>
+          ) : null}
+
+          {tab === "works" ? (
+            <Section
+              index="02"
+              title="作品"
+              en="SELECTED WORKS"
+              aside={
+                <p className="text-xs text-mist">
+                  共 {works} 件，点开看大图。
                 </p>
-              ) : undefined
-            }
-          >
-            <ProgressPanel pursuit={pursuit} milestones={pursuit.milestones} />
-          </Section>
+              }
+            >
+              <PortfolioGrid items={pursuit.portfolio_items} />
+            </Section>
+          ) : null}
 
-          <Section index="02" title="作品" en="SELECTED WORKS">
-            <PortfolioGrid items={pursuit.portfolio_items} />
-          </Section>
+          {tab === "notes" ? (
+            <Section
+              index="03"
+              title="笔记"
+              en="FIELD NOTES"
+              aside={
+                <p className="text-xs text-mist">
+                  共 {notes} 篇，写在 Markdown 里，随页面一起更新。
+                </p>
+              }
+            >
+              <NoteList notes={pursuit.notes} />
+            </Section>
+          ) : null}
 
-          <Section
-            index="03"
-            title="笔记"
-            en="FIELD NOTES"
-            aside={
-              <p className="text-xs text-mist">
-                过程中的记录，写在 Markdown 里，随页面一起更新。
-              </p>
-            }
-          >
-            <NoteList notes={pursuit.notes} />
-          </Section>
-
-          <Section index="04" title="学习资料与链接" en="MATERIALS">
-            <LinkList links={pursuit.materials_and_links} />
-          </Section>
+          {tab === "materials" ? (
+            <Section
+              index="04"
+              title="学习资料与链接"
+              en="MATERIALS"
+              aside={
+                <p className="text-xs text-mist">共 {materials} 条。</p>
+              }
+            >
+              <LinkList links={pursuit.materials_and_links} />
+            </Section>
+          ) : null}
         </div>
 
-        <aside className="space-y-4 lg:sticky lg:top-24">
-          <div className="border-t border-[var(--line)] pt-4">
-            <p className="label">At a glance</p>
-            <dl className="mt-4">
-              {facts.map((f) => (
-                <div
-                  key={f.en}
-                  className="flex items-baseline justify-between gap-3 border-b border-[var(--line)] py-2 last:border-0"
-                >
-                  <dt className="text-[11px] text-mist">
-                    {f.label}
-                    <span className="ml-1.5 font-display text-[8px] tracking-[0.16em] text-mist/60">
-                      {f.en.toUpperCase()}
-                    </span>
-                  </dt>
-                  <dd className="font-display text-[11px] tracking-[0.04em] text-ink">
-                    {f.value}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
+        {tab === "progress" ? (
+          <aside className="space-y-4 lg:sticky lg:top-32">
+            <div className="border-t border-[var(--line)] pt-4">
+              <p className="label">At a glance</p>
+              <dl className="mt-4">
+                {facts.map((f) => (
+                  <div
+                    key={f.en}
+                    className="flex items-baseline justify-between gap-3 border-b border-[var(--line)] py-2 last:border-0"
+                  >
+                    <dt className="text-[11px] text-mist">
+                      {f.label}
+                      <span className="ml-1.5 font-display text-[8px] tracking-[0.16em] text-mist/60">
+                        {f.en.toUpperCase()}
+                      </span>
+                    </dt>
+                    <dd className="font-display text-[11px] tracking-[0.04em] text-ink">
+                      {f.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
 
-          <div className="border-t border-[var(--line)] pt-4">
-            <p className="label">Colophon</p>
-            <p className="mt-3 text-[11px] leading-relaxed text-mist">
-              页面从 Supabase 实时读取。内容会随追求推进而变，不保证稳定。
-            </p>
-            <p className="sub-ja mt-2 text-[10px]">
-              このページは進行に合わせて更新されます。
-            </p>
-          </div>
+            <div className="border-t border-[var(--line)] pt-4">
+              <p className="label">Colophon</p>
+              <p className="mt-3 text-[11px] leading-relaxed text-mist">
+                页面从 Supabase 实时读取。内容会随追求推进而变，不保证稳定。
+              </p>
+              <p className="sub-ja mt-2 text-[10px]">
+                このページは進行に合わせて更新されます。
+              </p>
+            </div>
 
-          <Link
-            href="/pursuits"
-            className="group flex items-center justify-between border border-[var(--line)] px-4 py-3 transition hover:border-ink/40"
-          >
-            <span className="font-display text-[9px] tracking-[0.22em] text-mist transition group-hover:text-ink">
-              ALL PURSUITS
-            </span>
-            <span className="text-mist transition group-hover:-translate-x-1 group-hover:text-ink">
-              ←
-            </span>
-          </Link>
-        </aside>
+            <Link
+              href="/pursuits"
+              className="group flex items-center justify-between border border-[var(--line)] px-4 py-3 transition hover:border-ink/40"
+            >
+              <span className="font-display text-[9px] tracking-[0.22em] text-mist transition group-hover:text-ink">
+                ALL PURSUITS
+              </span>
+              <span className="text-mist transition group-hover:-translate-x-1 group-hover:text-ink">
+                ←
+              </span>
+            </Link>
+          </aside>
+        ) : null}
       </div>
     </article>
   );
