@@ -116,7 +116,7 @@ export function SavedBanner({ show }: { show: boolean }) {
   if (!show) return null;
   return (
     <div className="mb-4 flex items-center gap-2 rounded-lg border border-lime/30 bg-lime/10 px-3 py-2 text-[12px] text-lime/90">
-      <span className="h-1.5 w-1.5 rounded-full bg-lime shadow-[0_0_8px_#a3e635]" />
+      <span className="h-1.5 w-1.5 rounded-full bg-lime shadow-[0_0_8px_#93a477]" />
       已保存
     </div>
   );

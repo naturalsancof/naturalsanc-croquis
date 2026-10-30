@@ -151,7 +151,7 @@ export default async function PursuitPage({ params }: PageProps) {
               <div
                 className="absolute inset-0"
                 style={{
-                  background: `linear-gradient(90deg, #070a10 0%, rgba(7,10,16,0.45) 45%, rgba(7,10,16,0.15) 100%), linear-gradient(0deg, rgba(7,10,16,0.9), transparent 45%)`,
+                  background: `linear-gradient(90deg, #0a0b0d 0%, rgba(7,10,16,0.45) 45%, rgba(7,10,16,0.15) 100%), linear-gradient(0deg, rgba(7,10,16,0.9), transparent 45%)`,
                 }}
               />
             </div>

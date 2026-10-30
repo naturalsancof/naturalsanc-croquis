@@ -163,7 +163,7 @@ export default async function EditPursuitPage({
                 </span>
               ) : null}
               {active ? (
-                <span className="absolute inset-x-3 -bottom-px h-px bg-cyan shadow-[0_0_10px_#22d3ee]" />
+                <span className="absolute inset-x-3 -bottom-px h-px bg-cyan shadow-[0_0_10px_#6e9ba2]" />
               ) : null}
             </Link>
           );

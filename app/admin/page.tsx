@@ -52,7 +52,7 @@ export default async function AdminHome() {
               <span
                 className={`h-1.5 w-1.5 shrink-0 rounded-full ${
                   p.is_published
-                    ? "bg-lime shadow-[0_0_8px_#a3e635]"
+                    ? "bg-lime shadow-[0_0_8px_#93a477]"
                     : "bg-mist/30"
                 }`}
                 title={p.is_published ? "已发布" : "草稿"}

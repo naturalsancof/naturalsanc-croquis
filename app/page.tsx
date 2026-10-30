@@ -38,7 +38,7 @@ export default async function HomePage() {
             <p className="sub-ja">未完成のものを記録するスタジオ。</p>
             <div className="mt-5 flex flex-wrap gap-2">
               <span className="chip">
-                <span className="h-1 w-1 rounded-full bg-cyan shadow-[0_0_8px_#22d3ee]" />
+                <span className="h-1 w-1 rounded-full bg-cyan shadow-[0_0_8px_#6e9ba2]" />
                 {pursuits.length} 个追求
               </span>
               <span className="chip">中文 / EN / 日本語</span>
@@ -83,7 +83,7 @@ export default async function HomePage() {
             </p>
           </div>
         ) : (
-          <div className="stagger grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          <div className="stagger grid grid-cols-3 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
             {pursuits.map((p, i) => (
               <Reveal key={p.id} delay={(i % 3) * 90}>
                 <PursuitCard pursuit={p} index={i} />

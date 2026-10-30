@@ -220,7 +220,7 @@ export function PursuitForm({ pursuit }: { pursuit: Pursuit }) {
               type="checkbox"
               name="is_published"
               defaultChecked={pursuit.is_published}
-              className="h-4 w-4 accent-[#22d3ee]"
+              className="h-4 w-4 accent-[#6e9ba2]"
             />
             已发布（不勾就是草稿）
           </label>

@@ -32,7 +32,7 @@ export function ProgressPanel({
               className="absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border transition"
               style={{
                 left: `${((i + 0.5) / STAGES.length) * 100}%`,
-                background: i <= idx ? "var(--accent)" : "#05060a",
+                background: i <= idx ? "var(--accent)" : "#070708",
                 borderColor: i <= idx ? "var(--accent)" : "rgba(255,255,255,0.16)",
                 boxShadow: i <= idx ? "0 0 12px var(--accent)" : "none",
               }}

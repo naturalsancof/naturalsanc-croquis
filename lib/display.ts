@@ -1,11 +1,11 @@
 import type { Accent, Stage } from "./types";
 
 export const ACCENT_HEX: Record<Accent, string> = {
-  cyan: "#22d3ee",
-  magenta: "#ff4d9d",
-  violet: "#a78bfa",
-  lime: "#a3e635",
-  amber: "#fbbf24",
+  cyan: "#6e9ba2",
+  magenta: "#bc90a4",
+  violet: "#bcb5d0",
+  lime: "#93a477",
+  amber: "#aa9b75",
 };
 
 export const STAGES: { key: Stage; zh: string; en: string; ja: string }[] = [

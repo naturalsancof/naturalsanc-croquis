@@ -11,22 +11,22 @@
   --font-body: ui-sans-serif, -apple-system, "Segoe UI", "PingFang SC",
     "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
 
-  --color-ink: #05060a;
-  --color-ink-2: #080b11;
+  --color-ink: #070708;
+  --color-ink-2: #0b0c0e;
   --color-mist: #8b95a7;
   --color-paper: #e8eef7;
 
-  --color-cyan: #22d3ee;
-  --color-magenta: #ff4d9d;
-  --color-violet: #a78bfa;
-  --color-lime: #a3e635;
-  --color-amber: #fbbf24;
+  --color-cyan: #6e9ba2;
+  --color-magenta: #bc90a4;
+  --color-violet: #bcb5d0;
+  --color-lime: #93a477;
+  --color-amber: #aa9b75;
 }
 
 :root {
   color-scheme: dark;
-  --accent: #22d3ee;
-  --accent-2: #a78bfa;
+  --accent: #6e9ba2;
+  --accent-2: #bcb5d0;
   --line: rgb(255 255 255 / 0.07);
   --line-strong: rgb(255 255 255 / 0.12);
 }
@@ -66,7 +66,7 @@ body {
       color-mix(in oklab, var(--accent-2) 10%, transparent),
       transparent 65%
     ),
-    linear-gradient(to bottom, #05060a, #05060a);
+    linear-gradient(to bottom, #070708, #070708);
 }
 
 .page-grid::before {
@@ -125,7 +125,7 @@ body {
   border-radius: 20px;
   background:
     linear-gradient(180deg, rgb(255 255 255 / 0.035), rgb(255 255 255 / 0.008)),
-    #070a10;
+    #0a0b0d;
   box-shadow:
     0 1px 0 rgb(255 255 255 / 0.04) inset,
     0 30px 80px -50px rgb(0 0 0 / 0.9);
@@ -362,7 +362,7 @@ body {
 }
 
 .prose-cyber pre {
-  background: #04060a;
+  background: #060708;
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 0.9rem 1rem;
@@ -415,11 +415,11 @@ body {
 }
 .hljs-number,
 .hljs-built_in {
-  color: #fbbf24;
+  color: #aa9b75;
 }
 .hljs-title,
 .hljs-function .hljs-title {
-  color: #22d3ee;
+  color: #6e9ba2;
 }
 .hljs-variable,
 .hljs-template-variable {
@@ -458,22 +458,35 @@ body {
 }
 
 /* ---------- 错位卡片网格 ---------- */
-/* 桌面三列：第 2 列下沉、第 3 列再低一档；平板两列：第 2 列半档 */
-@media (min-width: 640px) and (max-width: 1023.98px) {
-  .stagger > *:nth-child(2n) {
-    margin-top: 2.5rem;
+/* 三列（手机 / 平板）：第 1 列最低、第 2 列最高、第 3 列次高 */
+@media (max-width: 1023.98px) {
+  .stagger > *:nth-child(3n + 1) {
+    margin-top: 2.75rem;
+  }
+  .stagger > *:nth-child(3n + 2) {
+    margin-top: 0;
+  }
+  .stagger > *:nth-child(3n + 3) {
+    margin-top: 1.25rem;
   }
 }
 
+/* 四列（桌面）：第 2 列最高，第 3 列次高，第 4 列居中，第 1 列最低 */
 @media (min-width: 1024px) {
-  .stagger > *:nth-child(3n + 2) {
-    margin-top: 3rem;
-  }
-  .stagger > *:nth-child(3n) {
+  .stagger > *:nth-child(4n + 1) {
     margin-top: 6rem;
   }
+  .stagger > *:nth-child(4n + 2) {
+    margin-top: 0;
+  }
+  .stagger > *:nth-child(4n + 3) {
+    margin-top: 2.5rem;
+  }
+  .stagger > *:nth-child(4n + 4) {
+    margin-top: 4rem;
+  }
   .stagger {
-    padding-bottom: 6rem;
+    padding-bottom: 6.5rem;
   }
 }
 
@@ -483,12 +496,12 @@ body {
   height: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: #05060a;
+  background: #070708;
 }
 ::-webkit-scrollbar-thumb {
   background: #1a2130;
   border-radius: 999px;
-  border: 2px solid #05060a;
+  border: 2px solid #070708;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #24304a;

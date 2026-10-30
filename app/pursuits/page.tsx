@@ -28,7 +28,7 @@ export default async function PursuitsPage() {
         </p>
       </header>
 
-      <div className="stagger mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      <div className="stagger mt-10 grid grid-cols-3 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
         {pursuits.map((p, i) => (
           <Reveal key={p.id} delay={(i % 3) * 90}>
             <PursuitCard pursuit={p} index={i} />

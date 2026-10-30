@@ -133,7 +133,7 @@ export function Sortable({
             title="拖拽排序（手指也可以按住拖）"
             aria-label="拖拽排序"
             style={{ touchAction: "none" }}
-            className={`absolute -left-1.5 top-2 z-10 flex h-9 w-6 cursor-grab items-center justify-center rounded-md border border-white/10 bg-[#070a10]/90 text-mist/40 backdrop-blur transition hover:border-cyan/40 hover:text-cyan active:cursor-grabbing ${
+            className={`absolute -left-1.5 top-2 z-10 flex h-9 w-6 cursor-grab items-center justify-center rounded-md border border-white/10 bg-[#0a0b0d]/90 text-mist/40 backdrop-blur transition hover:border-cyan/40 hover:text-cyan active:cursor-grabbing ${
               dragging === item.id ? "border-cyan/60 text-cyan" : ""
             }`}
           >

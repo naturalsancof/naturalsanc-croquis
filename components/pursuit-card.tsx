@@ -25,32 +25,40 @@ export function PursuitCard({
             src={pursuit.cover_url}
             alt={pursuit.title}
             fill
-            sizes="(max-width: 768px) 100vw, 380px"
+            sizes="(max-width: 640px) 33vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover opacity-75 transition duration-700 group-hover:scale-[1.04] group-hover:opacity-95"
           />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#070a10] via-[#070a10]/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0b0d] via-[#0a0b0d]/20 to-transparent" />
 
-        <span className="chip chip-accent absolute left-4 top-4">
-          <span
-            className="h-1 w-1 rounded-full"
-            style={{ background: accent, boxShadow: `0 0 8px ${accent}` }}
-          />
-          {stage.en}
+        {/* 手机上卡片只有一百来像素宽，标签换成一个小圆点 */}
+        <span
+          className="absolute left-1.5 top-1.5 h-1.5 w-1.5 rounded-full sm:hidden"
+          style={{ background: accent, boxShadow: `0 0 8px ${accent}` }}
+        />
+        <span className="absolute left-3 top-3 hidden sm:block">
+          <span className="chip chip-accent">
+            <span
+              className="h-1 w-1 rounded-full"
+              style={{ background: accent, boxShadow: `0 0 8px ${accent}` }}
+            />
+            {stage.en}
+          </span>
         </span>
 
-        <span className="absolute bottom-4 right-4 font-display text-[10px] tracking-[0.3em] text-white/40">
+        <span className="absolute bottom-2 right-2 font-display text-[9px] tracking-[0.24em] text-white/40">
           {String(index + 1).padStart(2, "0")}
         </span>
       </div>
 
-      <div className="p-5 sm:p-6">
-        <h3 className="text-xl text-paper transition group-hover:text-white">
+      <div className="p-2.5 sm:p-4 lg:p-5">
+        <h3 className="text-[12px] leading-snug text-paper transition group-hover:text-white sm:text-base lg:text-lg">
           {pursuit.title}
         </h3>
-        <p className="mt-1.5 flex flex-wrap items-baseline gap-x-2">
+
+        <p className="mt-1 hidden flex-wrap items-baseline gap-x-2 sm:flex">
           {pursuit.title_en ? (
             <span className="sub uppercase">{pursuit.title_en}</span>
           ) : null}
@@ -60,31 +68,26 @@ export function PursuitCard({
         </p>
 
         {pursuit.subtitle ? (
-          <p className="mt-4 line-clamp-2 text-sm leading-relaxed text-mist/90">
+          <p className="mt-2.5 hidden line-clamp-2 text-sm leading-relaxed text-mist/90 sm:block">
             {pursuit.subtitle}
           </p>
         ) : null}
 
-        <div className="mt-6 flex items-center gap-2">
+        <div className="mt-2.5 flex items-center gap-1 sm:mt-5 sm:gap-2">
           {STAGES.map((s, i) => (
             <span
               key={s.key}
               className={`h-[3px] flex-1 rounded-full ${
-                i <= stageIndex(pursuit.stage)
-                  ? ""
-                  : "bg-white/[0.07]"
+                i <= stageIndex(pursuit.stage) ? "" : "bg-white/[0.07]"
               }`}
               style={
                 i <= stageIndex(pursuit.stage)
-                  ? {
-                      background: accent,
-                      boxShadow: `0 0 10px ${accent}66`,
-                    }
+                  ? { background: accent, boxShadow: `0 0 10px ${accent}66` }
                   : undefined
               }
             />
           ))}
-          <span className="ml-2 font-display text-[9px] tracking-[0.2em] text-mist/50">
+          <span className="ml-1 hidden font-display text-[9px] tracking-[0.2em] text-mist/50 sm:ml-2 sm:inline">
             {stage.zh}
           </span>
         </div>

@@ -48,7 +48,7 @@ export function MilestonesEditor({
           name="done"
           defaultChecked={m.done}
           title="已完成"
-          className="h-5 w-5 shrink-0 cursor-pointer accent-[#22d3ee]"
+          className="h-5 w-5 shrink-0 cursor-pointer accent-[#6e9ba2]"
         />
         <div className="grid min-w-[180px] flex-1 gap-0.5">
           <input
@@ -379,9 +379,9 @@ export function WorksEditor({
         <input type="hidden" name="pursuit_id" value={pursuitId} />
               <input type="hidden" name="return_tab" value="works" />
         <p className="text-[12px] text-mist/60">
-          新增作品：<span className="text-paper/80">上传文件</span>，或者直接
-          <span className="text-paper/80">粘贴一个链接</span>
-          （图片 / 音频地址都行）。
+          新增作品：可以只<span className="text-paper/80">上传文件</span>、只
+          <span className="text-paper/80">粘贴链接</span>，或者两个都填
+          （都填时以文件为准）。
         </p>
 
         <div className="mt-3 grid gap-3 sm:grid-cols-[110px_1fr_auto] sm:items-end">
@@ -408,7 +408,7 @@ export function WorksEditor({
               className={fileCls}
             />
           </Field>
-          <Field label="或者填链接" hint="URL · 和文件二选一">
+          <Field label="作品链接" hint="URL · 可以和文件一起填">
             <Input
               name="media_url"
               placeholder="https://… 或 /demo/x.jpg"
@@ -518,7 +518,7 @@ export function NotesEditor({
                     type="checkbox"
                     name="is_pinned"
                     defaultChecked={n.is_pinned}
-                    className="h-4 w-4 accent-[#22d3ee]"
+                    className="h-4 w-4 accent-[#6e9ba2]"
                   />
                   置顶
                 </label>
@@ -527,7 +527,7 @@ export function NotesEditor({
                     type="checkbox"
                     name="is_published"
                     defaultChecked={n.is_published}
-                    className="h-4 w-4 accent-[#22d3ee]"
+                    className="h-4 w-4 accent-[#6e9ba2]"
                   />
                   公开
                 </label>
