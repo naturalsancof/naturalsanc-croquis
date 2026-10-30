@@ -84,6 +84,46 @@ async function upload(
   return data.publicUrl as string;
 }
 
+/* --------------------------------- reorder -------------------------------- */
+
+const REORDERABLE = [
+  "milestones",
+  "portfolio_items",
+  "notes",
+  "materials_and_links",
+] as const;
+
+export async function reorderRows(table: string, ids: string[]) {
+  if (!REORDERABLE.includes(table as (typeof REORDERABLE)[number])) {
+    throw new Error("不支持排序的表");
+  }
+  const supabase = await guard();
+  if (ids.length === 0) return { ok: true };
+
+  await Promise.all(
+    ids.map((id, i) =>
+      supabase
+        .from(table)
+        .update({ sort_order: i + 1 })
+        .eq("id", id),
+    ),
+  );
+
+  const { data } = await supabase
+    .from(table)
+    .select("pursuit_id")
+    .eq("id", ids[0])
+    .maybeSingle();
+
+  if (data?.pursuit_id) {
+    const slug = await slugOf(supabase, data.pursuit_id);
+    refreshPublic(slug);
+    revalidatePath(`/admin/pursuits/${data.pursuit_id}`);
+  }
+
+  return { ok: true };
+}
+
 /* ---------------------------------- auth ---------------------------------- */
 
 export async function signIn(fd: FormData) {
