@@ -31,7 +31,7 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
   const mode = useRef<Mode>("idle");
   const raf = useRef<number | null>(null);
   const last = useRef(0);
-  const drag = useRef({ active: false, x: 0, start: 0, moved: 0, t: 0 });
+  const drag = useRef({ active: false, x: 0, x0: 0, start: 0, moved: 0, t: 0 });
   const samples = useRef<{ t: number; x: number }[]>([]);
 
   const [size, setSize] = useState({ w: 300, h: 450 });
@@ -149,6 +149,7 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
     const d = drag.current;
     d.active = true;
     d.x = e.clientX;
+    d.x0 = e.clientX;
     d.start = offset.current;
     d.moved = 0;
     d.t = performance.now();
@@ -161,7 +162,7 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
   const onPointerMove = (e: React.PointerEvent) => {
     const d = drag.current;
     if (!d.active) return;
-    const dx = e.clientX - d.x;
+    const dx = e.clientX - d.x0;
     d.moved = Math.max(d.moved, Math.abs(dx));
     offset.current = d.start - dx / step;
     paint();
@@ -269,7 +270,7 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
         className={`relative my-auto h-[60vh] min-h-[340px] w-full cursor-grab select-none overflow-hidden active:cursor-grabbing ${
           selected ? "pointer-events-none opacity-40 blur-[2px] grayscale" : ""
         } transition-[opacity,filter] duration-500`}
-        style={{ touchAction: "pan-y", overscrollBehaviorX: "contain" }}
+        style={{ touchAction: "none", overscrollBehaviorX: "contain" }}
       >
         {pursuits.map((p, i) => {
           const accent = ACCENT_HEX[p.accent];
