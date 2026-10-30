@@ -42,6 +42,7 @@ export function MilestonesEditor({
       >
         <input type="hidden" name="id" value={m.id} />
         <input type="hidden" name="pursuit_id" value={pursuitId} />
+              <input type="hidden" name="return_tab" value="milestones" />
         <input
           type="checkbox"
           name="done"
@@ -115,6 +116,7 @@ export function MilestonesEditor({
         className="mt-4 grid gap-3 rounded-xl border border-dashed border-white/12 bg-white/[0.01] p-4 sm:grid-cols-[2fr_1fr_1fr_auto] sm:items-end"
       >
         <input type="hidden" name="pursuit_id" value={pursuitId} />
+              <input type="hidden" name="return_tab" value="milestones" />
         <Field label="新增里程碑" hint="中文">
           <Input name="title" placeholder="例如：整理首组 12 张作品" />
         </Field>
@@ -148,6 +150,7 @@ function WorkEditForm({
     >
       <input type="hidden" name="id" value={item.id} />
       <input type="hidden" name="pursuit_id" value={pursuitId} />
+              <input type="hidden" name="return_tab" value="works" />
 
       <div className="flex flex-wrap items-start gap-4">
         <div className="relative h-24 w-32 shrink-0 overflow-hidden rounded-lg border border-white/10 bg-black/40">
@@ -321,6 +324,7 @@ export function WorksEditor({
             <form action={saveWork} className="contents">
               <input type="hidden" name="id" value={item.id} />
               <input type="hidden" name="pursuit_id" value={pursuitId} />
+              <input type="hidden" name="return_tab" value="works" />
               <button
                 type="submit"
                 name="intent"
@@ -370,29 +374,47 @@ export function WorksEditor({
 
       <form
         action={saveWork}
-        className="mt-5 grid gap-3 rounded-xl border border-dashed border-white/12 bg-white/[0.01] p-4 sm:grid-cols-[110px_1fr_1fr_auto] sm:items-end"
+        className="mt-5 rounded-xl border border-dashed border-white/12 bg-white/[0.01] p-4"
       >
         <input type="hidden" name="pursuit_id" value={pursuitId} />
-        <Field label="新增作品" hint="TYPE">
-          <Select name="kind" defaultValue="image">
-            <option value="image">图片</option>
-            <option value="audio">音频</option>
-          </Select>
-        </Field>
-        <Field label="标题" hint="中文，可后补">
-          <Input name="title" placeholder="作品名" />
-        </Field>
-        <Field label="上传文件" hint="必填">
-          <input
-            type="file"
-            name="file"
-            accept="image/*,audio/*"
-            className={fileCls}
-          />
-        </Field>
-        <Btn type="submit" name="intent" value="save">
-          添加
-        </Btn>
+              <input type="hidden" name="return_tab" value="works" />
+        <p className="text-[12px] text-mist/60">
+          新增作品：<span className="text-paper/80">上传文件</span>，或者直接
+          <span className="text-paper/80">粘贴一个链接</span>
+          （图片 / 音频地址都行）。
+        </p>
+
+        <div className="mt-3 grid gap-3 sm:grid-cols-[110px_1fr_auto] sm:items-end">
+          <Field label="类型" hint="TYPE">
+            <Select name="kind" defaultValue="image">
+              <option value="image">图片</option>
+              <option value="audio">音频</option>
+            </Select>
+          </Field>
+          <Field label="标题" hint="中文，可后补">
+            <Input name="title" placeholder="作品名" />
+          </Field>
+          <Btn type="submit" name="intent" value="save">
+            添加
+          </Btn>
+        </div>
+
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <Field label="上传文件" hint="图片或音频">
+            <input
+              type="file"
+              name="file"
+              accept="image/*,audio/*"
+              className={fileCls}
+            />
+          </Field>
+          <Field label="或者填链接" hint="URL · 和文件二选一">
+            <Input
+              name="media_url"
+              placeholder="https://… 或 /demo/x.jpg"
+            />
+          </Field>
+        </div>
       </form>
     </div>
   );
@@ -443,6 +465,7 @@ export function NotesEditor({
             >
               <input type="hidden" name="id" value={n.id} />
               <input type="hidden" name="pursuit_id" value={pursuitId} />
+              <input type="hidden" name="return_tab" value="notes" />
 
               <div className="grid gap-3 sm:grid-cols-[2fr_1fr_1fr_auto] sm:items-end">
                 <Field label="标题" hint="中文">
@@ -519,6 +542,7 @@ export function NotesEditor({
         className="mt-4 grid gap-3 rounded-xl border border-dashed border-white/12 bg-white/[0.01] p-4 sm:grid-cols-[2fr_1fr_auto] sm:items-end"
       >
         <input type="hidden" name="pursuit_id" value={pursuitId} />
+              <input type="hidden" name="return_tab" value="notes" />
         <Field label="新增笔记" hint="标题">
           <Input name="title" placeholder="写点什么" />
         </Field>
@@ -560,6 +584,7 @@ export function MaterialsEditor({
       >
         <input type="hidden" name="id" value={l.id} />
         <input type="hidden" name="pursuit_id" value={pursuitId} />
+              <input type="hidden" name="return_tab" value="links" />
         <span
           className="grid h-7 w-7 place-items-center rounded-md border border-white/10 bg-black/40 font-display text-[10px] text-cyan/70"
           title={hostOf(l.url)}
@@ -638,6 +663,7 @@ export function MaterialsEditor({
         className="mt-4 grid gap-3 rounded-xl border border-dashed border-white/12 bg-white/[0.01] p-4 sm:grid-cols-[1.2fr_1.6fr_110px_auto] sm:items-end"
       >
         <input type="hidden" name="pursuit_id" value={pursuitId} />
+              <input type="hidden" name="return_tab" value="links" />
         <Field label="新增链接" hint="标题">
           <Input name="title" placeholder="例如：Refactoring UI" />
         </Field>

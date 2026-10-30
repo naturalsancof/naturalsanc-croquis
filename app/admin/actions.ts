@@ -39,6 +39,11 @@ async function guard() {
   return supabase;
 }
 
+function backTo(pursuitId: string, fd: FormData) {
+  const tab = str(fd, "return_tab");
+  return `/admin/pursuits/${pursuitId}?${tab ? `tab=${tab}&` : ""}saved=1`;
+}
+
 function refreshPublic(slug?: string | null) {
   revalidatePath("/");
   revalidatePath("/pursuits");
@@ -238,7 +243,7 @@ export async function savePursuit(fd: FormData) {
     return;
   }
 
-  redirect(`/admin/pursuits/${id}?saved=1`);
+  redirect(backTo(id, fd));
 }
 
 export async function deletePursuit(fd: FormData) {
@@ -294,7 +299,7 @@ export async function saveMilestone(fd: FormData) {
   }
 
   refreshPublic(await slugOf(supabase, pursuitId));
-  redirect(`/admin/pursuits/${pursuitId}?saved=1`);
+  redirect(backTo(pursuitId, fd));
 }
 
 /* -------------------------------- portfolio ------------------------------- */
@@ -356,7 +361,7 @@ export async function saveWork(fd: FormData) {
     return;
   }
 
-  redirect(`/admin/pursuits/${pursuitId}?saved=1`);
+  redirect(backTo(pursuitId, fd));
 }
 
 /* ---------------------------------- notes --------------------------------- */
@@ -391,7 +396,7 @@ export async function saveNote(fd: FormData) {
   }
 
   refreshPublic(await slugOf(supabase, pursuitId));
-  redirect(`/admin/pursuits/${pursuitId}?saved=1`);
+  redirect(backTo(pursuitId, fd));
 }
 
 /* -------------------------------- materials ------------------------------- */
@@ -437,5 +442,5 @@ export async function saveMaterial(fd: FormData) {
   }
 
   refreshPublic(await slugOf(supabase, pursuitId));
-  redirect(`/admin/pursuits/${pursuitId}?saved=1`);
+  redirect(backTo(pursuitId, fd));
 }

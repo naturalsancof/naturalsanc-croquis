@@ -457,6 +457,26 @@ body {
   cursor: pointer;
 }
 
+/* ---------- 错位卡片网格 ---------- */
+/* 桌面三列：第 2 列下沉、第 3 列再低一档；平板两列：第 2 列半档 */
+@media (min-width: 640px) and (max-width: 1023.98px) {
+  .stagger > *:nth-child(2n) {
+    margin-top: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .stagger > *:nth-child(3n + 2) {
+    margin-top: 3rem;
+  }
+  .stagger > *:nth-child(3n) {
+    margin-top: 6rem;
+  }
+  .stagger {
+    padding-bottom: 6rem;
+  }
+}
+
 /* ---------- 滚动条 ---------- */
 ::-webkit-scrollbar {
   width: 10px;

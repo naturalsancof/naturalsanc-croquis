@@ -17,7 +17,7 @@ export function PursuitCard({
     <Link
       href={`/pursuits/${pursuit.slug}`}
       style={{ ["--accent" as string]: accent }}
-      className="group panel block transition duration-500 hover:-translate-y-1 hover:border-white/15"
+      className="group panel block transition-all duration-500 ease-out hover:-translate-y-2 hover:border-white/20 hover:shadow-[0_28px_70px_-32px_var(--accent)]"
     >
       <div className="relative aspect-[4/3] overflow-hidden">
         {pursuit.cover_url ? (

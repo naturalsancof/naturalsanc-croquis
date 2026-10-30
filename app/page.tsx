@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PursuitCard } from "@/components/pursuit-card";
+import { Reveal } from "@/components/reveal";
 import { getPursuits } from "@/lib/queries";
 
 export const revalidate = 30;
@@ -82,9 +83,11 @@ export default async function HomePage() {
             </p>
           </div>
         ) : (
-          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          <div className="stagger grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {pursuits.map((p, i) => (
-              <PursuitCard key={p.id} pursuit={p} index={i} />
+              <Reveal key={p.id} delay={(i % 3) * 90}>
+                <PursuitCard pursuit={p} index={i} />
+              </Reveal>
             ))}
           </div>
         )}
