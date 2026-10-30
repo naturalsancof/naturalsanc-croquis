@@ -165,8 +165,8 @@ export default async function PursuitPage({ params, searchParams }: PageProps) {
       </header>
 
       {/* ---------------- TABS ---------------- */}
-      <div className="sticky top-16 z-40 -mx-5 mt-10 bg-[color-mix(in_oklab,#f5f0f4_88%,transparent)] px-5 py-3 backdrop-blur-md sm:-mx-8 sm:px-8">
-        <nav className="flex gap-1 overflow-x-auto rounded-xl border border-[var(--line)] bg-white/70 px-2 py-1">
+      <div className="sticky top-16 z-40 mt-10">
+        <nav className="mx-auto grid w-fit grid-cols-4 gap-1 rounded-full border border-[var(--line)] bg-white/75 p-1 backdrop-blur-xl">
           {TABS.map((t) => {
             const active = t.key === tab;
             return (
@@ -174,7 +174,7 @@ export default async function PursuitPage({ params, searchParams }: PageProps) {
                 key={t.key}
                 href={`/pursuits/${pursuit.slug}?tab=${t.key}`}
                 scroll={false}
-                className={`relative flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 font-display text-[10px] tracking-[0.16em] uppercase transition ${
+                className={`flex w-[76px] items-center justify-center gap-1.5 rounded-full px-1 py-2 font-display text-[10px] tracking-[0.14em] uppercase transition sm:w-[126px] sm:gap-2 sm:px-2 ${
                   active
                     ? "bg-ink text-white"
                     : "text-mist hover:bg-ink/5 hover:text-ink"
@@ -190,7 +190,7 @@ export default async function PursuitPage({ params, searchParams }: PageProps) {
                 </span>
                 {t.count !== null && t.count > 0 ? (
                   <span
-                    className={`rounded-full px-1.5 py-0.5 text-[8px] ${
+                    className={`hidden rounded-full px-1.5 py-0.5 text-[8px] sm:inline ${
                       active ? "bg-white/20 text-white" : "bg-ink/5 text-mist"
                     }`}
                   >
