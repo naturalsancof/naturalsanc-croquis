@@ -32,7 +32,7 @@ export default async function AdminHome() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="kicker">Studio — Index</p>
-          <h1 className="mt-3 font-display text-3xl tracking-tight text-paper">
+          <h1 className="mt-3 font-display text-3xl tracking-tight text-ink">
             你的追求
           </h1>
           <p className="sub-ja mt-2">
@@ -47,7 +47,7 @@ export default async function AdminHome() {
           return (
             <div
               key={p.id}
-              className="group flex flex-wrap items-center gap-4 rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3 transition hover:border-white/20"
+              className="group flex flex-wrap items-center gap-4 rounded-xl border border-[var(--line)] bg-white/50 px-4 py-3 transition hover:border-white/20"
             >
               <span
                 className={`h-1.5 w-1.5 shrink-0 rounded-full ${
@@ -58,7 +58,7 @@ export default async function AdminHome() {
                 title={p.is_published ? "已发布" : "草稿"}
               />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-[15px] text-paper">{p.title}</p>
+                <p className="truncate text-[15px] text-ink">{p.title}</p>
                 <p className="font-display text-[10px] tracking-[0.14em] text-mist/40">
                   /{p.slug}
                   {p.title_en ? ` · ${p.title_en}` : ""}
@@ -70,14 +70,14 @@ export default async function AdminHome() {
               <Link
                 href={`/pursuits/${p.slug}`}
                 target="_blank"
-                className="font-display text-[10px] tracking-[0.14em] text-mist/40 transition hover:text-paper"
+                className="font-display text-[10px] tracking-[0.14em] text-mist/40 transition hover:text-ink"
               >
                 预览 ↗
               </Link>
 
               <Link
                 href={`/admin/pursuits/${p.id}`}
-                className="rounded-lg border border-white/10 px-3 py-1.5 font-display text-[10px] tracking-[0.16em] text-mist transition hover:border-cyan/50 hover:text-cyan"
+                className="rounded-lg border border-[var(--line)] px-3 py-1.5 font-display text-[10px] tracking-[0.16em] text-mist transition hover:border-cyan/50 hover:text-cyan"
               >
                 编辑
               </Link>
@@ -91,7 +91,7 @@ export default async function AdminHome() {
       </div>
 
       <section className="panel mt-8 p-5 sm:p-7">
-        <h2 className="text-[15px] text-paper">新建一个追求</h2>
+        <h2 className="text-[15px] text-ink">新建一个追求</h2>
         <p className="mt-1 text-[12px] text-mist/50">
           先只有名字也行，建完再慢慢补。默认是草稿，写完再勾「已发布」。
         </p>

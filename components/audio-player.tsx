@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { formatDuration } from "@/lib/display";
 import type { PortfolioItem } from "@/lib/types";
 
-const BARS = Array.from({ length: 32 }, (_, i) => {
+const BARS = Array.from({ length: 40 }, (_, i) => {
   const wave = Math.sin(i * 0.9) * 0.5 + Math.sin(i * 0.31) * 0.5;
-  return 0.28 + Math.abs(wave) * 0.72;
+  return 0.22 + Math.abs(wave) * 0.78;
 });
 
 export function AudioPlayer({ item }: { item: PortfolioItem }) {
@@ -64,7 +64,7 @@ export function AudioPlayer({ item }: { item: PortfolioItem }) {
   const progress = duration > 0 ? Math.min(current / duration, 1) : 0;
 
   return (
-    <div className="rounded-2xl border border-white/[0.07] bg-white/[0.02] p-4 sm:p-5">
+    <div className="border border-[var(--line)] bg-white/60 p-4 sm:p-5">
       <audio ref={audioRef} src={item.media_url} preload="metadata" />
 
       <div className="flex items-center gap-4">
@@ -72,46 +72,37 @@ export function AudioPlayer({ item }: { item: PortfolioItem }) {
           type="button"
           onClick={toggle}
           aria-label={playing ? "暂停" : "播放"}
-          className="grid h-11 w-11 shrink-0 place-items-center rounded-full border transition hover:scale-105"
-          style={{
-            borderColor: "color-mix(in oklab, var(--accent) 55%, transparent)",
-            background: "color-mix(in oklab, var(--accent) 12%, transparent)",
-            color: "var(--accent)",
-            boxShadow: playing
-              ? "0 0 22px color-mix(in oklab, var(--accent) 45%, transparent)"
-              : "none",
-          }}
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-ink text-white transition hover:scale-105"
         >
           {playing ? (
-            <svg width="12" height="14" viewBox="0 0 12 14" fill="currentColor">
+            <svg width="10" height="12" viewBox="0 0 12 14" fill="currentColor">
               <rect x="0" y="0" width="4" height="14" rx="1" />
               <rect x="8" y="0" width="4" height="14" rx="1" />
             </svg>
           ) : (
-            <svg width="12" height="14" viewBox="0 0 12 14" fill="currentColor">
+            <svg width="10" height="12" viewBox="0 0 12 14" fill="currentColor">
               <path d="M0 0.8v12.4c0 0.6 0.7 1 1.2 0.6l9.6-6.2c0.5-0.3 0.5-1 0-1.3L1.2 0.2C0.7-0.1 0 0.2 0 0.8Z" />
             </svg>
           )}
         </button>
 
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[15px] text-paper">
+          <p className="truncate text-[14px] text-ink">
             {item.title ?? "未命名音频"}
           </p>
           {item.title_en || item.title_ja ? (
-            <p className="sub mt-0.5 truncate text-[10px] uppercase">
+            <p className="sub mt-0.5 truncate text-[9px] uppercase">
               {[item.title_en, item.title_ja].filter(Boolean).join(" · ")}
             </p>
           ) : null}
         </div>
 
-        <span className="shrink-0 font-display text-[10px] tracking-[0.12em] text-mist/50">
+        <span className="shrink-0 font-display text-[9px] tracking-[0.12em] text-mist">
           {formatDuration(current)} / {formatDuration(duration)}
         </span>
       </div>
 
-      {/* 波形（装饰） */}
-      <div className="mt-4 flex h-8 items-end gap-[3px]" aria-hidden>
+      <div className="mt-4 flex h-6 items-end gap-[2px]" aria-hidden>
         {BARS.map((h, i) => {
           const lit = i / BARS.length <= progress;
           return (
@@ -120,10 +111,7 @@ export function AudioPlayer({ item }: { item: PortfolioItem }) {
               className="flex-1 rounded-sm transition-colors duration-300"
               style={{
                 height: `${Math.round(h * 100)}%`,
-                background: lit
-                  ? "color-mix(in oklab, var(--accent) 75%, transparent)"
-                  : "rgba(255,255,255,0.10)",
-                boxShadow: lit ? "0 0 6px color-mix(in oklab, var(--accent) 40%, transparent)" : "none",
+                background: lit ? "var(--accent)" : "rgb(20 20 25 / 0.12)",
               }}
             />
           );
@@ -140,12 +128,12 @@ export function AudioPlayer({ item }: { item: PortfolioItem }) {
         aria-label="播放进度"
         className="range-neon mt-3 w-full cursor-pointer"
         style={{
-          background: `linear-gradient(90deg, var(--accent) ${progress * 100}%, rgba(255,255,255,0.10) ${progress * 100}%)`,
+          background: `linear-gradient(90deg, #141419 ${progress * 100}%, rgb(20 20 25 / 0.12) ${progress * 100}%)`,
         }}
       />
 
       {item.description ? (
-        <p className="mt-3 text-[13px] leading-relaxed text-mist/70">
+        <p className="mt-3 text-[13px] leading-relaxed text-ink/60">
           {item.description}
         </p>
       ) : null}

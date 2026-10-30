@@ -7,7 +7,7 @@ export function AdminTopBar() {
       <div className="flex items-center gap-4">
         <Link
           href="/admin"
-          className="font-display text-[11px] tracking-[0.24em] text-paper transition hover:text-cyan"
+          className="font-display text-[11px] tracking-[0.24em] text-ink transition hover:text-cyan"
         >
           STUDIO
         </Link>
@@ -17,10 +17,10 @@ export function AdminTopBar() {
       </div>
 
       <div className="flex items-center gap-5 font-display text-[10px] tracking-[0.18em]">
-        <Link href="/admin/account" className="text-mist/60 transition hover:text-paper">
+        <Link href="/admin/account" className="text-mist/60 transition hover:text-ink">
           账号
         </Link>
-        <Link href="/" className="text-mist/60 transition hover:text-paper">
+        <Link href="/" className="text-mist/60 transition hover:text-ink">
           查看网站 ↗
         </Link>
         <form action={signOut}>

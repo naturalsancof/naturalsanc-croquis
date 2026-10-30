@@ -35,7 +35,7 @@ export default async function AccountPage({
 
       <div className="max-w-xl">
         <p className="kicker">Studio — Account</p>
-        <h1 className="mt-3 font-display text-2xl tracking-tight text-paper">
+        <h1 className="mt-3 font-display text-2xl tracking-tight text-ink">
           账号
         </h1>
         <p className="mt-2 font-display text-[11px] tracking-[0.12em] text-mist/50">
@@ -43,7 +43,7 @@ export default async function AccountPage({
         </p>
 
         <div className="panel mt-6 p-5 sm:p-7">
-          <h2 className="text-[15px] text-paper">改密码</h2>
+          <h2 className="text-[15px] text-ink">改密码</h2>
           <p className="mt-1 text-[12px] text-mist/50">
             改完立刻生效，下次登录用新密码。
           </p>

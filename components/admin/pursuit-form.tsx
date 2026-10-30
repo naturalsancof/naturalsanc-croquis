@@ -6,7 +6,7 @@ import type { Pursuit } from "@/lib/types";
 
 function CoverPreview({ pursuit }: { pursuit: Pursuit }) {
   return (
-    <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-white/10 bg-black/40">
+    <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-[var(--line)] bg-white/60">
       {pursuit.cover_url ? (
         <Image
           src={pursuit.cover_url}
@@ -110,7 +110,7 @@ export function PursuitForm({ pursuit }: { pursuit: Pursuit }) {
                   defaultChecked={pursuit.stage === s.key}
                   className="peer sr-only"
                 />
-                <span className="block rounded-lg border border-white/10 px-2 py-2.5 text-center transition peer-checked:border-cyan/60 peer-checked:bg-cyan/10 peer-checked:text-cyan hover:border-white/25">
+                <span className="block rounded-lg border border-[var(--line)] px-2 py-2.5 text-center transition peer-checked:border-cyan/60 peer-checked:bg-cyan/10 peer-checked:text-cyan hover:border-white/25">
                   <span className="block text-[13px]">{s.zh}</span>
                   <span className="mt-0.5 block font-display text-[8px] tracking-[0.16em] text-mist/45">
                     {s.en.toUpperCase()}
@@ -208,7 +208,7 @@ export function PursuitForm({ pursuit }: { pursuit: Pursuit }) {
                 type="file"
                 name="cover_file"
                 accept="image/*"
-                className="w-full cursor-pointer rounded-lg border border-dashed border-white/15 bg-black/30 px-3 py-2 text-[11px] text-mist transition hover:border-cyan/40 file:mr-3 file:cursor-pointer file:rounded file:border-0 file:bg-white/10 file:px-2.5 file:py-1 file:text-[10px] file:text-paper"
+                className="w-full cursor-pointer rounded-lg border border-dashed border-white/15 bg-white/60 px-3 py-2 text-[11px] text-mist transition hover:border-cyan/40 file:mr-3 file:cursor-pointer file:rounded file:border-0 file:bg-white/10 file:px-2.5 file:py-1 file:text-[10px] file:text-ink"
               />
             </Field>
           </div>
@@ -220,7 +220,7 @@ export function PursuitForm({ pursuit }: { pursuit: Pursuit }) {
               type="checkbox"
               name="is_published"
               defaultChecked={pursuit.is_published}
-              className="h-4 w-4 accent-[#6e9ba2]"
+              className="h-4 w-4 accent-[#2e7f8a]"
             />
             已发布（不勾就是草稿）
           </label>
@@ -245,7 +245,7 @@ export function PursuitForm({ pursuit }: { pursuit: Pursuit }) {
         </p>
         <CoverPreview pursuit={pursuit} />
 
-        <div className="rounded-xl border border-white/8 bg-white/[0.02] p-4">
+        <div className="rounded-xl border border-[var(--line)] bg-white/50 p-4">
           <div className="flex items-center justify-between">
             <span className="chip !py-1 !text-[9px]">
               {pursuit.is_published ? "已发布" : "草稿"}
@@ -276,7 +276,7 @@ export function PursuitForm({ pursuit }: { pursuit: Pursuit }) {
         <a
           href={`/pursuits/${pursuit.slug}`}
           target="_blank"
-          className="block rounded-xl border border-white/8 px-4 py-3 text-center font-display text-[10px] tracking-[0.18em] text-mist/60 transition hover:border-white/25 hover:text-paper"
+          className="block rounded-xl border border-[var(--line)] px-4 py-3 text-center font-display text-[10px] tracking-[0.18em] text-mist/60 transition hover:border-white/25 hover:text-ink"
         >
           打开公开页面 ↗
         </a>

@@ -110,11 +110,11 @@ export default async function EditPursuitPage({
         <div>
           <Link
             href="/admin"
-            className="font-display text-[10px] tracking-[0.2em] text-mist/40 transition hover:text-paper"
+            className="font-display text-[10px] tracking-[0.2em] text-mist/40 transition hover:text-ink"
           >
             ← 全部追求
           </Link>
-          <h1 className="mt-3 font-display text-2xl tracking-tight text-paper">
+          <h1 className="mt-3 font-display text-2xl tracking-tight text-ink">
             {pursuit.title}
           </h1>
           <p className="mt-1 font-display text-[10px] tracking-[0.14em] text-mist/40">
@@ -126,7 +126,7 @@ export default async function EditPursuitPage({
         <Link
           href={`/pursuits/${pursuit.slug}`}
           target="_blank"
-          className="rounded-lg border border-white/10 px-3.5 py-2 font-display text-[10px] tracking-[0.16em] text-mist transition hover:border-white/30 hover:text-paper"
+          className="rounded-lg border border-[var(--line)] px-3.5 py-2 font-display text-[10px] tracking-[0.16em] text-mist transition hover:border-white/30 hover:text-ink"
         >
           预览公开页面 ↗
         </Link>
@@ -135,7 +135,7 @@ export default async function EditPursuitPage({
       <SavedBanner show={saved === "1"} />
 
       {/* 分页签 */}
-      <nav className="mb-6 flex gap-1 overflow-x-auto border-b border-white/8 pb-px">
+      <nav className="mb-6 flex gap-1 overflow-x-auto border-b border-[var(--line)] pb-px">
         {TABS.map((t) => {
           const active = t.key === tab;
           const n = counts[t.key];
@@ -146,8 +146,8 @@ export default async function EditPursuitPage({
               scroll={false}
               className={`relative flex shrink-0 items-center gap-2 px-4 py-3 text-[13px] transition ${
                 active
-                  ? "text-paper"
-                  : "text-mist/50 hover:text-paper/80"
+                  ? "text-ink"
+                  : "text-mist/50 hover:text-ink/80"
               }`}
             >
               {t.label}

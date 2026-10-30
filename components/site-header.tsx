@@ -1,49 +1,43 @@
 import Link from "next/link";
 
 const NAV = [
-  { href: "/", label: "首页", en: "HOME" },
-  { href: "/pursuits", label: "追求", en: "PURSUITS" },
-  { href: "/#about", label: "关于", en: "ABOUT" },
+  { href: "/", label: "首页", en: "HOME", ja: "ホーム" },
+  { href: "/pursuits", label: "追求", en: "PURSUITS", ja: "追求" },
+  { href: "/#about", label: "关于", en: "ABOUT", ja: "アバウト" },
 ];
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-50 border-b border-white/5 bg-[#070708]/70 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-white/40 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
         <Link href="/" className="group flex items-center gap-3">
-          <span className="relative grid h-8 w-8 place-items-center border border-cyan/40 bg-cyan/5 transition group-hover:border-cyan/80">
-            <span className="h-1.5 w-1.5 bg-cyan shadow-[0_0_10px_#6e9ba2]" />
-            <span className="absolute -right-px -top-px h-1.5 w-1.5 border-r border-t border-cyan/80" />
-            <span className="absolute -bottom-px -left-px h-1.5 w-1.5 border-b border-l border-cyan/80" />
+          <span className="relative grid h-7 w-7 place-items-center border border-[var(--line-strong)] bg-white/60">
+            <span className="font-display text-[11px] leading-none text-ink">✕</span>
           </span>
           <span className="leading-none">
-            <span className="block font-display text-[13px] tracking-[0.22em] text-paper">
+            <span className="block font-display text-[11px] tracking-[0.22em] text-ink">
               NATURALSANC
             </span>
-            <span className="mt-1 block font-display text-[9px] tracking-[0.34em] text-mist/70">
+            <span className="mt-1 block font-display text-[8px] tracking-[0.34em] text-mist">
               CROQUIS
             </span>
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-7 md:flex">
+        <nav className="hidden items-center gap-8 md:flex">
           {NAV.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="group flex items-baseline gap-2 text-[13px] text-mist transition hover:text-paper"
-            >
-              <span>{item.label}</span>
-              <span className="font-display text-[9px] tracking-[0.2em] text-mist/40 transition group-hover:text-cyan/70">
-                {item.en}
+            <Link key={item.href} href={item.href} className="group text-center">
+              <span className="block font-display text-[10px] tracking-[0.2em] text-ink/70 transition group-hover:text-ink">
+                {item.label} {item.en}
               </span>
+              <span className="mt-1 block text-[9px] text-mist/60">{item.ja}</span>
             </Link>
           ))}
         </nav>
 
         <div className="flex items-center gap-3">
-          <span className="hidden items-center gap-2 font-display text-[10px] tracking-[0.22em] text-mist/60 sm:flex">
-            <span className="h-1 w-1 animate-pulse rounded-full bg-lime shadow-[0_0_8px_#93a477]" />
+          <span className="hidden items-center gap-2 font-display text-[9px] tracking-[0.2em] text-mist/70 sm:flex">
+            <span className="h-1 w-1 rounded-full bg-ink/40" />
             STUDIO / ONLINE
           </span>
         </div>

@@ -7,7 +7,7 @@ import type {
 } from "react";
 
 export const inputCls =
-  "w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-paper outline-none transition placeholder:text-mist/30 focus:border-cyan/50 focus:ring-1 focus:ring-cyan/30";
+  "w-full rounded-lg border border-[var(--line)] bg-white/60 px-3 py-2 text-sm text-ink outline-none transition placeholder:text-mist/30 focus:border-cyan/50 focus:ring-1 focus:ring-cyan/30";
 
 export function Field({
   label,
@@ -69,7 +69,7 @@ export function Btn({
       ? "border-cyan/50 bg-cyan/10 text-cyan hover:bg-cyan/20"
       : variant === "danger"
         ? "border-red-500/30 text-red-300/80 hover:border-red-500/60 hover:bg-red-500/10"
-        : "border-white/10 text-mist hover:border-white/25 hover:text-paper";
+        : "border-[var(--line)] text-mist hover:border-white/25 hover:text-ink";
 
   return (
     <button
@@ -99,7 +99,7 @@ export function AdminCard({
           <span className="font-display text-[10px] tracking-[0.28em] text-cyan/70">
             {index}
           </span>
-          <h2 className="text-[15px] text-paper">{title}</h2>
+          <h2 className="text-[15px] text-ink">{title}</h2>
         </div>
         {hint ? (
           <span className="font-display text-[9px] tracking-[0.2em] text-mist/35">

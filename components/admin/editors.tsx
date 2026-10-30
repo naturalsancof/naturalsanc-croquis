@@ -19,7 +19,7 @@ import { formatDate, hostOf } from "@/lib/display";
 import type { MaterialLink, Milestone, Note, PortfolioItem } from "@/lib/types";
 
 const fileCls =
-  "w-full cursor-pointer rounded-lg border border-dashed border-white/15 bg-black/30 px-3 py-2 text-[11px] text-mist transition hover:border-cyan/40 file:mr-3 file:cursor-pointer file:rounded file:border-0 file:bg-white/10 file:px-2.5 file:py-1 file:text-[10px] file:text-paper";
+  "w-full cursor-pointer rounded-lg border border-dashed border-white/15 bg-white/60 px-3 py-2 text-[11px] text-mist transition hover:border-cyan/40 file:mr-3 file:cursor-pointer file:rounded file:border-0 file:bg-white/10 file:px-2.5 file:py-1 file:text-[10px] file:text-ink";
 
 const iconBtn =
   "grid h-8 w-8 cursor-pointer place-items-center rounded-lg border text-[12px] transition";
@@ -38,7 +38,7 @@ export function MilestonesEditor({
     node: (
       <form
         action={saveMilestone}
-        className="flex flex-wrap items-center gap-3 rounded-xl border border-white/8 bg-white/[0.02] py-2.5 pl-7 pr-3 transition hover:border-white/15"
+        className="flex flex-wrap items-center gap-3 rounded-xl border border-[var(--line)] bg-white/50 py-2.5 pl-7 pr-3 transition hover:border-white/15"
       >
         <input type="hidden" name="id" value={m.id} />
         <input type="hidden" name="pursuit_id" value={pursuitId} />
@@ -48,26 +48,26 @@ export function MilestonesEditor({
           name="done"
           defaultChecked={m.done}
           title="已完成"
-          className="h-5 w-5 shrink-0 cursor-pointer accent-[#6e9ba2]"
+          className="h-5 w-5 shrink-0 cursor-pointer accent-[#2e7f8a]"
         />
         <div className="grid min-w-[180px] flex-1 gap-0.5">
           <input
             name="title"
             defaultValue={m.title}
-            className="border-b border-transparent bg-transparent text-[13px] text-paper outline-none transition hover:border-white/15 focus:border-cyan/50"
+            className="border-b border-transparent bg-transparent text-[13px] text-ink outline-none transition hover:border-white/15 focus:border-cyan/50"
           />
           <div className="flex gap-3">
             <input
               name="title_en"
               defaultValue={m.title_en ?? ""}
               placeholder="EN"
-              className="w-1/2 border-b border-transparent bg-transparent font-display text-[9px] tracking-[0.08em] text-mist/60 outline-none transition hover:border-white/10 focus:border-cyan/40"
+              className="w-1/2 border-b border-transparent bg-transparent font-display text-[9px] tracking-[0.08em] text-mist/60 outline-none transition hover:border-[var(--line)] focus:border-cyan/40"
             />
             <input
               name="title_ja"
               defaultValue={m.title_ja ?? ""}
               placeholder="日本語"
-              className="w-1/2 border-b border-transparent bg-transparent text-[10px] text-mist/50 outline-none transition hover:border-white/10 focus:border-cyan/40"
+              className="w-1/2 border-b border-transparent bg-transparent text-[10px] text-mist/50 outline-none transition hover:border-[var(--line)] focus:border-cyan/40"
             />
           </div>
         </div>
@@ -75,7 +75,7 @@ export function MilestonesEditor({
           type="number"
           name="sort_order"
           defaultValue={m.sort_order}
-          className="w-12 rounded-md border border-white/8 bg-black/30 px-1 py-1 text-center font-display text-[10px] text-mist/60 outline-none focus:border-cyan/40"
+          className="w-12 rounded-md border border-[var(--line)] bg-white/60 px-1 py-1 text-center font-display text-[10px] text-mist/60 outline-none focus:border-cyan/40"
         />
         <div className="flex gap-1.5">
           <Btn
@@ -104,7 +104,7 @@ export function MilestonesEditor({
   return (
     <div>
       {items.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-white/10 py-8 text-center text-[12px] text-mist/45">
+        <p className="rounded-xl border border-dashed border-[var(--line)] py-8 text-center text-[12px] text-mist/45">
           还没有里程碑。下面加第一个。
         </p>
       ) : (
@@ -113,7 +113,7 @@ export function MilestonesEditor({
 
       <form
         action={saveMilestone}
-        className="mt-4 grid gap-3 rounded-xl border border-dashed border-white/12 bg-white/[0.01] p-4 sm:grid-cols-[2fr_1fr_1fr_auto] sm:items-end"
+        className="mt-4 grid gap-3 rounded-xl border border-dashed border-[var(--line)] bg-white/30 p-4 sm:grid-cols-[2fr_1fr_1fr_auto] sm:items-end"
       >
         <input type="hidden" name="pursuit_id" value={pursuitId} />
               <input type="hidden" name="return_tab" value="milestones" />
@@ -153,7 +153,7 @@ function WorkEditForm({
               <input type="hidden" name="return_tab" value="works" />
 
       <div className="flex flex-wrap items-start gap-4">
-        <div className="relative h-24 w-32 shrink-0 overflow-hidden rounded-lg border border-white/10 bg-black/40">
+        <div className="relative h-24 w-32 shrink-0 overflow-hidden rounded-lg border border-[var(--line)] bg-white/60">
           {item.kind === "image" ? (
             item.media_url ? (
               <Image
@@ -279,8 +279,8 @@ export function WorksEditor({
   const nodes = items.map((item, i) => ({
     id: item.id,
     node: (
-      <div className="overflow-hidden rounded-xl border border-white/8 bg-white/[0.02] transition hover:border-white/20">
-        <div className="relative aspect-[4/3] bg-black/40">
+      <div className="overflow-hidden rounded-xl border border-[var(--line)] bg-white/50 transition hover:border-white/20">
+        <div className="relative aspect-[4/3] bg-white/60">
           {item.kind === "image" && item.media_url ? (
             <Image
               src={item.media_url}
@@ -303,7 +303,7 @@ export function WorksEditor({
         </div>
 
         <div className="p-3">
-          <p className="truncate text-[13px] text-paper">
+          <p className="truncate text-[13px] text-ink">
             {item.title || "未命名"}
           </p>
           <p className="mt-0.5 truncate font-display text-[9px] tracking-[0.1em] text-mist/40">
@@ -313,7 +313,7 @@ export function WorksEditor({
           <div className="mt-3 flex items-center gap-1.5">
             <Link
               href={`?tab=works&edit=${item.id}`}
-              className={`${iconBtn} border-white/10 text-mist/70 hover:border-cyan/50 hover:text-cyan`}
+              className={`${iconBtn} border-[var(--line)] text-mist/70 hover:border-cyan/50 hover:text-cyan`}
               title="编辑"
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -329,7 +329,7 @@ export function WorksEditor({
                 type="submit"
                 name="intent"
                 value="delete"
-                className={`${iconBtn} border-white/10 text-mist/50 hover:border-red-500/50 hover:text-red-300`}
+                className={`${iconBtn} border-[var(--line)] text-mist/50 hover:border-red-500/50 hover:text-red-300`}
                 title="删除"
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -355,7 +355,7 @@ export function WorksEditor({
             </p>
             <Link
               href="?tab=works"
-              className="font-display text-[9px] tracking-[0.16em] text-mist/50 hover:text-paper"
+              className="font-display text-[9px] tracking-[0.16em] text-mist/50 hover:text-ink"
             >
               收起 ✕
             </Link>
@@ -365,7 +365,7 @@ export function WorksEditor({
       ) : null}
 
       {items.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-white/10 py-10 text-center text-[12px] text-mist/45">
+        <p className="rounded-xl border border-dashed border-[var(--line)] py-10 text-center text-[12px] text-mist/45">
           还没有作品。从下面加第一件。
         </p>
       ) : (
@@ -374,13 +374,13 @@ export function WorksEditor({
 
       <form
         action={saveWork}
-        className="mt-5 rounded-xl border border-dashed border-white/12 bg-white/[0.01] p-4"
+        className="mt-5 rounded-xl border border-dashed border-[var(--line)] bg-white/30 p-4"
       >
         <input type="hidden" name="pursuit_id" value={pursuitId} />
               <input type="hidden" name="return_tab" value="works" />
         <p className="text-[12px] text-mist/60">
-          新增作品：可以只<span className="text-paper/80">上传文件</span>、只
-          <span className="text-paper/80">粘贴链接</span>，或者两个都填
+          新增作品：可以只<span className="text-ink/80">上传文件</span>、只
+          <span className="text-ink/80">粘贴链接</span>，或者两个都填
           （都填时以文件为准）。
         </p>
 
@@ -435,7 +435,7 @@ export function NotesEditor({
         {items.map((n) => (
           <details
             key={n.id}
-            className="group rounded-xl border border-white/8 bg-white/[0.02] transition hover:border-white/15"
+            className="group rounded-xl border border-[var(--line)] bg-white/50 transition hover:border-white/15"
           >
             <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-3.5">
               <span className="font-display text-[10px] tracking-[0.12em] text-mist/45">
@@ -451,7 +451,7 @@ export function NotesEditor({
                   DRAFT
                 </span>
               ) : null}
-              <span className="min-w-0 flex-1 truncate text-[13px] text-paper">
+              <span className="min-w-0 flex-1 truncate text-[13px] text-ink">
                 {n.title}
               </span>
               <span className="font-display text-[9px] tracking-[0.14em] text-mist/40 transition group-open:text-cyan/70">
@@ -518,7 +518,7 @@ export function NotesEditor({
                     type="checkbox"
                     name="is_pinned"
                     defaultChecked={n.is_pinned}
-                    className="h-4 w-4 accent-[#6e9ba2]"
+                    className="h-4 w-4 accent-[#2e7f8a]"
                   />
                   置顶
                 </label>
@@ -527,7 +527,7 @@ export function NotesEditor({
                     type="checkbox"
                     name="is_published"
                     defaultChecked={n.is_published}
-                    className="h-4 w-4 accent-[#6e9ba2]"
+                    className="h-4 w-4 accent-[#2e7f8a]"
                   />
                   公开
                 </label>
@@ -539,7 +539,7 @@ export function NotesEditor({
 
       <form
         action={saveNote}
-        className="mt-4 grid gap-3 rounded-xl border border-dashed border-white/12 bg-white/[0.01] p-4 sm:grid-cols-[2fr_1fr_auto] sm:items-end"
+        className="mt-4 grid gap-3 rounded-xl border border-dashed border-[var(--line)] bg-white/30 p-4 sm:grid-cols-[2fr_1fr_auto] sm:items-end"
       >
         <input type="hidden" name="pursuit_id" value={pursuitId} />
               <input type="hidden" name="return_tab" value="notes" />
@@ -580,13 +580,13 @@ export function MaterialsEditor({
     node: (
       <form
         action={saveMaterial}
-        className="grid gap-2 rounded-xl border border-white/8 bg-white/[0.02] py-2.5 pl-7 pr-3 sm:grid-cols-[28px_1.1fr_1.5fr_100px_1fr_56px_auto] sm:items-center"
+        className="grid gap-2 rounded-xl border border-[var(--line)] bg-white/50 py-2.5 pl-7 pr-3 sm:grid-cols-[28px_1.1fr_1.5fr_100px_1fr_56px_auto] sm:items-center"
       >
         <input type="hidden" name="id" value={l.id} />
         <input type="hidden" name="pursuit_id" value={pursuitId} />
               <input type="hidden" name="return_tab" value="links" />
         <span
-          className="grid h-7 w-7 place-items-center rounded-md border border-white/10 bg-black/40 font-display text-[10px] text-cyan/70"
+          className="grid h-7 w-7 place-items-center rounded-md border border-[var(--line)] bg-white/60 font-display text-[10px] text-cyan/70"
           title={hostOf(l.url)}
         >
           {hostOf(l.url).slice(0, 1).toUpperCase()}
@@ -594,17 +594,17 @@ export function MaterialsEditor({
         <input
           name="title"
           defaultValue={l.title}
-          className="border-b border-transparent bg-transparent text-[13px] text-paper outline-none transition hover:border-white/15 focus:border-cyan/50"
+          className="border-b border-transparent bg-transparent text-[13px] text-ink outline-none transition hover:border-white/15 focus:border-cyan/50"
         />
         <input
           name="url"
           defaultValue={l.url}
-          className="truncate border-b border-transparent bg-transparent font-display text-[10px] text-mist/60 outline-none transition hover:border-white/10 focus:border-cyan/40"
+          className="truncate border-b border-transparent bg-transparent font-display text-[10px] text-mist/60 outline-none transition hover:border-[var(--line)] focus:border-cyan/40"
         />
         <select
           name="kind"
           defaultValue={l.kind}
-          className="rounded-md border border-white/8 bg-black/30 px-1.5 py-1 text-[11px] text-mist outline-none focus:border-cyan/40"
+          className="rounded-md border border-[var(--line)] bg-white/60 px-1.5 py-1 text-[11px] text-mist outline-none focus:border-cyan/40"
         >
           {Object.entries(KIND_LABEL).map(([k, v]) => (
             <option key={k} value={k}>
@@ -616,13 +616,13 @@ export function MaterialsEditor({
           name="description"
           defaultValue={l.description ?? ""}
           placeholder="一句说明"
-          className="border-b border-transparent bg-transparent text-[11px] text-mist/60 outline-none transition hover:border-white/10 focus:border-cyan/40"
+          className="border-b border-transparent bg-transparent text-[11px] text-mist/60 outline-none transition hover:border-[var(--line)] focus:border-cyan/40"
         />
         <input
           type="number"
           name="sort_order"
           defaultValue={l.sort_order}
-          className="w-12 rounded-md border border-white/8 bg-black/30 px-1 py-1 text-center font-display text-[10px] text-mist/60 outline-none focus:border-cyan/40"
+          className="w-12 rounded-md border border-[var(--line)] bg-white/60 px-1 py-1 text-center font-display text-[10px] text-mist/60 outline-none focus:border-cyan/40"
         />
         <div className="flex gap-1.5">
           <Btn
@@ -651,7 +651,7 @@ export function MaterialsEditor({
   return (
     <div>
       {items.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-white/10 py-8 text-center text-[12px] text-mist/45">
+        <p className="rounded-xl border border-dashed border-[var(--line)] py-8 text-center text-[12px] text-mist/45">
           还没有资料链接。
         </p>
       ) : (
@@ -660,7 +660,7 @@ export function MaterialsEditor({
 
       <form
         action={saveMaterial}
-        className="mt-4 grid gap-3 rounded-xl border border-dashed border-white/12 bg-white/[0.01] p-4 sm:grid-cols-[1.2fr_1.6fr_110px_auto] sm:items-end"
+        className="mt-4 grid gap-3 rounded-xl border border-dashed border-[var(--line)] bg-white/30 p-4 sm:grid-cols-[1.2fr_1.6fr_110px_auto] sm:items-end"
       >
         <input type="hidden" name="pursuit_id" value={pursuitId} />
               <input type="hidden" name="return_tab" value="links" />

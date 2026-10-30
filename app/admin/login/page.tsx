@@ -15,14 +15,14 @@ export default async function LoginPage({
     <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center py-10">
       <Link
         href="/"
-        className="mb-8 font-display text-[10px] tracking-[0.28em] text-mist/50 transition hover:text-paper"
+        className="mb-8 font-display text-[10px] tracking-[0.28em] text-mist/50 transition hover:text-ink"
       >
         ← 回到网站
       </Link>
 
       <div className="panel p-7 sm:p-9">
         <p className="kicker">Studio — Private</p>
-        <h1 className="mt-4 font-display text-2xl tracking-tight text-paper">
+        <h1 className="mt-4 font-display text-2xl tracking-tight text-ink">
           站长登录
         </h1>
         <p className="sub-ja mt-2">ここからサイトを編集します。</p>
