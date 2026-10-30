@@ -44,6 +44,14 @@ function backTo(pursuitId: string, fd: FormData) {
   return `/admin/pursuits/${pursuitId}?${tab ? `tab=${tab}&` : ""}saved=1`;
 }
 
+/** 校验不过就往回跳，并带上错误码，不要抛异常把整页打成报错屏 */
+function fail(pursuitId: string, fd: FormData, code: string): never {
+  const tab = str(fd, "return_tab");
+  redirect(
+    `/admin/pursuits/${pursuitId}?${tab ? `tab=${tab}&` : ""}err=${encodeURIComponent(code)}`,
+  );
+}
+
 function refreshPublic(slug?: string | null) {
   revalidatePath("/");
   revalidatePath("/pursuits");
@@ -315,8 +323,12 @@ export async function saveWork(fd: FormData) {
   if (intent === "delete" && id) {
     await supabase.from("portfolio_items").delete().eq("id", id);
   } else {
-    uploaded = await upload(supabase, fd.get("file"), pursuitId);
-    poster = await upload(supabase, fd.get("poster_file"), pursuitId);
+    try {
+      uploaded = await upload(supabase, fd.get("file"), pursuitId);
+      poster = await upload(supabase, fd.get("poster_file"), pursuitId);
+    } catch {
+      fail(pursuitId, fd, "upload");
+    }
 
     const patch: Record<string, unknown> = {
       pursuit_id: pursuitId,
@@ -336,7 +348,7 @@ export async function saveWork(fd: FormData) {
     };
 
     if (uploaded) patch.media_url = uploaded;
-    if (!patch.media_url) throw new Error("作品必须有文件或地址");
+    if (!patch.media_url) fail(pursuitId, fd, "work-media");
 
     if (id) {
       await supabase.from("portfolio_items").update(patch).eq("id", id);
@@ -431,7 +443,7 @@ export async function saveMaterial(fd: FormData) {
       sort_order: num(fd, "sort_order"),
     };
 
-    if (!patch.url) throw new Error("链接必须有 URL");
+    if (!patch.url) fail(pursuitId, fd, "link-url");
 
     if (id) {
       await supabase.from("materials_and_links").update(patch).eq("id", id);

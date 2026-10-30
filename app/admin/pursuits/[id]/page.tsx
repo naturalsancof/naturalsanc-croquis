@@ -8,7 +8,7 @@ import {
 } from "@/components/admin/editors";
 import { PursuitForm } from "@/components/admin/pursuit-form";
 import { AdminTopBar } from "@/components/admin/top-bar";
-import { SavedBanner } from "@/components/admin/ui";
+import { ErrorBanner, SavedBanner } from "@/components/admin/ui";
 import type {
   MaterialLink,
   Milestone,
@@ -44,10 +44,10 @@ export default async function EditPursuitPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ saved?: string; tab?: string; edit?: string }>;
+  searchParams: Promise<{ saved?: string; tab?: string; edit?: string; err?: string }>;
 }) {
   const { id } = await params;
-  const { saved, tab: rawTab, edit } = await searchParams;
+  const { saved, tab: rawTab, edit, err } = await searchParams;
 
   const tab: TabKey = TABS.some((t) => t.key === rawTab)
     ? (rawTab as TabKey)
@@ -133,6 +133,7 @@ export default async function EditPursuitPage({
       </div>
 
       <SavedBanner show={saved === "1"} />
+      <ErrorBanner code={err} />
 
       {/* 分页签 */}
       <nav className="mb-6 flex gap-1 overflow-x-auto border-b border-[var(--line)] pb-px">

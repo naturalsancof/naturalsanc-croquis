@@ -121,3 +121,20 @@ export function SavedBanner({ show }: { show: boolean }) {
     </div>
   );
 }
+
+const ERROR_TEXT: Record<string, string> = {
+  "work-media": "这件作品还没有图片或链接：上传一个文件，或者填一个地址。",
+  "link-url": "资料链接需要填网址。",
+  "note-empty": "笔记标题和正文不能都空着。",
+  upload: "文件没传上去：确认图片或音频格式，或者先只填链接。",
+};
+
+export function ErrorBanner({ code }: { code?: string }) {
+  if (!code) return null;
+  return (
+    <div className="mb-4 flex items-start gap-2 rounded-lg border border-red-500/25 bg-red-500/[0.06] px-3 py-2 text-[12px] text-red-500/90">
+      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-500/70" />
+      {ERROR_TEXT[code] ?? "没有保存成功，请再试一次。"}
+    </div>
+  );
+}
