@@ -98,8 +98,8 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
     if (mode.current === "inertia") {
       // 指数衰减，跟帧率无关
       offset.current += velocity.current * dt;
-      velocity.current *= Math.exp(-0.0042 * dt);
-      if (Math.abs(velocity.current) < 0.00018) {
+      velocity.current *= Math.exp(-0.0022 * dt);
+      if (Math.abs(velocity.current) < 0.00016) {
         velocity.current = 0;
         targetRef.current = Math.round(offset.current);
         mode.current = "settle";
@@ -107,7 +107,7 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
     } else if (mode.current === "settle") {
       // 阻尼插值：alpha 由 dt 算出，60Hz / 120Hz 手感一致
       const diff = targetRef.current - offset.current;
-      const alpha = 1 - Math.exp(-0.012 * dt);
+      const alpha = 1 - Math.exp(-0.0085 * dt);
       offset.current += diff * alpha;
       if (Math.abs(diff) < 0.0012) {
         offset.current = targetRef.current;
@@ -201,11 +201,11 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
     const fresh = now - lastP.t < 80;
     velocity.current = fresh && dtSample > 8 ? -dxSample / dtSample / step : 0;
     // 封顶，避免一下飞出去好几张
-    const MAX = 0.0045;
+    const MAX = 0.0075;
     velocity.current = Math.max(-MAX, Math.min(MAX, velocity.current));
     samples.current = [];
 
-    if (Math.abs(velocity.current) > 0.00012) {
+    if (Math.abs(velocity.current) > 0.00008) {
       mode.current = "inertia";
     } else {
       targetRef.current = Math.round(offset.current);

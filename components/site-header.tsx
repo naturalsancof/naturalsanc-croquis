@@ -24,9 +24,9 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="flex items-center gap-3 sm:gap-6 md:gap-8">
+        <nav className="flex items-center gap-1.5 sm:gap-4 md:gap-8">
           {NAV.map((item) => (
-            <Link key={item.href} href={item.href} className="group shrink-0 whitespace-nowrap text-center">
+            <Link key={item.href} href={item.href} className="group shrink-0 whitespace-nowrap rounded-md px-3 py-2.5 text-center transition hover:bg-white/50 sm:px-2.5 sm:py-2">
               <span className="block font-display text-[10px] tracking-[0.12em] text-ink/70 transition group-hover:text-ink sm:tracking-[0.18em]">
                 {item.label}
                 <span className="hidden sm:inline"> {item.en}</span>
