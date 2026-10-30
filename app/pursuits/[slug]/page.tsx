@@ -8,9 +8,15 @@ import { PortfolioGrid } from "@/components/portfolio-grid";
 import { ProgressPanel } from "@/components/progress-panel";
 import { Section } from "@/components/section";
 import { ACCENT_HEX, STAGES, formatDate, stageIndex } from "@/lib/display";
-import { getPursuitDetail } from "@/lib/queries";
+import { getPursuitDetail, getPursuitSlugs } from "@/lib/queries";
 
 export const revalidate = 30;
+
+/** 把已知的追求在构建时预渲染；新加的 slug 会走 ISR 按需生成 */
+export async function generateStaticParams() {
+  const slugs = await getPursuitSlugs();
+  return slugs.map((slug) => ({ slug }));
+}
 
 type PageProps = {
   params: Promise<{ slug: string }>;
