@@ -79,18 +79,44 @@ app/
   page.tsx              首页
   pursuits/page.tsx     追求索引
   pursuits/[slug]/      二级页（本次的主角）
+  admin/                站长后台（登录 + 编辑）
   not-found.tsx         404
 components/             卡片、进度、作品灯箱、音频播放器、Markdown…
+  admin/                后台的表单控件与五个编辑器
 lib/
   queries.ts            Supabase 查询（一条嵌套查询取回整页）
   supabase/public.ts    匿名只读客户端
+  supabase/server.ts    带登录态的服务端客户端（读写）
   types.ts              手写的表类型
   display.ts            阶段、日期、时长等展示辅助
+proxy.ts                刷新 /admin 的登录 cookie
 supabase/schema.sql     建表脚本
+supabase/admin.sql      站长权限（studio_admins + RLS 收紧）
 supabase/seed.sql       演示数据
 public/demo/            演示图片与一段 24 秒的合成环境音
 scripts/qa-viewports.cjs 响应式自检（390 / 1440 宽，检查横向溢出）
 ```
+
+## 站长后台
+
+登录地址：`/admin`（未登录会自动跳到 `/admin/login`）。
+
+- 首页列出所有追求（含草稿），可以新建。
+- 每个追求的编辑页分五块：基本信息 / 里程碑 / 作品 / 笔记 / 资料。
+- 图片、音频可以直接选文件上传到 Supabase Storage 的 `media` 桶；也可以手填外链。
+- 保存后会自动刷新公开页面（`revalidatePath`），不需要等缓存。
+
+### 权限是怎么收口的
+
+- 数据库里有一张 `studio_admins` 表，只放站长自己的 uid。
+- 所有写操作和 Storage 上传都要求 `public.is_studio_admin()` 为真，普通登录用户也写不了。
+- Supabase 的「允许新用户注册」已经关掉，即使打开，非 `studio_admins` 的人也只能读。
+- 匿名（未登录）只能看到 `is_published = true` 的内容。
+
+### 账号
+
+站长账号在 Supabase Dashboard → Authentication → Users 里管理。
+忘记密码就在那里重置，或者用「Send invitation」重新发一封设置密码的邮件。
 
 ## 部署（GitHub Desktop → Vercel）
 
@@ -99,11 +125,9 @@ scripts/qa-viewports.cjs 响应式自检（390 / 1440 宽，检查横向溢出�
 3. 在 Environment Variables 里填 `NEXT_PUBLIC_SUPABASE_URL` 和 `NEXT_PUBLIC_SUPABASE_ANON_KEY`。
 4. Deploy。之后每次 push，Vercel 自动重新构建。
 
-## 下一步（第二阶段）
+## 还没做的
 
-- 登录（Supabase Auth，邮箱 + 密码，仅站长一个账号）
-- 网页端编辑：追求 / 里程碑 / 作品 / 笔记 / 资料 的增删改
-- 图片、音频直接上传到 Storage
-- 保存后触发 `revalidatePath`，页面立刻更新
-
-数据表和 RLS 已经按这个方向准备好了：`authenticated` 角色可以写，匿名只能读已发布内容。
+- 拖拽排序（现在靠 `sort_order` 数字，后台里手改）
+- 多账号 / 协作
+- 图片自动压缩、视频
+- 中英日三语的正文（笔记 body 现在只存中文，标题三语）
