@@ -3,7 +3,7 @@ import Link from "next/link";
 const NAV = [
   { href: "/", label: "首页", en: "HOME", ja: "ホーム" },
   { href: "/pursuits", label: "追求", en: "PURSUITS", ja: "追求" },
-  { href: "/#about", label: "关于", en: "ABOUT", ja: "アバウト" },
+  { href: "/about", label: "关于", en: "ABOUT", ja: "アバウト" },
 ];
 
 export function SiteHeader() {

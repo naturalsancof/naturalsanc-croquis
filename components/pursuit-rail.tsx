@@ -20,26 +20,25 @@ function wrap(pos: number, n: number) {
   return p;
 }
 
+type Mode = "idle" | "drag" | "inertia" | "settle";
+
 export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
   const railRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const offset = useRef(0);
-  const target = useRef(0);
-  const dragging = useRef(false);
-  const startX = useRef(0);
-  const startOffset = useRef(0);
-  const moved = useRef(0);
-  const velocity = useRef(0);
-  const lastX = useRef(0);
-  const lastT = useRef(0);
+  const velocity = useRef(0); // 张 / 毫秒
+  const targetRef = useRef(0);
+  const mode = useRef<Mode>("idle");
   const raf = useRef<number | null>(null);
+  const last = useRef(0);
+  const drag = useRef({ active: false, x: 0, start: 0, moved: 0, t: 0 });
 
   const [size, setSize] = useState({ w: 300, h: 450 });
   const [active, setActive] = useState(0);
   const [selected, setSelected] = useState<Pursuit | null>(null);
 
   const n = pursuits.length;
-  const step = size.w * 1.16;
+  const step = size.w * 1.12;
 
   /* ------------------------------ 尺寸 ------------------------------ */
   useLayoutEffect(() => {
@@ -47,17 +46,22 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
       const rail = railRef.current;
       if (!rail) return;
       const vw = window.innerWidth;
-      const byWidth = vw < 640 ? vw * 0.78 : Infinity;
-      const h = Math.max(240, Math.min(rail.clientHeight * 0.82, 470, byWidth));
+      // 手机上卡片小一些；桌面按视口宽度换算，保证「3 张整卡 + 两张半卡」
+      const byWidth = vw < 640 ? vw * 0.78 : vw * 0.318;
+      const h = Math.max(240, Math.min(rail.clientHeight * 0.8, 470, byWidth));
       setSize({ w: Math.round((h * 2) / 3), h: Math.round(h) });
     };
     measure();
     const ro = new ResizeObserver(measure);
     if (railRef.current) ro.observe(railRef.current);
-    return () => ro.disconnect();
+    window.addEventListener("resize", measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
   }, []);
 
-  /* ------------------------------ 渲染循环 ------------------------------ */
+  /* ------------------------------ 绘制 ------------------------------ */
   const paint = useCallback(() => {
     if (!n) return;
     const cur = offset.current;
@@ -72,10 +76,10 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
         nearestDist = dist;
         nearest = i;
       }
-      const scale = Math.max(0.72, 1 - dist * 0.085);
-      const rotY = Math.max(-14, Math.min(14, -pos * 7));
-      const opacity = Math.max(0.18, 1 - dist * 0.26);
-      el.style.transform = `translate(-50%, -50%) translateX(${pos * step}px) translateZ(0) perspective(1200px) rotateY(${rotY}deg) scale(${scale})`;
+      const scale = Math.max(0.7, 1 - dist * 0.08);
+      const rotY = Math.max(-16, Math.min(16, -pos * 8));
+      const opacity = Math.max(0.15, 1 - dist * 0.22);
+      el.style.transform = `translate(-50%, -50%) translateX(${pos * step}px) perspective(1400px) rotateY(${rotY}deg) scale(${scale})`;
       el.style.opacity = String(opacity);
       el.style.zIndex = String(100 - Math.round(dist * 10));
       el.style.pointerEvents = dist > 2.6 ? "none" : "auto";
@@ -84,27 +88,49 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
     setActive((prev) => (prev === nearest ? prev : nearest));
   }, [n, step]);
 
-  const tick = useCallback(() => {
-    const diff = target.current - offset.current;
-    if (Math.abs(diff) > 0.0008) {
-      offset.current += diff * 0.14;
-      paint();
-      raf.current = requestAnimationFrame(tick);
-    } else {
-      offset.current = target.current;
-      paint();
+  /* ------------------------------ 动画帧 ------------------------------ */
+  const frame = useCallback(() => {
+    const now = performance.now();
+    const dt = Math.min(48, now - (last.current || now));
+    last.current = now;
+
+    if (mode.current === "inertia") {
+      offset.current += velocity.current * dt;
+      velocity.current *= Math.exp(-0.0045 * dt);
+      if (Math.abs(velocity.current) < 0.00035) {
+        velocity.current = 0;
+        targetRef.current = Math.round(offset.current);
+        mode.current = "settle";
+      }
+    } else if (mode.current === "settle") {
+      const diff = targetRef.current - offset.current;
+      offset.current += diff * 0.2;
+      if (Math.abs(diff) < 0.0015) {
+        offset.current = targetRef.current;
+        mode.current = "idle";
+      }
+    }
+
+    paint();
+
+    if (mode.current === "idle") {
       raf.current = null;
+      last.current = 0;
+    } else {
+      raf.current = requestAnimationFrame(frame);
     }
   }, [paint]);
 
-  const start = useCallback(() => {
-    if (raf.current === null) raf.current = requestAnimationFrame(tick);
-  }, [tick]);
+  const kick = useCallback(() => {
+    if (raf.current === null) {
+      last.current = 0;
+      raf.current = requestAnimationFrame(frame);
+    }
+  }, [frame]);
 
   useEffect(() => {
     paint();
-    start();
-  }, [paint, start, size.w]);
+  }, [paint, size.w]);
 
   useEffect(
     () => () => {
@@ -116,79 +142,93 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
   /* ------------------------------ 拖拽 ------------------------------ */
   const onPointerDown = (e: React.PointerEvent) => {
     if (e.button !== 0) return;
-    dragging.current = true;
-    moved.current = 0;
-    startX.current = e.clientX;
-    startOffset.current = offset.current;
-    lastX.current = e.clientX;
-    lastT.current = performance.now();
+    const d = drag.current;
+    d.active = true;
+    d.x = e.clientX;
+    d.start = offset.current;
+    d.moved = 0;
+    d.t = performance.now();
     velocity.current = 0;
+    mode.current = "drag";
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
 
   const onPointerMove = (e: React.PointerEvent) => {
-    if (!dragging.current) return;
-    const dx = e.clientX - startX.current;
-    moved.current = Math.max(moved.current, Math.abs(dx));
-    target.current = startOffset.current - dx / step;
-    offset.current = target.current;
+    const d = drag.current;
+    if (!d.active) return;
+    const dx = e.clientX - d.x;
+    d.moved = Math.max(d.moved, Math.abs(dx));
+    offset.current = d.start - dx / step;
     paint();
 
     const now = performance.now();
-    const dt = Math.max(16, now - lastT.current);
-    velocity.current = (e.clientX - lastX.current) / dt;
-    lastX.current = e.clientX;
-    lastT.current = now;
+    const dt = Math.max(8, now - d.t);
+    velocity.current = -dx / dt / step;
+    d.t = now;
+    d.x = e.clientX;
   };
 
   const onPointerUp = (e: React.PointerEvent) => {
-    if (!dragging.current) return;
-    dragging.current = false;
+    const d = drag.current;
+    if (!d.active) return;
+    d.active = false;
     try {
       (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
     } catch {
       /* 指针可能已释放 */
     }
-    const momentum = -velocity.current * 240 / step;
-    target.current = Math.round(offset.current + momentum);
-    start();
 
-    if (moved.current <= 6 && pursuits[active]) {
-      setSelected(pursuits[active]);
+    if (d.moved <= 6) {
+      mode.current = "idle";
+      if (pursuits[active]) setSelected(pursuits[active]);
+      return;
     }
+
+    // 惯性：保留速度，逐帧衰减，最后吸附
+    if (Math.abs(velocity.current) > 0.00012) {
+      mode.current = "inertia";
+    } else {
+      targetRef.current = Math.round(offset.current);
+      mode.current = "settle";
+    }
+    kick();
   };
 
-  const onWheel = (e: React.WheelEvent) => {
-    const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-    if (Math.abs(delta) < 1) return;
-    e.preventDefault();
-    target.current += delta / 260;
-    start();
-    window.clearTimeout((onWheel as unknown as { t?: number }).t);
-    (onWheel as unknown as { t?: number }).t = window.setTimeout(() => {
-      target.current = Math.round(target.current);
-      start();
-    }, 140);
-  };
+  /* ------------------------------ 滚轮（原生，非被动） ------------------------------ */
+  useEffect(() => {
+    const el = railRef.current;
+    if (!el) return;
+
+    const onWheel = (e: WheelEvent) => {
+      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      if (Math.abs(delta) < 1) return;
+      e.preventDefault();
+      if (drag.current.active) return;
+      velocity.current = 0;
+      const base = mode.current === "settle" ? targetRef.current : Math.round(offset.current);
+      targetRef.current = base + delta / (step * 1.6);
+      mode.current = "settle";
+      kick();
+    };
+
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [step, kick]);
 
   /* ------------------------------ 键盘 ------------------------------ */
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (selected) return;
-      if (e.key === "ArrowRight") {
-        target.current = Math.round(target.current) + 1;
-        start();
-      }
-      if (e.key === "ArrowLeft") {
-        target.current = Math.round(target.current) - 1;
-        start();
-      }
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      const dir = e.key === "ArrowRight" ? 1 : -1;
+      const base = mode.current === "settle" ? targetRef.current : Math.round(offset.current);
+      targetRef.current = base + dir;
+      mode.current = "settle";
+      kick();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [selected, start]);
-
-
+  }, [selected, kick]);
 
   if (n === 0) {
     return (
@@ -206,7 +246,6 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
-        onWheel={onWheel}
         className={`relative my-auto h-[60vh] min-h-[340px] w-full cursor-grab select-none overflow-hidden active:cursor-grabbing ${
           selected ? "pointer-events-none opacity-40 blur-[2px] grayscale" : ""
         } transition-[opacity,filter] duration-500`}
@@ -255,7 +294,6 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
                   className="absolute left-3 top-3 h-1.5 w-1.5 rounded-full"
                   style={{ background: accent }}
                 />
-
               </span>
             </button>
           );

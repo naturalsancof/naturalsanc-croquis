@@ -103,6 +103,12 @@ body {
   color: var(--color-mist);
 }
 
+/* 让某一段突破 main 的最大宽度，横向铺满视口 */
+.bleed-x {
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+
 .hairline {
   height: 1px;
   background: var(--line-strong);
