@@ -34,13 +34,6 @@ export default async function HomePage() {
           <PursuitRail pursuits={pursuits} />
         </div>
 
-        <div className="flex items-end justify-between border-t border-[var(--line)] pt-4">
-          <p className="label">Drag ←→ · Click to open</p>
-          <p className="label hidden sm:block">
-            {String(pursuits.length).padStart(2, "0")} Pursuits
-          </p>
-          <p className="label">©2026</p>
-        </div>
       </section>
 
     </div>

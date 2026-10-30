@@ -8,8 +8,8 @@ const NAV = [
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-white/40 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
+    <header className="sticky top-0 z-50">
+      <div className="relative mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
         <Link href="/" className="group flex items-center gap-3">
           <span className="relative grid h-7 w-7 place-items-center border border-[var(--line-strong)] bg-white/60">
             <span className="font-display text-[11px] leading-none text-ink">✕</span>
@@ -24,10 +24,10 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="flex items-center gap-1.5 sm:gap-4 md:gap-8">
+        <nav className="flex items-center gap-1.5 sm:gap-5 md:absolute md:left-1/2 md:-translate-x-1/2 md:gap-8">
           {NAV.map((item) => (
             <Link key={item.href} href={item.href} className="group shrink-0 whitespace-nowrap rounded-md px-3 py-2.5 text-center transition hover:bg-white/50 sm:px-2.5 sm:py-2">
-              <span className="block font-display text-[10px] tracking-[0.12em] text-ink/70 transition group-hover:text-ink sm:tracking-[0.18em]">
+              <span className="block font-display text-[9px] tracking-[0.14em] text-mist transition group-hover:text-ink sm:text-[10px] sm:tracking-[0.2em]">
                 {item.label}
                 <span className="hidden sm:inline"> {item.en}</span>
               </span>

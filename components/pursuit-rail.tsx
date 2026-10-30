@@ -36,6 +36,9 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
 
   const [size, setSize] = useState({ w: 300, h: 450 });
   const activeRef = useRef(0);
+  const labelRef = useRef<HTMLParagraphElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
+  const markRef = useRef<HTMLDivElement>(null);
   const [selected, setSelected] = useState<Pursuit | null>(null);
 
   const n = pursuits.length;
@@ -77,16 +80,28 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
         nearestDist = dist;
         nearest = i;
       }
-      const scale = Math.max(0.7, 1 - dist * 0.08);
-      const rotY = Math.max(-16, Math.min(16, -pos * 8));
-      const opacity = Math.max(0.15, 1 - dist * 0.22);
+      const scale = Math.max(0.84, 1 - dist * 0.045);
+      const rotY = Math.max(-11, Math.min(11, -pos * 6));
+      const opacity = Math.max(0.55, 1 - dist * 0.085);
       el.style.transform = `translate3d(calc(-50% + ${pos * step}px), -50%, 0) perspective(1400px) rotateY(${rotY}deg) scale(${scale})`;
       el.style.opacity = String(opacity);
       el.style.zIndex = String(100 - Math.round(dist * 10));
       el.style.pointerEvents = dist > 2.6 ? "none" : "auto";
     });
 
-    activeRef.current = nearest;
+    if (activeRef.current !== nearest) {
+      activeRef.current = nearest;
+      if (labelRef.current) {
+        labelRef.current.textContent = pursuits[nearest]?.title ?? "";
+      }
+    }
+    if (markRef.current) {
+      markRef.current.style.transform = `rotate(${(-8 + cur * 18).toFixed(2)}deg)`;
+    }
+    if (progressRef.current && n > 1) {
+      const p = ((cur % n) + n) % n;
+      progressRef.current.style.width = `${((p + 0.5) / n) * 100}%`;
+    }
   }, [n, step]);
 
   /* ------------------------------ 动画帧 ------------------------------ */
@@ -267,14 +282,13 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
-        className={`relative my-auto h-[60vh] min-h-[340px] w-full cursor-grab select-none overflow-hidden active:cursor-grabbing ${
+        className={`relative -mt-5 h-[57vh] min-h-[320px] w-full cursor-grab select-none overflow-hidden active:cursor-grabbing ${
           selected ? "pointer-events-none opacity-40 blur-[2px] grayscale" : ""
         } transition-[opacity,filter] duration-500`}
         style={{ touchAction: "none", overscrollBehaviorX: "contain" }}
       >
         {pursuits.map((p, i) => {
           const accent = ACCENT_HEX[p.accent];
-          const stage = STAGES[stageIndex(p.stage)];
           return (
             <button
               key={p.id}
@@ -289,14 +303,11 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
                 willChange: "transform, opacity",
               }}
             >
-              <span className="poster-cap absolute -top-5 left-0 right-0">
-                <span className="truncate">
-                  {nf(i + 1)} / {p.slug.replace(/-/g, "_").toUpperCase()}
-                </span>
-                <span className="hidden shrink-0 sm:inline">{stage.en}</span>
+              <span className="absolute -top-[18px] left-0 right-0 truncate font-display text-[8px] uppercase tracking-[0.2em] text-mist">
+                {nf(i + 1)} / {p.slug.replace(/-/g, "_").toUpperCase()}
               </span>
 
-              <span className="relative block h-full w-full overflow-hidden rounded-[10px] bg-[#101014] shadow-[0_40px_70px_-40px_rgba(20,20,25,0.65),0_10px_24px_-14px_rgba(20,20,25,0.35)]">
+              <span className="relative block h-full w-full overflow-hidden rounded-[6px] bg-[#101014] shadow-[0_36px_70px_-44px_rgba(20,20,25,0.5),0_10px_26px_-18px_rgba(20,20,25,0.28)]">
                 {p.cover_url ? (
                   <Image
                     src={p.cover_url}
@@ -319,6 +330,36 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
             </button>
           );
         })}
+      </div>
+
+'      <div className="relative z-10 -mt-3 flex justify-center">
+        <div
+          ref={markRef}
+          className="grid h-[52px] w-[52px] place-items-center rounded-[4px] border border-white/60 bg-white/55 shadow-[0_14px_30px_-18px_rgba(20,20,25,0.55)] backdrop-blur-sm"
+        >
+          <span className="font-display text-[17px] leading-none text-ink/45">✕</span>
+        </div>
+      </div>
+
+      <div className="mt-3 w-full">'
+        <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
+        <div className="mx-auto mb-3 h-px w-40 bg-ink/12">
+          <div ref={progressRef} className="h-px bg-ink/60" style={{ width: "0%" }} />
+        </div>
+        <div className="flex items-end justify-between border-t border-[var(--line)] pt-3">
+          <p className="label flex items-center gap-2">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-ink/45" />
+            CROQUIS / {nf(pursuits.length)}
+          </p>
+          <p
+            ref={labelRef}
+            className="font-display text-[9px] uppercase tracking-[0.24em] text-mist"
+          >
+            {pursuits[0]?.title ?? ""}
+          </p>
+          <p className="label">©2026</p>
+        </div>
+        </div>
       </div>
 
       {selected ? (
