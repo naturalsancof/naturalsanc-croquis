@@ -24,13 +24,16 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="flex items-center gap-3 sm:gap-6 md:gap-8">
           {NAV.map((item) => (
-            <Link key={item.href} href={item.href} className="group text-center">
-              <span className="block font-display text-[10px] tracking-[0.2em] text-ink/70 transition group-hover:text-ink">
-                {item.label} {item.en}
+            <Link key={item.href} href={item.href} className="group shrink-0 whitespace-nowrap text-center">
+              <span className="block font-display text-[10px] tracking-[0.12em] text-ink/70 transition group-hover:text-ink sm:tracking-[0.18em]">
+                {item.label}
+                <span className="hidden sm:inline"> {item.en}</span>
               </span>
-              <span className="mt-1 block text-[9px] text-mist/60">{item.ja}</span>
+              <span className="mt-1 hidden text-[9px] text-mist/60 md:block">
+                {item.ja}
+              </span>
             </Link>
           ))}
         </nav>

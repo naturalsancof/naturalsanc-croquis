@@ -32,9 +32,10 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
   const raf = useRef<number | null>(null);
   const last = useRef(0);
   const drag = useRef({ active: false, x: 0, start: 0, moved: 0, t: 0 });
+  const samples = useRef<{ t: number; x: number }[]>([]);
 
   const [size, setSize] = useState({ w: 300, h: 450 });
-  const [active, setActive] = useState(0);
+  const activeRef = useRef(0);
   const [selected, setSelected] = useState<Pursuit | null>(null);
 
   const n = pursuits.length;
@@ -79,13 +80,13 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
       const scale = Math.max(0.7, 1 - dist * 0.08);
       const rotY = Math.max(-16, Math.min(16, -pos * 8));
       const opacity = Math.max(0.15, 1 - dist * 0.22);
-      el.style.transform = `translate(-50%, -50%) translateX(${pos * step}px) perspective(1400px) rotateY(${rotY}deg) scale(${scale})`;
+      el.style.transform = `translate3d(calc(-50% + ${pos * step}px), -50%, 0) perspective(1400px) rotateY(${rotY}deg) scale(${scale})`;
       el.style.opacity = String(opacity);
       el.style.zIndex = String(100 - Math.round(dist * 10));
       el.style.pointerEvents = dist > 2.6 ? "none" : "auto";
     });
 
-    setActive((prev) => (prev === nearest ? prev : nearest));
+    activeRef.current = nearest;
   }, [n, step]);
 
   /* ------------------------------ 动画帧 ------------------------------ */
@@ -95,17 +96,20 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
     last.current = now;
 
     if (mode.current === "inertia") {
+      // 指数衰减，跟帧率无关
       offset.current += velocity.current * dt;
-      velocity.current *= Math.exp(-0.0045 * dt);
-      if (Math.abs(velocity.current) < 0.00035) {
+      velocity.current *= Math.exp(-0.0042 * dt);
+      if (Math.abs(velocity.current) < 0.00018) {
         velocity.current = 0;
         targetRef.current = Math.round(offset.current);
         mode.current = "settle";
       }
     } else if (mode.current === "settle") {
+      // 阻尼插值：alpha 由 dt 算出，60Hz / 120Hz 手感一致
       const diff = targetRef.current - offset.current;
-      offset.current += diff * 0.2;
-      if (Math.abs(diff) < 0.0015) {
+      const alpha = 1 - Math.exp(-0.012 * dt);
+      offset.current += diff * alpha;
+      if (Math.abs(diff) < 0.0012) {
         offset.current = targetRef.current;
         mode.current = "idle";
       }
@@ -149,6 +153,7 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
     d.moved = 0;
     d.t = performance.now();
     velocity.current = 0;
+    samples.current = [{ t: performance.now(), x: e.clientX }];
     mode.current = "drag";
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
@@ -162,10 +167,12 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
     paint();
 
     const now = performance.now();
-    const dt = Math.max(8, now - d.t);
-    velocity.current = -dx / dt / step;
     d.t = now;
     d.x = e.clientX;
+
+    const list = samples.current;
+    list.push({ t: now, x: e.clientX });
+    while (list.length > 2 && now - list[0].t > 140) list.shift();
   };
 
   const onPointerUp = (e: React.PointerEvent) => {
@@ -180,11 +187,24 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
 
     if (d.moved <= 6) {
       mode.current = "idle";
-      if (pursuits[active]) setSelected(pursuits[active]);
+      if (pursuits[activeRef.current]) setSelected(pursuits[activeRef.current]);
       return;
     }
 
-    // 惯性：保留速度，逐帧衰减，最后吸附
+    // 用最后 ~140ms 的位移估速度；松手前停住超过 80ms 就不算甩动
+    const list = samples.current;
+    const now = performance.now();
+    const lastP = list[list.length - 1];
+    const first = list.find((s) => now - s.t <= 140) ?? list[0];
+    const dtSample = lastP.t - first.t;
+    const dxSample = lastP.x - first.x;
+    const fresh = now - lastP.t < 80;
+    velocity.current = fresh && dtSample > 8 ? -dxSample / dtSample / step : 0;
+    // 封顶，避免一下飞出去好几张
+    const MAX = 0.0045;
+    velocity.current = Math.max(-MAX, Math.min(MAX, velocity.current));
+    samples.current = [];
+
     if (Math.abs(velocity.current) > 0.00012) {
       mode.current = "inertia";
     } else {
@@ -206,7 +226,7 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
       if (drag.current.active) return;
       velocity.current = 0;
       const base = mode.current === "settle" ? targetRef.current : Math.round(offset.current);
-      targetRef.current = base + delta / (step * 1.6);
+      targetRef.current = Math.max(base - 3, Math.min(base + 3, base + delta / (step * 1.15)));
       mode.current = "settle";
       kick();
     };
@@ -249,7 +269,7 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
         className={`relative my-auto h-[60vh] min-h-[340px] w-full cursor-grab select-none overflow-hidden active:cursor-grabbing ${
           selected ? "pointer-events-none opacity-40 blur-[2px] grayscale" : ""
         } transition-[opacity,filter] duration-500`}
-        style={{ touchAction: "pan-y" }}
+        style={{ touchAction: "pan-y", overscrollBehaviorX: "contain" }}
       >
         {pursuits.map((p, i) => {
           const accent = ACCENT_HEX[p.accent];
