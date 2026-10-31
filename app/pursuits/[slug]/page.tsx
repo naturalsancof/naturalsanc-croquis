@@ -8,15 +8,15 @@ import { PortfolioGrid } from "@/components/portfolio-grid";
 import { ProgressPanel } from "@/components/progress-panel";
 import { Section } from "@/components/section";
 import { ACCENT_HEX, STAGES, formatDate, stageIndex } from "@/lib/display";
-import { getPursuitDetail, getPursuitSlugs } from "@/lib/queries";
+import { getPursuitDetail } from "@/lib/queries";
 
-export const revalidate = 30;
-
-/** 把已知的追求在构建时预渲染；新加的 slug 会走 ISR 按需生成 */
-export async function generateStaticParams() {
-  const slugs = await getPursuitSlugs();
-  return slugs.map((slug) => ({ slug }));
-}
+/**
+ * 这一页读 searchParams（四个页签），属于动态渲染。
+ * 如果同时开 generateStaticParams + revalidate，线上会走「静态预渲染」路径，
+ * 读 searchParams 时抛 DYNAMIC_SERVER_USAGE（表现为整页 500，日志里就是这个 digest）。
+ * 所以这里明确声明动态，去掉构建期预渲染。
+ */
+export const dynamic = "force-dynamic";
 
 type TabKey = "progress" | "works" | "notes" | "materials";
 
