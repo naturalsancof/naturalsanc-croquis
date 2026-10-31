@@ -172,16 +172,28 @@ export async function changePassword(fd: FormData) {
 
 /* -------------------------------- pursuits -------------------------------- */
 
-export async function createPursuit(fd: FormData) {
+export type CreateResult = { error?: string; id?: string };
+
+/**
+ * 新建追求。
+ * 注意：带文件上传时不能在 action 里 redirect —— multipart 的响应体正在写入，
+ * 重定向会被吞掉（表现就是「建完了但页面没跳」）。所以这里只返回结果，
+ * 由客户端的 CreatePursuitForm 负责跳转。
+ */
+export async function createPursuit(
+  _prev: CreateResult,
+  fd: FormData,
+): Promise<CreateResult> {
   const supabase = await guard();
 
   const title = str(fd, "title") || "未命名追求";
   const rawSlug = str(fd, "slug") || title;
-  const slug = rawSlug
-    .toLowerCase()
-    .replace(/[^a-z0-9\u4e00-\u9fa5-]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 60) || `pursuit-${Date.now().toString(36)}`;
+  const slug =
+    rawSlug
+      .toLowerCase()
+      .replace(/[^a-z0-9\u4e00-\u9fa5-]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 60) || `pursuit-${Date.now().toString(36)}`;
 
   const { data: maxRow } = await supabase
     .from("pursuits")
@@ -203,11 +215,8 @@ export async function createPursuit(fd: FormData) {
     .select("id")
     .single();
 
-  if (error) {
-    // 常见原因：slug 重复
-    redirect(
-      `/admin?err=${encodeURIComponent(error.code === "23505" ? "slug-taken" : "create")}`,
-    );
+  if (error || !data) {
+    return { error: error?.code === "23505" ? "slug-taken" : "create" };
   }
 
   // 新建时直接带的封面：先插入拿到 id，再用这个 id 当文件夹传上去
@@ -223,12 +232,12 @@ export async function createPursuit(fd: FormData) {
       }
     } catch {
       refreshPublic();
-      redirect(`/admin/pursuits/${data.id}?err=upload`);
+      return { error: "upload", id: data.id };
     }
   }
 
   refreshPublic();
-  redirect(`/admin/pursuits/${data.id}`);
+  return { id: data.id };
 }
 
 export async function savePursuit(fd: FormData) {
