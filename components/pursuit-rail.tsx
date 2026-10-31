@@ -299,7 +299,7 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
-        className={`relative -mt-5 h-[57vh] min-h-[320px] w-full cursor-grab select-none overflow-hidden active:cursor-grabbing ${
+        className={`relative flex-1 min-h-[260px] w-full cursor-grab select-none overflow-hidden active:cursor-grabbing ${
           selected ? "pointer-events-none opacity-40 blur-[2px] grayscale" : ""
         } transition-[opacity,filter] duration-500`}
         style={{ touchAction: "none", overscrollBehaviorX: "contain" }}
