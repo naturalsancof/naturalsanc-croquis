@@ -45,7 +45,10 @@ export default async function HomePage() {
             marginRight: "calc(50% - 50vw)",
           }}
         >
-          <p className="label">Naturalsanc — Personal Digital Studio</p>
+          <p className="label">
+            Naturalsanc
+            <span className="hidden sm:inline"> — Personal Digital Studio</span>
+          </p>
           <span className="h-px flex-1 bg-ink/10" />
           <p className="label hidden sm:block">素描 / 草稿 / 進行中</p>
         </div>
