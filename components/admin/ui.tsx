@@ -127,6 +127,8 @@ const ERROR_TEXT: Record<string, string> = {
   "link-url": "资料链接需要填网址。",
   "note-empty": "笔记标题和正文不能都空着。",
   upload: "文件没传上去：确认图片或音频格式，或者先只填链接。",
+  create: "新建失败，请再试一次。",
+  "slug-taken": "这个网址片段已经被占用了，换一个。",
 };
 
 export function ErrorBanner({ code }: { code?: string }) {

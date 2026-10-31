@@ -203,7 +203,29 @@ export async function createPursuit(fd: FormData) {
     .select("id")
     .single();
 
-  if (error) throw new Error(`新建失败：${error.message}`);
+  if (error) {
+    // 常见原因：slug 重复
+    redirect(
+      `/admin?err=${encodeURIComponent(error.code === "23505" ? "slug-taken" : "create")}`,
+    );
+  }
+
+  // 新建时直接带的封面：先插入拿到 id，再用这个 id 当文件夹传上去
+  const coverFile = fd.get("cover_file");
+  if (coverFile && typeof coverFile !== "string" && coverFile.size > 0) {
+    try {
+      const coverUrl = await upload(supabase, coverFile, data.id);
+      if (coverUrl) {
+        await supabase
+          .from("pursuits")
+          .update({ cover_url: coverUrl })
+          .eq("id", data.id);
+      }
+    } catch {
+      refreshPublic();
+      redirect(`/admin/pursuits/${data.id}?err=upload`);
+    }
+  }
 
   refreshPublic();
   redirect(`/admin/pursuits/${data.id}`);
@@ -236,7 +258,12 @@ export async function savePursuit(fd: FormData) {
     cover_url: nullable(fd, "cover_url"),
   };
 
-  const uploaded = await upload(supabase, fd.get("cover_file"), id);
+  let uploaded: string | null = null;
+  try {
+    uploaded = await upload(supabase, fd.get("cover_file"), id);
+  } catch {
+    fail(id, fd, "upload");
+  }
   if (uploaded) patch.cover_url = uploaded;
 
   const { error } = await supabase.from("pursuits").update(patch).eq("id", id);

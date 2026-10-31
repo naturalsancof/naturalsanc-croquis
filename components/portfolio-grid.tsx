@@ -39,7 +39,10 @@ export function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
     );
   }
 
-  const active = openIndex === null ? null : images[openIndex];
+  const active =
+    openIndex === null || openIndex >= images.length
+      ? null
+      : images[openIndex];
 
   return (
     <div className="space-y-6">

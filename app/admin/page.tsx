@@ -2,14 +2,19 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createPursuit } from "@/app/admin/actions";
 import { AdminTopBar } from "@/components/admin/top-bar";
-import { Btn, Field, Input } from "@/components/admin/ui";
+import { Btn, ErrorBanner, Field, Input } from "@/components/admin/ui";
 import { STAGES, stageIndex } from "@/lib/display";
 import { supabaseServer } from "@/lib/supabase/server";
 
 export const metadata = { title: "Studio" };
 export const dynamic = "force-dynamic";
 
-export default async function AdminHome() {
+export default async function AdminHome({
+  searchParams,
+}: {
+  searchParams: Promise<{ err?: string }>;
+}) {
+  const { err } = await searchParams;
   const supabase = await supabaseServer();
   const {
     data: { user },
@@ -28,6 +33,8 @@ export default async function AdminHome() {
   return (
     <div className="pb-10">
       <AdminTopBar />
+
+      <ErrorBanner code={err} />
 
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
@@ -70,6 +77,7 @@ export default async function AdminHome() {
               <Link
                 href={`/pursuits/${p.slug}`}
                 target="_blank"
+              rel="noreferrer"
                 className="font-display text-[10px] tracking-[0.14em] text-mist/40 transition hover:text-ink"
               >
                 预览 ↗
@@ -98,13 +106,21 @@ export default async function AdminHome() {
 
         <form
           action={createPursuit}
-          className="mt-5 grid gap-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end"
+          className="mt-5 grid gap-4 sm:grid-cols-[1fr_1fr_1.2fr_auto] sm:items-end"
         >
           <Field label="名字" hint="中文">
             <Input name="title" required placeholder="例如：城市声音采集" />
           </Field>
           <Field label="网址片段" hint="slug · 小写英文">
             <Input name="slug" placeholder="city-sound" />
+          </Field>
+          <Field label="封面图" hint="可选 · 也可以建完再传">
+            <input
+              type="file"
+              name="cover_file"
+              accept="image/*"
+              className="w-full cursor-pointer rounded-lg border border-dashed border-[var(--line-strong)] bg-white/60 px-3 py-2 text-[11px] text-mist transition hover:border-ink/40 file:mr-3 file:cursor-pointer file:rounded file:border-0 file:bg-ink/5 file:px-2.5 file:py-1 file:text-[10px] file:text-ink"
+            />
           </Field>
           <Btn type="submit" className="sm:mb-0.5">
             创建

@@ -112,9 +112,11 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
       const p = ((cur % n) + n) % n;
       progressRef.current.style.width = `${((p + 0.5) / n) * 100}%`;
     }
-  }, [n, step]);
+  }, [n, step, pursuits]);
 
   /* ------------------------------ 动画帧 ------------------------------ */
+  const frameRef = useRef<() => void>(() => {});
+
   const frame = useCallback(() => {
     const now = performance.now();
     const dt = Math.min(48, now - (last.current || now));
@@ -146,16 +148,21 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
       raf.current = null;
       last.current = 0;
     } else {
-      raf.current = requestAnimationFrame(frame);
+      raf.current = requestAnimationFrame(() => frameRef.current());
     }
   }, [paint]);
+
+  // 把每帧函数存进 ref，rAF 才能递归调用它（直接自引用会触发 TDZ 检查）
+  useEffect(() => {
+    frameRef.current = frame;
+  }, [frame]);
 
   const kick = useCallback(() => {
     if (raf.current === null) {
       last.current = 0;
-      raf.current = requestAnimationFrame(frame);
+      raf.current = requestAnimationFrame(() => frameRef.current());
     }
-  }, [frame]);
+  }, []);
 
   useEffect(() => {
     paint();
@@ -343,7 +350,7 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
         })}
       </div>
 
-'      <div className="relative z-10 -mt-3 flex justify-center">
+      <div className="relative z-10 -mt-3 flex justify-center">
         <div
           ref={markRef}
           className="grid h-[52px] w-[52px] place-items-center rounded-[4px] border border-white/60 bg-white/55 shadow-[0_14px_30px_-18px_rgba(20,20,25,0.55)] backdrop-blur-sm"
@@ -352,7 +359,7 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
         </div>
       </div>
 
-      <div className="mt-3 w-full">'
+      <div className="mt-3 w-full">
         <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
         <div className="mx-auto mb-3 h-px w-40 bg-ink/12">
           <div ref={progressRef} className="h-px bg-ink/60" style={{ width: "0%" }} />

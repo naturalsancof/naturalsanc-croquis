@@ -6,14 +6,13 @@ import {
   saveNote,
   saveWork,
 } from "@/app/admin/actions";
+import { ConfirmSubmit } from "@/components/admin/confirm-submit";
 import { Sortable } from "@/components/admin/sortable";
 import {
   Btn,
   Field,
   Input,
   Select,
-  Textarea,
-  inputCls,
 } from "@/components/admin/ui";
 import { formatDate, hostOf } from "@/lib/display";
 import type { MaterialLink, Milestone, Note, PortfolioItem } from "@/lib/types";
@@ -325,19 +324,20 @@ export function WorksEditor({
               <input type="hidden" name="id" value={item.id} />
               <input type="hidden" name="pursuit_id" value={pursuitId} />
               <input type="hidden" name="return_tab" value="works" />
-              <button
-                type="submit"
+              <ConfirmSubmit
                 name="intent"
                 value="delete"
+                message="删除这件作品？文件会留在存储里，但记录会消失。"
                 className={`${iconBtn} border-[var(--line)] text-mist/50 hover:border-red-500/50 hover:text-red-300`}
                 title="删除"
+                ariaLabel="删除作品"
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M3 6h18" />
                   <path d="M8 6V4h8v2" />
                   <path d="M19 6l-1 14H6L5 6" />
                 </svg>
-              </button>
+              </ConfirmSubmit>
             </form>
           </div>
         </div>
@@ -601,14 +601,14 @@ function NoteSheet({ pursuitId, note }: { pursuitId: string; note: Note }) {
         <input type="hidden" name="id" value={note.id} />
         <input type="hidden" name="pursuit_id" value={pursuitId} />
         <input type="hidden" name="return_tab" value="notes" />
-        <button
-          type="submit"
+        <ConfirmSubmit
           name="intent"
           value="delete"
+          message="删除这篇笔记？不能撤销。"
           className="cursor-pointer font-display text-[9px] uppercase tracking-[0.16em] text-red-400/70 transition hover:text-red-500"
         >
           删除这篇笔记
-        </button>
+        </ConfirmSubmit>
       </form>
     </div>
   );

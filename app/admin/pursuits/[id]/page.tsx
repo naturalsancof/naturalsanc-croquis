@@ -126,6 +126,7 @@ export default async function EditPursuitPage({
         <Link
           href={`/pursuits/${pursuit.slug}`}
           target="_blank"
+              rel="noreferrer"
           className="rounded-lg border border-[var(--line)] px-3.5 py-2 font-display text-[10px] tracking-[0.16em] text-mist transition hover:border-white/30 hover:text-ink"
         >
           预览公开页面 ↗

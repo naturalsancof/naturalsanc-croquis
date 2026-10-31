@@ -27,22 +27,30 @@ export function Sortable({
   grid?: boolean;
 }) {
   const [order, setOrder] = useState<Item[]>(items);
+  const latest = useRef<Item[]>(items);
   const [dragging, setDragging] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   const dragId = useRef<string | null>(null);
   const moved = useRef(false);
-  const orderRef = useRef<Item[]>(items);
 
-  useEffect(() => {
-    orderRef.current = items;
+  // props 变了（保存后重新渲染）就同步本地顺序；按 React 推荐的
+  // 「渲染期间调整 state」写法，避免 effect 里 setState 造成二次渲染
+  const [prevItems, setPrevItems] = useState<Item[]>(items);
+  if (items !== prevItems) {
+    setPrevItems(items);
     setOrder(items);
-  }, [items]);
+  }
 
   const apply = useCallback((next: Item[]) => {
-    orderRef.current = next;
+    latest.current = next;
     setOrder(next);
   }, []);
+
+  // 服务端重新渲染后同步一份「最新顺序」，供松手时提交
+  useEffect(() => {
+    latest.current = order;
+  }, [order]);
 
   const commit = useCallback(
     (next: Item[]) => {
@@ -58,16 +66,15 @@ export function Sortable({
 
   const moveTo = useCallback(
     (fromId: string, toId: string) => {
-      const prev = orderRef.current;
-      const from = prev.findIndex((i) => i.id === fromId);
-      const to = prev.findIndex((i) => i.id === toId);
+      const from = order.findIndex((i) => i.id === fromId);
+      const to = order.findIndex((i) => i.id === toId);
       if (from < 0 || to < 0 || from === to) return;
-      const next = [...prev];
+      const next = [...order];
       const [item] = next.splice(from, 1);
       next.splice(to, 0, item);
       apply(next);
     },
-    [apply],
+    [apply, order],
   );
 
   const onPointerDown = (
@@ -101,7 +108,7 @@ export function Sortable({
       dragId.current = null;
       setDragging(null);
 
-      if (moved.current && id) commit(orderRef.current);
+      if (moved.current && id) commit(latest.current);
       moved.current = false;
     };
 

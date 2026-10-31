@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { deletePursuit, savePursuit } from "@/app/admin/actions";
+import { ConfirmSubmit } from "@/components/admin/confirm-submit";
 import { Btn, Field, Input, Textarea } from "@/components/admin/ui";
 import { ACCENT_HEX, STAGES, stageIndex } from "@/lib/display";
 import type { Pursuit } from "@/lib/types";
@@ -227,13 +228,13 @@ export function PursuitForm({ pursuit }: { pursuit: Pursuit }) {
 
           <div className="flex items-center gap-3">
             <Btn type="submit">保存</Btn>
-            <button
-              type="submit"
+            <ConfirmSubmit
               formAction={deletePursuit}
+              message="确定删除这个追求？作品、笔记、资料会一起删掉，不能撤销。"
               className="cursor-pointer rounded-lg border border-red-500/25 px-3.5 py-2 font-display text-[10px] tracking-[0.16em] text-red-300/70 uppercase transition hover:border-red-500/60 hover:bg-red-500/10"
             >
               删除
-            </button>
+            </ConfirmSubmit>
           </div>
         </div>
       </form>
@@ -276,6 +277,7 @@ export function PursuitForm({ pursuit }: { pursuit: Pursuit }) {
         <a
           href={`/pursuits/${pursuit.slug}`}
           target="_blank"
+              rel="noreferrer"
           className="block rounded-xl border border-[var(--line)] px-4 py-3 text-center font-display text-[10px] tracking-[0.18em] text-mist/60 transition hover:border-white/25 hover:text-ink"
         >
           打开公开页面 ↗

@@ -9,7 +9,8 @@ export function ProgressPanel({
   milestones: Milestone[];
 }) {
   const idx = stageIndex(pursuit.stage);
-  const pct = ((idx + 1) / STAGES.length) * 100;
+  // 圆点画在每段中间，进度条也要落到「当前阶段那个点」上，两者才对得齐
+  const pct = ((idx + 0.5) / STAGES.length) * 100;
   const doneCount = milestones.filter((m) => m.done).length;
 
   return (
