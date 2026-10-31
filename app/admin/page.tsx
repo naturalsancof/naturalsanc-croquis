@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createPursuit } from "@/app/admin/actions";
+import { CoverInput } from "@/components/admin/cover-input";
 import { AdminTopBar } from "@/components/admin/top-bar";
 import { Btn, ErrorBanner, Field, Input } from "@/components/admin/ui";
 import { STAGES, stageIndex } from "@/lib/display";
@@ -115,12 +116,7 @@ export default async function AdminHome({
             <Input name="slug" placeholder="city-sound" />
           </Field>
           <Field label="封面图" hint="可选 · 也可以建完再传">
-            <input
-              type="file"
-              name="cover_file"
-              accept="image/*"
-              className="w-full cursor-pointer rounded-lg border border-dashed border-[var(--line-strong)] bg-white/60 px-3 py-2 text-[11px] text-mist transition hover:border-ink/40 file:mr-3 file:cursor-pointer file:rounded file:border-0 file:bg-ink/5 file:px-2.5 file:py-1 file:text-[10px] file:text-ink"
-            />
+            <CoverInput className="w-full cursor-pointer rounded-lg border border-dashed border-[var(--line-strong)] bg-white/60 px-3 py-2 text-[11px] text-mist transition hover:border-ink/40 file:mr-3 file:cursor-pointer file:rounded file:border-0 file:bg-ink/5 file:px-2.5 file:py-1 file:text-[10px] file:text-ink" />
           </Field>
           <Btn type="submit" className="sm:mb-0.5">
             创建

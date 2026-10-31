@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { deletePursuit, savePursuit } from "@/app/admin/actions";
 import { ConfirmSubmit } from "@/components/admin/confirm-submit";
+import { CoverInput } from "@/components/admin/cover-input";
 import { Btn, Field, Input, Textarea } from "@/components/admin/ui";
 import { ACCENT_HEX, STAGES, stageIndex } from "@/lib/display";
 import type { Pursuit } from "@/lib/types";
@@ -205,12 +206,7 @@ export function PursuitForm({ pursuit }: { pursuit: Pursuit }) {
               />
             </Field>
             <Field label="上传封面" hint="选文件会覆盖地址">
-              <input
-                type="file"
-                name="cover_file"
-                accept="image/*"
-                className="w-full cursor-pointer rounded-lg border border-dashed border-white/15 bg-white/60 px-3 py-2 text-[11px] text-mist transition hover:border-cyan/40 file:mr-3 file:cursor-pointer file:rounded file:border-0 file:bg-white/10 file:px-2.5 file:py-1 file:text-[10px] file:text-ink"
-              />
+              <CoverInput className="w-full cursor-pointer rounded-lg border border-dashed border-white/15 bg-white/60 px-3 py-2 text-[11px] text-mist transition hover:border-cyan/40 file:mr-3 file:cursor-pointer file:rounded file:border-0 file:bg-white/10 file:px-2.5 file:py-1 file:text-[10px] file:text-ink" />
             </Field>
           </div>
         </fieldset>
