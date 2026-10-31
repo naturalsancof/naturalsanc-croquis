@@ -397,10 +397,24 @@ function DetailPanel({
   onClose: () => void;
 }) {
   const stage = STAGES[stageIndex(pursuit.stage)];
+  const [open, setOpen] = useState(false);
+  const [closing, setClosing] = useState(false);
+
+  // 挂载后下一帧再切到 open，过渡才有起点（否则一上来就是终态，没有动画）
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setOpen(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
+  const close = () => {
+    if (closing) return;
+    setClosing(true);
+    window.setTimeout(onClose, 260);
+  };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") close();
     };
     window.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
@@ -408,18 +422,43 @@ function DetailPanel({
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
     };
-  }, [onClose]);
+    // close 依赖 closing，重挂一次无副作用
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [closing]);
+
+  const shown = open && !closing;
+  const ease = "cubic-bezier(0.2, 0.8, 0.2, 1)";
 
   return (
     <div
-      className="fixed inset-0 z-[90] flex items-center justify-center bg-black/35 px-4 backdrop-blur-[2px]"
-      onClick={onClose}
+      className={`fixed inset-0 z-[90] flex items-center justify-center px-4 ${
+        shown ? "opacity-100" : "opacity-0"
+      } motion-reduce:transition-none`}
+      style={{
+        background: "rgb(10 10 12 / 0.55)",
+        backdropFilter: "blur(4px)",
+        transition: `opacity 260ms ${ease}`,
+      }}
+      onClick={close}
       role="dialog"
       aria-modal="true"
       aria-label={pursuit.title}
     >
-      <div className="absolute inset-x-0 top-0 h-[7vh] bg-[#0c0c0e]" />
-      <div className="absolute inset-x-0 bottom-0 h-[7vh] bg-[#0c0c0e]" />
+      {/* 上下黑边：从画面外滑进来 */}
+      <div
+        className="absolute inset-x-0 top-0 h-[7vh] bg-[#0c0c0e] motion-reduce:transition-none"
+        style={{
+          transform: shown ? "translateY(0)" : "translateY(-100%)",
+          transition: `transform 460ms ${ease}`,
+        }}
+      />
+      <div
+        className="absolute inset-x-0 bottom-0 h-[7vh] bg-[#0c0c0e] motion-reduce:transition-none"
+        style={{
+          transform: shown ? "translateY(0)" : "translateY(100%)",
+          transition: `transform 460ms ${ease}`,
+        }}
+      />
 
       <div
         className="relative mt-[6vh] w-full max-w-2xl"
@@ -427,15 +466,28 @@ function DetailPanel({
       >
         <button
           type="button"
-          onClick={onClose}
+          onClick={close}
           className="absolute -top-11 left-0 flex items-center gap-2 font-display text-[10px] tracking-[0.22em] text-white/80 transition hover:text-white"
+          style={{
+            opacity: shown ? 1 : 0,
+            transform: shown ? "translateY(0)" : "translateY(6px)",
+            transition: `opacity 240ms ${ease} 120ms, transform 240ms ${ease} 120ms`,
+          }}
         >
           ESC ✕
         </button>
 
         <div className="relative">
           {pursuit.cover_url ? (
-            <span className="absolute -top-16 left-1/2 block h-24 w-20 -translate-x-1/2 rotate-[-6deg] overflow-hidden rounded-md shadow-[0_20px_40px_-20px_rgba(0,0,0,0.8)]">
+            <span
+              className="absolute -top-16 left-1/2 block h-24 w-20 overflow-hidden rounded-md shadow-[0_20px_40px_-20px_rgba(0,0,0,0.8)]"
+              style={{
+                transform: shown
+                  ? "translateX(-50%) rotate(-6deg) scale(1)"
+                  : "translateX(-50%) rotate(-14deg) scale(0.86)",
+                transition: `transform 420ms ${ease} 60ms`,
+              }}
+            >
               <Image
                 src={pursuit.cover_url}
                 alt=""
@@ -446,7 +498,16 @@ function DetailPanel({
             </span>
           ) : null}
 
-          <div className="max-h-[62vh] overflow-y-auto rounded-2xl bg-[#0c0c0e] p-7 text-white/70 shadow-[0_40px_80px_-40px_rgba(0,0,0,0.9)] sm:p-9">
+          <div
+            className="max-h-[62vh] overflow-y-auto rounded-2xl bg-[#0c0c0e] p-7 text-white/70 shadow-[0_40px_80px_-40px_rgba(0,0,0,0.9)] sm:p-9"
+            style={{
+              opacity: shown ? 1 : 0,
+              transform: shown
+                ? "translateY(0) scale(1)"
+                : "translateY(18px) scale(0.975)",
+              transition: `opacity 260ms ${ease}, transform 380ms ${ease}`,
+            }}
+          >
             <div className="flex items-start justify-between gap-6">
               <div>
                 <p className="font-display text-[9px] tracking-[0.24em] text-white/35">
