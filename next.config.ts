@@ -1,11 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Server Action 默认只允许 1MB 请求体，封面上传/音频会直接报错。
-  // 放宽到 25MB，够放一张手机照片或一段短音频。
+  // 图片和音频由浏览器直传 Supabase Storage，不再塞进 Server Action。
+  // Vercel 函数请求体上限是 4.5MB，把这里调大也绕不过去。
   experimental: {
     serverActions: {
-      bodySizeLimit: "25mb",
+      bodySizeLimit: "2mb",
     },
   },
   images: {

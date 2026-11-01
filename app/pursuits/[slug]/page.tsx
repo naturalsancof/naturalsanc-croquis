@@ -129,7 +129,7 @@ export default async function PursuitPage({ params, searchParams }: PageProps) {
               {stage.en} · {stage.zh}
             </span>
 
-            <h1 className="mt-5 text-[38px] font-semibold leading-[1.02] tracking-[-0.03em] text-ink sm:text-[54px]">
+            <h1 className="mt-5 text-[38px] font-semibold leading-[1.02] tracking-[-0.03em] sm:text-[54px]">
               {pursuit.title}
             </h1>
 
@@ -141,7 +141,7 @@ export default async function PursuitPage({ params, searchParams }: PageProps) {
             ) : null}
 
             {pursuit.subtitle ? (
-              <p className="mt-7 max-w-xl text-[15px] leading-[1.95] text-ink/75">
+              <p className="mt-7 max-w-xl whitespace-pre-wrap text-[15px] leading-[1.95] text-ink/75">
                 {pursuit.subtitle}
               </p>
             ) : null}
@@ -219,7 +219,7 @@ export default async function PursuitPage({ params, searchParams }: PageProps) {
               en="PROGRESS"
               aside={
                 pursuit.description ? (
-                  <p className="max-w-2xl text-sm leading-[1.9] text-ink/65">
+                  <p className="max-w-2xl whitespace-pre-wrap text-sm leading-[1.9] text-ink/65">
                     {pursuit.description}
                   </p>
                 ) : undefined

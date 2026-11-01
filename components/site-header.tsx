@@ -8,7 +8,7 @@ const NAV = [
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-50">
+    <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[#f4eff4]/85 backdrop-blur-md">
       <div className="relative mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-5 sm:px-8">
         <Link href="/" className="group flex shrink-0 items-center gap-2.5 sm:gap-3">
           <span className="relative grid h-7 w-7 place-items-center border border-[var(--line-strong)] bg-white/60">

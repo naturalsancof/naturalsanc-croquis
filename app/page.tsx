@@ -24,7 +24,7 @@ export default async function HomePage() {
             marginRight: "calc(50% - 50vw)",
           }}
         >
-          <p
+          <h1
             className="select-none whitespace-nowrap px-5 font-extrabold uppercase leading-[0.9] tracking-[-0.055em] sm:px-8"
             style={{
               fontSize: "clamp(64px, 16vw, 240px)",
@@ -35,7 +35,7 @@ export default async function HomePage() {
             aria-label="Croquis"
           >
             Croquis
-          </p>
+          </h1>
         </div>
 
         <div
@@ -45,12 +45,12 @@ export default async function HomePage() {
             marginRight: "calc(50% - 50vw)",
           }}
         >
-          <p className="label">
+          <p className="label shrink-0">
             Naturalsanc
             <span className="hidden sm:inline"> — Personal Digital Studio</span>
           </p>
           <span className="h-px flex-1 bg-ink/10" />
-          <p className="label hidden sm:block">素描 / 草稿 / 進行中</p>
+          <p className="label hidden shrink-0 sm:block">素描 / 草稿 / 進行中</p>
         </div>
 
         <div

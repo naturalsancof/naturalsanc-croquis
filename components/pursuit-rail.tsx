@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { ACCENT_HEX, STAGES, stageIndex } from "@/lib/display";
+import { railWheelDecision, railWheelDelta } from "@/lib/rail-wheel";
 import type { Pursuit } from "@/lib/types";
 
 const nf = (n: number) => String(n).padStart(2, "0");
@@ -22,35 +23,62 @@ function wrap(pos: number, n: number) {
 
 type Mode = "idle" | "drag" | "inertia" | "settle";
 
+type Drag = {
+  tracking: boolean;
+  armed: boolean;
+  x0: number;
+  y0: number;
+  start: number;
+  moved: number;
+  cardIndex: number | null;
+};
+
 export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
   const railRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const offset = useRef(0);
-  const velocity = useRef(0); // 张 / 毫秒
+  const velocity = useRef(0);
   const targetRef = useRef(0);
   const mode = useRef<Mode>("idle");
   const raf = useRef<number | null>(null);
   const last = useRef(0);
-  const drag = useRef({ active: false, x: 0, x0: 0, start: 0, moved: 0, t: 0 });
+  const drag = useRef<Drag>({
+    tracking: false,
+    armed: false,
+    x0: 0,
+    y0: 0,
+    start: 0,
+    moved: 0,
+    cardIndex: null,
+  });
   const samples = useRef<{ t: number; x: number }[]>([]);
+  const reduceMotion = useRef(false);
+  const suppressClick = useRef(false);
 
   const [size, setSize] = useState({ w: 300, h: 450 });
   const activeRef = useRef(0);
   const labelRef = useRef<HTMLParagraphElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
-  const markRef = useRef<HTMLDivElement>(null);
   const [selected, setSelected] = useState<Pursuit | null>(null);
 
   const n = pursuits.length;
   const step = size.w * 1.12;
 
-  /* ------------------------------ 尺寸 ------------------------------ */
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const apply = () => {
+      reduceMotion.current = media.matches;
+    };
+    apply();
+    media.addEventListener("change", apply);
+    return () => media.removeEventListener("change", apply);
+  }, []);
+
   useLayoutEffect(() => {
     const measure = () => {
       const rail = railRef.current;
       if (!rail) return;
       const vw = window.innerWidth;
-      // 手机上卡片小一些；桌面按视口宽度换算，保证「3 张整卡 + 两张半卡」
       const byWidth = vw < 640 ? vw * 0.78 : vw * 0.318;
       const h = Math.max(240, Math.min(rail.clientHeight * 0.8, 470, byWidth));
       setSize({ w: Math.round((h * 2) / 3), h: Math.round(h) });
@@ -65,7 +93,6 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
     };
   }, []);
 
-  /* ------------------------------ 绘制 ------------------------------ */
   const paint = useCallback(() => {
     if (!n) return;
     const cur = offset.current;
@@ -80,19 +107,14 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
         nearestDist = dist;
         nearest = i;
       }
-      const scale = Math.max(0.78, 1 - dist * 0.06);
-      const rotY = Math.max(-14, Math.min(14, -pos * 8));
-      const opacity = Math.max(0.5, 1 - dist * 0.13);
-
-      // 越靠边越像隔着一层玻璃
+      const scale = Math.max(0.86, 1 - dist * 0.04);
+      const rotY = reduceMotion.current ? 0 : Math.max(-8, Math.min(8, -pos * 4));
+      const opacity = Math.max(0.62, 1 - dist * 0.1);
       const far = Math.max(0, dist - 1);
-      const blur = Math.min(6.5, far * 3.6);
-      const filterStr =
-        blur < 0.25
-          ? "none"
-          : `blur(${blur.toFixed(1)}px) saturate(${(1 - far * 0.18).toFixed(2)})`;
+      const blur = reduceMotion.current ? 0 : Math.min(2.5, far * 1.4);
+      const filterStr = blur < 0.25 ? "none" : `blur(${blur.toFixed(1)}px)`;
       if (el.style.filter !== filterStr) el.style.filter = filterStr;
-      el.style.setProperty("--glass", String(Math.min(0.9, far * 0.85)));
+      el.style.setProperty("--glass", String(Math.min(0.55, far * 0.4)));
       el.style.transform = `translate3d(calc(-50% + ${pos * step}px), -50%, 0) perspective(1400px) rotateY(${rotY}deg) scale(${scale})`;
       el.style.opacity = String(opacity);
       el.style.zIndex = String(100 - Math.round(dist * 10));
@@ -105,16 +127,12 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
         labelRef.current.textContent = pursuits[nearest]?.title ?? "";
       }
     }
-    if (markRef.current) {
-      markRef.current.style.transform = `rotate(${(-8 + cur * 18).toFixed(2)}deg)`;
-    }
     if (progressRef.current && n > 1) {
       const p = ((cur % n) + n) % n;
       progressRef.current.style.width = `${((p + 0.5) / n) * 100}%`;
     }
   }, [n, step, pursuits]);
 
-  /* ------------------------------ 动画帧 ------------------------------ */
   const frameRef = useRef<() => void>(() => {});
 
   const frame = useCallback(() => {
@@ -122,8 +140,11 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
     const dt = Math.min(48, now - (last.current || now));
     last.current = now;
 
-    if (mode.current === "inertia") {
-      // 指数衰减，跟帧率无关
+    if (reduceMotion.current) {
+      offset.current = targetRef.current;
+      velocity.current = 0;
+      mode.current = "idle";
+    } else if (mode.current === "inertia") {
       offset.current += velocity.current * dt;
       velocity.current *= Math.exp(-0.0022 * dt);
       if (Math.abs(velocity.current) < 0.00016) {
@@ -132,7 +153,6 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
         mode.current = "settle";
       }
     } else if (mode.current === "settle") {
-      // 阻尼插值：alpha 由 dt 算出，60Hz / 120Hz 手感一致
       const diff = targetRef.current - offset.current;
       const alpha = 1 - Math.exp(-0.0085 * dt);
       offset.current += diff * alpha;
@@ -152,17 +172,32 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
     }
   }, [paint]);
 
-  // 把每帧函数存进 ref，rAF 才能递归调用它（直接自引用会触发 TDZ 检查）
   useEffect(() => {
     frameRef.current = frame;
   }, [frame]);
 
   const kick = useCallback(() => {
+    if (reduceMotion.current) {
+      offset.current = targetRef.current;
+      mode.current = "idle";
+      paint();
+      return;
+    }
     if (raf.current === null) {
       last.current = 0;
       raf.current = requestAnimationFrame(() => frameRef.current());
     }
-  }, []);
+  }, [paint]);
+
+  const goTo = useCallback(
+    (target: number) => {
+      velocity.current = 0;
+      targetRef.current = target;
+      mode.current = "settle";
+      kick();
+    },
+    [kick],
+  );
 
   useEffect(() => {
     paint();
@@ -175,34 +210,52 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
     [],
   );
 
-  /* ------------------------------ 拖拽 ------------------------------ */
   const onPointerDown = (e: React.PointerEvent) => {
     if (e.button !== 0) return;
+    // 上一次拖拽如果没有产生 click，别把这次点击吃掉。
+    suppressClick.current = false;
+    const card = (e.target as HTMLElement).closest<HTMLElement>("[data-card-index]");
     const d = drag.current;
-    d.active = true;
-    d.x = e.clientX;
+    d.tracking = true;
+    d.armed = false;
     d.x0 = e.clientX;
+    d.y0 = e.clientY;
     d.start = offset.current;
     d.moved = 0;
-    d.t = performance.now();
+    d.cardIndex = card ? Number(card.dataset.cardIndex) : null;
     velocity.current = 0;
     samples.current = [{ t: performance.now(), x: e.clientX }];
     mode.current = "drag";
-    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
 
   const onPointerMove = (e: React.PointerEvent) => {
     const d = drag.current;
-    if (!d.active) return;
+    if (!d.tracking) return;
     const dx = e.clientX - d.x0;
+    const dy = e.clientY - d.y0;
+
+    if (!d.armed) {
+      if (Math.hypot(dx, dy) < 8) return;
+      // 纵向滑动交给页面滚动，不把整页锁在轨道上。
+      if (Math.abs(dy) > Math.abs(dx)) {
+        d.tracking = false;
+        mode.current = "idle";
+        suppressClick.current = true;
+        return;
+      }
+      d.armed = true;
+      try {
+        (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+      } catch {
+        /* 指针可能已经松开 */
+      }
+    }
+
     d.moved = Math.max(d.moved, Math.abs(dx));
     offset.current = d.start - dx / step;
     paint();
 
     const now = performance.now();
-    d.t = now;
-    d.x = e.clientX;
-
     const list = samples.current;
     list.push({ t: now, x: e.clientX });
     while (list.length > 2 && now - list[0].t > 140) list.shift();
@@ -210,84 +263,111 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
 
   const onPointerUp = (e: React.PointerEvent) => {
     const d = drag.current;
-    if (!d.active) return;
-    d.active = false;
+    if (!d.tracking) return;
+    const wasClick = !d.armed;
+    const cardIndex = d.cardIndex;
+    d.tracking = false;
+    d.armed = false;
     try {
       (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
     } catch {
       /* 指针可能已释放 */
     }
 
-    if (d.moved <= 6) {
+    if (wasClick) {
       mode.current = "idle";
-      if (pursuits[activeRef.current]) setSelected(pursuits[activeRef.current]);
+      if (cardIndex != null && pursuits[cardIndex]) setSelected(pursuits[cardIndex]);
       return;
     }
+    suppressClick.current = true;
 
-    // 用最后 ~140ms 的位移估速度；松手前停住超过 80ms 就不算甩动
     const list = samples.current;
     const now = performance.now();
     const lastP = list[list.length - 1];
     const first = list.find((s) => now - s.t <= 140) ?? list[0];
-    const dtSample = lastP.t - first.t;
-    const dxSample = lastP.x - first.x;
-    const fresh = now - lastP.t < 80;
+    const dtSample = lastP && first ? lastP.t - first.t : 0;
+    const dxSample = lastP && first ? lastP.x - first.x : 0;
+    const fresh = lastP ? now - lastP.t < 80 : false;
     velocity.current = fresh && dtSample > 8 ? -dxSample / dtSample / step : 0;
-    // 封顶，避免一下飞出去好几张
     const MAX = 0.0075;
     velocity.current = Math.max(-MAX, Math.min(MAX, velocity.current));
     samples.current = [];
 
-    if (Math.abs(velocity.current) > 0.00008) {
-      mode.current = "inertia";
-    } else {
-      targetRef.current = Math.round(offset.current);
-      mode.current = "settle";
+    if (reduceMotion.current || Math.abs(velocity.current) <= 0.00008) {
+      goTo(Math.round(offset.current));
+      return;
     }
+    mode.current = "inertia";
     kick();
   };
 
-  /* ------------------------------ 滚轮（原生，非被动） ------------------------------ */
+  const onPointerCancel = (e: React.PointerEvent) => {
+    drag.current.tracking = false;
+    drag.current.armed = false;
+    mode.current = "idle";
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {
+      /* 浏览器接管了这次手势 */
+    }
+  };
+
   useEffect(() => {
     const el = railRef.current;
     if (!el) return;
 
     const onWheel = (e: WheelEvent) => {
-      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-      if (Math.abs(delta) < 1) return;
+      const coarse = window.matchMedia("(pointer: coarse)").matches;
+      if (
+        railWheelDecision({
+          deltaX: e.deltaX,
+          deltaY: e.deltaY,
+          shiftKey: e.shiftKey,
+          ctrlKey: e.ctrlKey,
+          metaKey: e.metaKey,
+          coarsePointer: coarse,
+          cardCount: n,
+        }) === "ignore"
+      ) {
+        return;
+      }
       e.preventDefault();
-      if (drag.current.active) return;
-      velocity.current = 0;
+      if (drag.current.tracking) return;
+      const delta = railWheelDelta(e.deltaX, e.deltaY);
       const base = mode.current === "settle" ? targetRef.current : Math.round(offset.current);
-      targetRef.current = Math.max(base - 3, Math.min(base + 3, base + delta / (step * 1.15)));
-      mode.current = "settle";
-      kick();
+      goTo(Math.max(base - 4, Math.min(base + 4, base + delta / (step * 0.9))));
     };
 
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
-  }, [step, kick]);
+  }, [step, goTo, n]);
 
-  /* ------------------------------ 键盘 ------------------------------ */
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (selected) return;
-      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
-      const dir = e.key === "ArrowRight" ? 1 : -1;
-      const base = mode.current === "settle" ? targetRef.current : Math.round(offset.current);
-      targetRef.current = base + dir;
-      mode.current = "settle";
-      kick();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [selected, kick]);
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (selected) return;
+    if ((e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) {
+      e.preventDefault();
+      const current = pursuits[activeRef.current];
+      if (current) setSelected(current);
+      return;
+    }
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    e.preventDefault();
+    const dir = e.key === "ArrowRight" ? 1 : -1;
+    const base = mode.current === "settle" ? targetRef.current : Math.round(offset.current);
+    goTo(base + dir);
+  };
 
   if (n === 0) {
     return (
-      <p className="py-24 text-center text-sm text-mist">
-        还没有已发布的追求。
-      </p>
+      <div className="grid flex-1 place-items-center py-16 text-center">
+        <div>
+          <div className="mark mx-auto" aria-hidden>
+            <span>✕</span>
+          </div>
+          <p className="type-section mt-5 text-[20px]">还是空白的稿纸</p>
+          <p className="mt-1 text-[14px] text-mist">发布一条追求之后，会在这里排开。</p>
+        </div>
+      </div>
     );
   }
 
@@ -295,14 +375,19 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
     <>
       <div
         ref={railRef}
+        role="region"
+        aria-roledescription="轮播"
+        aria-label="正在进行的追求。左右方向键切换，点卡片打开对应的那一条。"
+        tabIndex={0}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
-        className={`relative flex-1 min-h-[260px] w-full cursor-grab select-none overflow-hidden active:cursor-grabbing ${
-          selected ? "pointer-events-none opacity-40 blur-[2px] grayscale" : ""
-        } transition-[opacity,filter] duration-500`}
-        style={{ touchAction: "none", overscrollBehaviorX: "contain" }}
+        onPointerCancel={onPointerCancel}
+        onKeyDown={onKeyDown}
+        className={`relative min-h-[260px] w-full flex-1 cursor-grab select-none overflow-hidden focus-visible:outline-[#3c4ec4] active:cursor-grabbing ${
+          selected ? "pointer-events-none opacity-40 blur-[1px]" : ""
+        } transition-[opacity,filter] duration-500 motion-reduce:transition-none`}
+        style={{ touchAction: "pan-y", overscrollBehaviorX: "contain" }}
       >
         {pursuits.map((p, i) => {
           const accent = ACCENT_HEX[p.accent];
@@ -313,14 +398,23 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
                 cardRefs.current[i] = el;
               }}
               type="button"
-              className="absolute left-1/2 top-1/2 block text-left"
+              data-card-index={i}
+              aria-label={p.title}
+              onClick={() => {
+                if (suppressClick.current) {
+                  suppressClick.current = false;
+                  return;
+                }
+                setSelected(p);
+              }}
+              className="group absolute left-1/2 top-1/2 block rounded-[6px] text-left transition-[filter] duration-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3c4ec4]"
               style={{
                 width: size.w,
                 height: size.h,
                 willChange: "transform, opacity",
               }}
             >
-              <span className="absolute -top-[18px] left-0 right-0 truncate font-display text-[8px] uppercase tracking-[0.2em] text-mist">
+              <span className="label absolute -top-[18px] left-0 right-0 truncate">
                 {nf(i + 1)} / {p.slug.replace(/-/g, "_").toUpperCase()}
               </span>
 
@@ -328,55 +422,48 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
                 {p.cover_url ? (
                   <Image
                     src={p.cover_url}
-                    alt={p.title}
+                    alt=""
                     fill
                     sizes="320px"
-                    className="object-cover"
+                    className="object-cover transition duration-700 ease-out group-hover:scale-[1.035] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                     draggable={false}
                     priority={i < 3}
                   />
                 ) : (
                   <span className="absolute inset-0 bg-gradient-to-br from-[#2a2a33] to-[#101014]" />
                 )}
-                <span className="glass-veil" />
+                <span className="glass-veil" aria-hidden />
                 <span className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-black/10" />
                 <span
                   className="absolute left-3 top-3 h-1.5 w-1.5 rounded-full"
                   style={{ background: accent }}
                 />
+                <span className="sr-only">{p.title}</span>
               </span>
             </button>
           );
         })}
       </div>
 
-      <div className="relative z-10 -mt-3 flex justify-center">
-        <div
-          ref={markRef}
-          className="grid h-[52px] w-[52px] place-items-center rounded-[4px] border border-white/60 bg-white/55 shadow-[0_14px_30px_-18px_rgba(20,20,25,0.55)] backdrop-blur-sm"
-        >
-          <span className="font-display text-[17px] leading-none text-ink/45">✕</span>
-        </div>
-      </div>
-
       <div className="mt-3 w-full">
         <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
-        <div className="mx-auto mb-3 h-px w-40 bg-ink/12">
-          <div ref={progressRef} className="h-px bg-ink/60" style={{ width: "0%" }} />
-        </div>
-        <div className="flex items-end justify-between border-t border-[var(--line)] pt-3">
-          <p className="label flex items-center gap-2">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-ink/45" />
-            CROQUIS / {nf(pursuits.length)}
-          </p>
-          <p
-            ref={labelRef}
-            className="font-display text-[9px] uppercase tracking-[0.24em] text-mist"
-          >
-            {pursuits[0]?.title ?? ""}
-          </p>
-          <p className="label">©2026</p>
-        </div>
+          <div className="mx-auto mb-3 h-px w-40 bg-ink/12">
+            <div ref={progressRef} className="h-px bg-ink/60" style={{ width: "0%" }} />
+          </div>
+          <div className="flex items-end justify-between border-t border-[var(--line)] pt-3">
+            <p className="label flex items-center gap-2">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-ink/45" />
+              CROQUIS / {nf(pursuits.length)}
+            </p>
+            <p
+              ref={labelRef}
+              aria-live="polite"
+              className="label max-w-[45%] truncate text-center"
+            >
+              {pursuits[0]?.title ?? ""}
+            </p>
+            <p className="label">©{new Date().getFullYear()}</p>
+          </div>
         </div>
       </div>
 
@@ -386,8 +473,6 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
     </>
   );
 }
-
-/* ------------------------------ 黑色信息面板 ------------------------------ */
 
 function DetailPanel({
   pursuit,
@@ -399,164 +484,144 @@ function DetailPanel({
   const stage = STAGES[stageIndex(pursuit.stage)];
   const [open, setOpen] = useState(false);
   const [closing, setClosing] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<() => void>(() => {});
+  const closingRef = useRef(false);
 
-  // 挂载后下一帧再切到 open，过渡才有起点（否则一上来就是终态，没有动画）
+  useEffect(() => {
+    closeRef.current = () => {
+      if (closingRef.current) return;
+      closingRef.current = true;
+      setClosing(true);
+      window.setTimeout(onClose, 220);
+    };
+  }, [onClose]);
+
   useEffect(() => {
     const id = requestAnimationFrame(() => setOpen(true));
     return () => cancelAnimationFrame(id);
   }, []);
 
-  const close = () => {
-    if (closing) return;
-    setClosing(true);
-    window.setTimeout(onClose, 260);
-  };
-
   useEffect(() => {
+    const root = panelRef.current;
+    const previously = document.activeElement as HTMLElement | null;
+    root?.querySelector<HTMLElement>("[data-close]")?.focus();
+
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeRef.current();
+        return;
+      }
+      if (e.key !== "Tab" || !root) return;
+      const items = [
+        ...root.querySelectorAll<HTMLElement>("a[href], button:not([disabled])"),
+      ];
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
-    window.addEventListener("keydown", onKey);
+
+    document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
     return () => {
-      window.removeEventListener("keydown", onKey);
+      document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
+      previously?.focus();
     };
-    // close 依赖 closing，重挂一次无副作用
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [closing]);
+  }, []);
 
   const shown = open && !closing;
-  const ease = "cubic-bezier(0.2, 0.8, 0.2, 1)";
 
   return (
     <div
+      ref={panelRef}
       className={`fixed inset-0 z-[90] flex items-center justify-center px-4 ${
         shown ? "opacity-100" : "opacity-0"
       } motion-reduce:transition-none`}
       style={{
-        background: "rgb(10 10 12 / 0.55)",
-        backdropFilter: "blur(4px)",
-        transition: `opacity 260ms ${ease}`,
+        background: "rgb(244 240 250 / 0.46)",
+        backdropFilter: "blur(10px)",
+        transition: "opacity 220ms ease",
       }}
-      onClick={close}
+      onClick={() => closeRef.current()}
       role="dialog"
       aria-modal="true"
       aria-label={pursuit.title}
     >
-      {/* 上下黑边：从画面外滑进来 */}
       <div
-        className="absolute inset-x-0 top-0 h-[7vh] bg-[#0c0c0e] motion-reduce:transition-none"
-        style={{
-          transform: shown ? "translateY(0)" : "translateY(-100%)",
-          transition: `transform 460ms ${ease}`,
-        }}
-      />
-      <div
-        className="absolute inset-x-0 bottom-0 h-[7vh] bg-[#0c0c0e] motion-reduce:transition-none"
-        style={{
-          transform: shown ? "translateY(0)" : "translateY(100%)",
-          transition: `transform 460ms ${ease}`,
-        }}
-      />
-
-      <div
-        className="relative mt-[6vh] w-full max-w-2xl"
+        className="relative w-full max-w-2xl rounded-2xl border border-ink/10 bg-white/80 p-6 text-ink backdrop-blur-md sm:p-8"
         onClick={(e) => e.stopPropagation()}
+        style={{
+          transform: shown ? "translateY(0)" : "translateY(10px)",
+          transition: "transform 220ms ease",
+        }}
       >
         <button
           type="button"
-          onClick={close}
-          className="absolute -top-11 left-0 flex items-center gap-2 font-display text-[10px] tracking-[0.22em] text-white/80 transition hover:text-white"
-          style={{
-            opacity: shown ? 1 : 0,
-            transform: shown ? "translateY(0)" : "translateY(6px)",
-            transition: `opacity 240ms ${ease} 120ms, transform 240ms ${ease} 120ms`,
-          }}
+          data-close
+          onClick={() => closeRef.current()}
+          className="mb-4 rounded-full px-2 py-1 font-display text-[10px] tracking-[0.18em] text-mist hover:text-ink"
         >
-          ESC ✕
+          关闭 ESC
         </button>
 
-        <div className="relative">
+        <div className="flex items-start gap-4">
           {pursuit.cover_url ? (
-            <span
-              className="absolute -top-16 left-1/2 block h-24 w-20 overflow-hidden rounded-md shadow-[0_20px_40px_-20px_rgba(0,0,0,0.8)]"
-              style={{
-                transform: shown
-                  ? "translateX(-50%) rotate(-6deg) scale(1)"
-                  : "translateX(-50%) rotate(-14deg) scale(0.86)",
-                transition: `transform 420ms ${ease} 60ms`,
-              }}
-            >
+            <span className="relative hidden h-24 w-20 shrink-0 overflow-hidden rounded-md sm:block">
               <Image
                 src={pursuit.cover_url}
-                alt=""
+                alt={`${pursuit.title} 的封面`}
                 fill
                 sizes="80px"
                 className="object-cover"
               />
             </span>
           ) : null}
-
-          <div
-            className="max-h-[62vh] overflow-y-auto rounded-2xl bg-[#0c0c0e] p-7 text-white/70 shadow-[0_40px_80px_-40px_rgba(0,0,0,0.9)] sm:p-9"
-            style={{
-              opacity: shown ? 1 : 0,
-              transform: shown
-                ? "translateY(0) scale(1)"
-                : "translateY(18px) scale(0.975)",
-              transition: `opacity 260ms ${ease}, transform 380ms ${ease}`,
-            }}
-          >
-            <div className="flex items-start justify-between gap-6">
-              <div>
-                <p className="font-display text-[9px] tracking-[0.24em] text-white/35">
-                  {pursuit.slug.replace(/-/g, "_").toUpperCase()} ·{" "}
-                  {stage.en.toUpperCase()}
-                </p>
-                <h2 className="mt-3 text-2xl text-white">{pursuit.title}</h2>
-                {pursuit.title_en ? (
-                  <p className="mt-1 font-display text-[9px] tracking-[0.2em] text-white/35">
-                    {pursuit.title_en.toUpperCase()}
-                  </p>
-                ) : null}
-              </div>
-              <span
-                className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full"
-                style={{ background: ACCENT_HEX[pursuit.accent] }}
-              />
-            </div>
-
-            {pursuit.subtitle ? (
-              <p className="mt-6 text-[13px] leading-relaxed text-white/60">
-                {pursuit.subtitle}
+          <div className="min-w-0 flex-1">
+            <p className="font-display text-[9px] tracking-[0.2em] text-mist">
+              {pursuit.slug.replace(/-/g, "_").toUpperCase()} · {stage.zh}
+            </p>
+            <h2 className="mt-2 text-[24px] font-semibold leading-tight tracking-[-0.02em] text-ink">
+              {pursuit.title}
+            </h2>
+            {pursuit.title_en ? (
+              <p className="mt-1 font-display text-[10px] tracking-[0.16em] text-mist">
+                {pursuit.title_en}
               </p>
             ) : null}
-            {pursuit.description ? (
-              <p className="mt-4 text-[12px] leading-[1.9] text-white/45">
-                {pursuit.description}
-              </p>
-            ) : null}
-
-            {pursuit.progress_note ? (
-              <p className="mt-5 border-l border-white/15 pl-4 font-display text-[10px] leading-relaxed tracking-[0.02em] text-white/40">
-                {pursuit.progress_note}
-              </p>
-            ) : null}
-
-            <div className="mt-7 flex items-center justify-between border-t border-white/10 pt-5">
-              <p className="font-display text-[9px] tracking-[0.2em] text-white/25">
-                {stage.zh} · {pursuit.started_at ?? "—"}
-              </p>
-              <Link
-                href={`/pursuits/${pursuit.slug}`}
-                className="group inline-flex items-center gap-2 border border-white/20 px-4 py-2 font-display text-[9px] tracking-[0.22em] text-white/80 transition hover:border-white hover:bg-white hover:text-black"
-              >
-                进入这个追求
-                <span className="transition group-hover:translate-x-1">→</span>
-              </Link>
-            </div>
           </div>
+        </div>
+
+        {pursuit.subtitle ? (
+          <p className="mt-5 whitespace-pre-wrap text-[14px] leading-relaxed text-ink/80">{pursuit.subtitle}</p>
+        ) : null}
+        {pursuit.description ? (
+          <p className="mt-3 whitespace-pre-wrap text-[13px] leading-[1.8] text-ink/70">{pursuit.description}</p>
+        ) : null}
+        {pursuit.progress_note ? (
+          <p className="mt-4 border-l-2 border-[#5b4eb8]/40 pl-4 text-[13px] leading-relaxed text-ink/75">
+            {pursuit.progress_note}
+          </p>
+        ) : null}
+
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-ink/10 pt-4">
+          <p className="text-[12px] text-mist">
+            {stage.zh} · {pursuit.started_at ?? "未填开始日期"}
+          </p>
+          <Link
+            href={`/pursuits/${pursuit.slug}`}
+            className="inline-flex items-center rounded-full bg-ink px-4 py-2 text-[12px] text-white hover:bg-ink/85"
+          >
+            进入这个追求
+          </Link>
         </div>
       </div>
     </div>
