@@ -772,7 +772,7 @@ function MilestoneLine({
         type="button"
         aria-label="删除里程碑"
         onClick={onDelete}
-        className="rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2 py-0.5 text-[12px] text-[var(--text-muted)] opacity-0 transition hover:bg-[var(--surface-muted)] hover:text-[var(--danger)] group-hover:opacity-100 group-focus-within:opacity-100"
+        className="rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2 py-0.5 text-[12px] text-[var(--text-muted)] transition hover:bg-[var(--surface-muted)] hover:text-[var(--danger)]"
       >
         删
       </button>
@@ -852,7 +852,7 @@ function WorkLine({
           type="button"
           aria-label="删除作品"
           onClick={onDelete}
-          className="rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2 py-0.5 text-[12px] text-[var(--text-muted)] opacity-0 transition hover:bg-[var(--surface-muted)] hover:text-[var(--danger)] group-hover:opacity-100 group-focus-within:opacity-100"
+          className="rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2 py-0.5 text-[12px] text-[var(--text-muted)] transition hover:bg-[var(--surface-muted)] hover:text-[var(--danger)]"
         >
           删
         </button>
@@ -913,7 +913,7 @@ function MaterialLine({
           type="button"
           aria-label="删除资料"
           onClick={onDelete}
-          className="rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2 py-0.5 text-[12px] text-[var(--text-muted)] opacity-0 transition hover:bg-[var(--surface-muted)] hover:text-[var(--danger)] group-hover:opacity-100 group-focus-within:opacity-100"
+          className="rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2 py-0.5 text-[12px] text-[var(--text-muted)] transition hover:bg-[var(--surface-muted)] hover:text-[var(--danger)]"
         >
           删
         </button>
