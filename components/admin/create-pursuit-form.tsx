@@ -70,7 +70,7 @@ export function CreatePursuitForm() {
           name="cover_file"
           accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
           onChange={(event) => setFile(event.target.files?.[0] ?? null)}
-          className="w-full cursor-pointer rounded-lg border border-dashed border-[var(--line-strong)] bg-white/60 px-3 py-2 text-[11px] text-mist file:mr-3 file:rounded file:border-0 file:bg-ink/5 file:px-2.5 file:py-1 file:text-[10px] file:text-ink"
+          className="w-full cursor-pointer rounded-[8px] border-[0.5px] border-dashed border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2 text-[11px] text-[var(--text-muted)] file:mr-3 file:rounded-[8px] file:border-0 file:bg-[var(--surface-muted)] file:px-2.5 file:py-1 file:text-[11px] file:text-[var(--text)]"
         />
       </Field>
       <Btn type="submit" disabled={pending} className="sm:mb-0.5">
@@ -78,7 +78,7 @@ export function CreatePursuitForm() {
       </Btn>
 
       {error ? (
-        <p className="text-[12px] text-red-700 sm:col-span-4">
+        <p className="text-[12px] text-[var(--danger)] sm:col-span-4">
           {MESSAGE[error] ?? "新建失败，请再试一次。"}
         </p>
       ) : null}

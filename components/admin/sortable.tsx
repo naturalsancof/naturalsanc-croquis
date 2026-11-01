@@ -90,15 +90,23 @@ export function Sortable({
             title="按住拖动排序"
             onPointerDown={(event) => onPointerDown(event, item.id)}
             style={{ touchAction: "none" }}
-            className="absolute -left-1 top-2 z-10 grid h-8 w-5 cursor-grab place-items-center text-ink/20 hover:text-ink/60"
+            className="absolute -left-1 top-2 z-10 grid h-8 w-5 cursor-grab place-items-center rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] text-[var(--text-soft)] transition hover:bg-[var(--surface-muted)] hover:text-[var(--text)]"
           >
-            <svg width="8" height="14" viewBox="0 0 8 14" fill="currentColor" aria-hidden>
-              <circle cx="2" cy="2" r="1.15" />
-              <circle cx="6" cy="2" r="1.15" />
-              <circle cx="2" cy="7" r="1.15" />
-              <circle cx="6" cy="7" r="1.15" />
-              <circle cx="2" cy="12" r="1.15" />
-              <circle cx="6" cy="12" r="1.15" />
+            <svg
+              width="8"
+              height="14"
+              viewBox="0 0 8 14"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1"
+              aria-hidden="true"
+            >
+              <circle cx="2" cy="2" r="0.9" />
+              <circle cx="6" cy="2" r="0.9" />
+              <circle cx="2" cy="7" r="0.9" />
+              <circle cx="6" cy="7" r="0.9" />
+              <circle cx="2" cy="12" r="0.9" />
+              <circle cx="6" cy="12" r="0.9" />
             </svg>
           </button>
           {item.node}

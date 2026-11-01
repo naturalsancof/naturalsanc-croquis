@@ -12,12 +12,12 @@ export default async function LoginPage({
 
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-sm flex-col justify-center">
-      <Link href="/" className="mb-10 text-[14px] text-mist">
+      <Link href="/" className="mb-10 inline-flex w-fit rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2.5 py-1.5 text-[14px] text-[var(--text-muted)] transition hover:bg-[var(--surface-muted)] hover:text-[var(--text)]">
         ←
       </Link>
-      <h1 className="text-[34px] font-semibold tracking-[-0.03em] text-ink">登录</h1>
+      <h1 className="text-[22px] font-medium text-[var(--text)]">登录</h1>
       {error ? (
-        <p className="mt-6 text-[13px] text-red-700">
+        <p className="mt-6 text-[13px] text-[var(--danger)]">
           {error === "forbidden" ? "这个账号没有编辑权限。" : "邮箱或密码不对。"}
         </p>
       ) : null}
@@ -29,7 +29,7 @@ export default async function LoginPage({
           autoComplete="username"
           aria-label="邮箱"
           placeholder="邮箱"
-          className="plain-write text-[17px]"
+          className="plain-write text-[16px]"
         />
         <input
           name="password"
@@ -38,9 +38,9 @@ export default async function LoginPage({
           autoComplete="current-password"
           aria-label="密码"
           placeholder="密码"
-          className="plain-write text-[17px]"
+          className="plain-write text-[16px]"
         />
-        <button type="submit" className="pt-4 text-[14px] text-ink">
+        <button type="submit" className="mt-2 w-fit rounded-[8px] border-[0.5px] border-[var(--accent)] bg-[var(--accent-soft)] px-4 py-2 text-[14px] text-[var(--accent)] transition hover:bg-[var(--surface-muted)]">
           进入
         </button>
       </form>

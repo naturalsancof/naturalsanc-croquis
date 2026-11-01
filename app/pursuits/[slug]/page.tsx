@@ -7,7 +7,7 @@ import { NoteList } from "@/components/note-list";
 import { PortfolioGrid } from "@/components/portfolio-grid";
 import { ProgressPanel } from "@/components/progress-panel";
 import { Section } from "@/components/section";
-import { ACCENT_HEX, STAGES, formatDate, stageIndex } from "@/lib/display";
+import { STAGES, formatDate, stageIndex } from "@/lib/display";
 import { getPursuitDetail } from "@/lib/queries";
 
 /**
@@ -58,7 +58,6 @@ export default async function PursuitPage({ params, searchParams }: PageProps) {
 
   if (!pursuit) notFound();
 
-  const accent = ACCENT_HEX[pursuit.accent];
   const stage = STAGES[stageIndex(pursuit.stage)];
   const works = pursuit.portfolio_items.length;
   const notes = pursuit.notes.length;
@@ -66,10 +65,10 @@ export default async function PursuitPage({ params, searchParams }: PageProps) {
   const milestones = pursuit.milestones.length;
 
   const TABS: { key: TabKey; label: string; en: string; count: number | null }[] = [
-    { key: "progress", label: "进展", en: "PROGRESS", count: milestones || null },
-    { key: "works", label: "作品", en: "WORKS", count: works },
-    { key: "notes", label: "笔记", en: "NOTES", count: notes },
-    { key: "materials", label: "资料", en: "MATERIALS", count: materials },
+    { key: "progress", label: "进展", en: "Progress", count: milestones || null },
+    { key: "works", label: "作品", en: "Works", count: works },
+    { key: "notes", label: "笔记", en: "Notes", count: notes },
+    { key: "materials", label: "资料", en: "Materials", count: materials },
   ];
 
   const tab: TabKey = TABS.some((t) => t.key === rawTab)
@@ -86,22 +85,19 @@ export default async function PursuitPage({ params, searchParams }: PageProps) {
   ];
 
   return (
-    <article style={{ ["--accent" as string]: accent }} className="pb-6">
+    <article className="pb-6">
       {/* ---------------- HERO ---------------- */}
       <header className="rise">
-        <nav className="mb-8 flex items-center gap-2 font-display text-[9px] tracking-[0.22em] text-mist">
-          <Link href="/pursuits" className="transition hover:text-ink">
+        <nav className="mb-8 flex items-center gap-2 font-display text-[11px] text-[var(--text-muted)]">
+          <Link href="/pursuits" className="transition hover:text-[var(--text)]">
             追求
           </Link>
-          <span className="text-mist/40">/</span>
-          <span className="text-ink/70">{pursuit.slug.toUpperCase()}</span>
+          <span className="text-[var(--text-soft)]">/</span>
+          <span className="text-[var(--text)]">{pursuit.slug}</span>
         </nav>
 
         <div className="grid gap-8 lg:grid-cols-[330px_minmax(0,1fr)] lg:items-start lg:gap-12">
-          <div
-            className="poster aspect-[3/4] w-full max-w-[330px]"
-            style={{ ["--tilt" as string]: "-1.4deg" }}
-          >
+          <div className="poster aspect-[3/4] w-full max-w-[330px]">
             {pursuit.cover_url ? (
               <Image
                 src={pursuit.cover_url}
@@ -112,41 +108,37 @@ export default async function PursuitPage({ params, searchParams }: PageProps) {
                 priority
               />
             ) : (
-              <div className="absolute inset-0 bg-gradient-to-br from-[#2a2a33] to-[#101014]" />
+              <div className="absolute inset-0 bg-[var(--surface-muted)]" />
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-            <span className="absolute bottom-3 left-3 font-display text-[8px] tracking-[0.2em] text-white/50">
-              {pursuit.slug.replace(/-/g, "_").toUpperCase()}
+            <span className="absolute bottom-3 left-3 bg-[var(--media-scrim)] px-2 py-1 font-display text-[11px] text-[var(--on-image)]">
+              {pursuit.slug.replace(/-/g, "_")}
             </span>
           </div>
 
           <div className="pt-2">
             <span className="chip chip-accent">
-              <span
-                className="h-1 w-1 rounded-full"
-                style={{ background: accent }}
-              />
+              <span className="h-1 w-1 rounded-full bg-[var(--accent)]" aria-hidden />
               {stage.en} · {stage.zh}
             </span>
 
-            <h1 className="mt-5 text-[38px] font-semibold leading-[1.02] tracking-[-0.03em] sm:text-[54px]">
+            <h1 className="mt-5 text-[22px] font-medium leading-[1.3] text-[var(--text)]">
               {pursuit.title}
             </h1>
 
             {pursuit.title_en ? (
-              <p className="sub mt-4 uppercase">{pursuit.title_en}</p>
+              <p className="sub mt-4">{pursuit.title_en}</p>
             ) : null}
             {pursuit.title_ja ? (
-              <p className="sub-ja mt-1 text-sm">{pursuit.title_ja}</p>
+              <p className="sub-ja mt-1 text-[13px]">{pursuit.title_ja}</p>
             ) : null}
 
             {pursuit.subtitle ? (
-              <p className="mt-7 max-w-xl whitespace-pre-wrap text-[15px] leading-[1.95] text-ink/75">
+              <p className="mt-7 max-w-xl whitespace-pre-wrap text-base leading-[1.7] text-[var(--text-muted)]">
                 {pursuit.subtitle}
               </p>
             ) : null}
             {pursuit.subtitle_en ? (
-              <p className="sub mt-2 max-w-xl text-[11px] normal-case tracking-normal">
+              <p className="sub mt-2 max-w-xl text-[12px]">
                 {pursuit.subtitle_en}
               </p>
             ) : null}
@@ -154,7 +146,7 @@ export default async function PursuitPage({ params, searchParams }: PageProps) {
               <p className="sub-ja mt-1 max-w-xl">{pursuit.subtitle_ja}</p>
             ) : null}
 
-            <div className="mt-8 flex flex-wrap gap-2 border-t border-[var(--line)] pt-6">
+            <div className="mt-8 flex flex-wrap gap-2 border-t-[0.5px] border-[var(--border)] pt-6">
               <span className="chip">开始 {formatDate(pursuit.started_at)}</span>
               <span className="chip">{works} 件作品</span>
               <span className="chip">{notes} 篇笔记</span>
@@ -166,7 +158,7 @@ export default async function PursuitPage({ params, searchParams }: PageProps) {
 
       {/* ---------------- TABS ---------------- */}
       <div className="sticky top-16 z-40 mt-10">
-        <nav className="mx-auto grid w-fit grid-cols-4 gap-1 rounded-full border border-[var(--line)] bg-white/75 p-1 backdrop-blur-xl">
+        <nav className="mx-auto grid w-fit grid-cols-4 gap-1 rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] p-1">
           {TABS.map((t) => {
             const active = t.key === tab;
             return (
@@ -174,24 +166,26 @@ export default async function PursuitPage({ params, searchParams }: PageProps) {
                 key={t.key}
                 href={`/pursuits/${pursuit.slug}?tab=${t.key}`}
                 scroll={false}
-                className={`flex w-[76px] items-center justify-center gap-1.5 rounded-full px-1 py-2 font-display text-[10px] tracking-[0.14em] uppercase transition sm:w-[126px] sm:gap-2 sm:px-2 ${
+                className={`flex w-[76px] items-center justify-center gap-1.5 rounded-[8px] border-[0.5px] px-1 py-2 font-display text-[11px] transition sm:w-[126px] sm:gap-2 sm:px-2 ${
                   active
-                    ? "bg-ink text-white"
-                    : "text-mist hover:bg-ink/5 hover:text-ink"
+                    ? "border-[var(--surface-inverse)] bg-[var(--surface-inverse)] text-[var(--text-inverse)] hover:bg-[var(--text-muted)]"
+                    : "border-[var(--border)] bg-[var(--surface-muted)] text-[var(--text-muted)] hover:bg-[var(--surface)] hover:text-[var(--text)]"
                 }`}
               >
                 {t.label}
                 <span
-                  className={`hidden text-[9px] tracking-normal sm:inline ${
-                    active ? "text-white/50" : "text-mist/50"
+                  className={`hidden text-[11px] sm:inline ${
+                    active ? "text-[var(--text-inverse-muted)]" : "text-[var(--text-soft)]"
                   }`}
                 >
                   {t.en}
                 </span>
                 {t.count !== null && t.count > 0 ? (
                   <span
-                    className={`hidden rounded-full px-1.5 py-0.5 text-[8px] sm:inline ${
-                      active ? "bg-white/20 text-white" : "bg-ink/5 text-mist"
+                    className={`hidden rounded-[8px] px-1.5 py-0.5 text-[11px] sm:inline ${
+                      active
+                        ? "bg-[var(--surface)] text-[var(--text)]"
+                        : "bg-[var(--surface-muted)] text-[var(--text-muted)]"
                     }`}
                   >
                     {t.count}
@@ -216,10 +210,10 @@ export default async function PursuitPage({ params, searchParams }: PageProps) {
             <Section
               index="01"
               title="进展与进度"
-              en="PROGRESS"
+              en="Progress"
               aside={
                 pursuit.description ? (
-                  <p className="max-w-2xl whitespace-pre-wrap text-sm leading-[1.9] text-ink/65">
+                  <p className="max-w-2xl whitespace-pre-wrap text-base leading-[1.7] text-[var(--text-muted)]">
                     {pursuit.description}
                   </p>
                 ) : undefined
@@ -233,9 +227,9 @@ export default async function PursuitPage({ params, searchParams }: PageProps) {
             <Section
               index="02"
               title="作品"
-              en="SELECTED WORKS"
+              en="Selected works"
               aside={
-                <p className="text-xs text-mist">
+                <p className="text-[13px] text-[var(--text-muted)]">
                   共 {works} 件，点开看大图。
                 </p>
               }
@@ -248,9 +242,9 @@ export default async function PursuitPage({ params, searchParams }: PageProps) {
             <Section
               index="03"
               title="笔记"
-              en="FIELD NOTES"
+              en="Field notes"
               aside={
-                <p className="text-xs text-mist">
+                <p className="text-[13px] text-[var(--text-muted)]">
                   共 {notes} 篇，写在 Markdown 里，随页面一起更新。
                 </p>
               }
@@ -263,9 +257,9 @@ export default async function PursuitPage({ params, searchParams }: PageProps) {
             <Section
               index="04"
               title="学习资料与链接"
-              en="MATERIALS"
+              en="Materials"
               aside={
-                <p className="text-xs text-mist">共 {materials} 条。</p>
+                <p className="text-[13px] text-[var(--text-muted)]">共 {materials} 条。</p>
               }
             >
               <LinkList links={pursuit.materials_and_links} />
@@ -275,21 +269,21 @@ export default async function PursuitPage({ params, searchParams }: PageProps) {
 
         {tab === "progress" ? (
           <aside className="space-y-4 lg:sticky lg:top-32">
-            <div className="border-t border-[var(--line)] pt-4">
+            <div className="border-t-[0.5px] border-[var(--border)] pt-4">
               <p className="label">At a glance</p>
               <dl className="mt-4">
                 {facts.map((f) => (
                   <div
                     key={f.en}
-                    className="flex items-baseline justify-between gap-3 border-b border-[var(--line)] py-2 last:border-0"
+                    className="flex items-baseline justify-between gap-3 border-b-[0.5px] border-[var(--border)] py-2 last:border-0"
                   >
-                    <dt className="text-[11px] text-mist">
+                    <dt className="text-[11px] text-[var(--text-muted)]">
                       {f.label}
-                      <span className="ml-1.5 font-display text-[8px] tracking-[0.16em] text-mist/60">
-                        {f.en.toUpperCase()}
+                      <span className="ml-1.5 font-display text-[11px] text-[var(--text-soft)]">
+                        {f.en}
                       </span>
                     </dt>
-                    <dd className="font-display text-[11px] tracking-[0.04em] text-ink">
+                    <dd className="font-display text-[11px] text-[var(--text)]">
                       {f.value}
                     </dd>
                   </div>
@@ -297,24 +291,24 @@ export default async function PursuitPage({ params, searchParams }: PageProps) {
               </dl>
             </div>
 
-            <div className="border-t border-[var(--line)] pt-4">
+            <div className="border-t-[0.5px] border-[var(--border)] pt-4">
               <p className="label">Colophon</p>
-              <p className="mt-3 text-[11px] leading-relaxed text-mist">
+              <p className="mt-3 text-[11px] leading-[1.7] text-[var(--text-muted)]">
                 页面从 Supabase 实时读取。内容会随追求推进而变，不保证稳定。
               </p>
-              <p className="sub-ja mt-2 text-[10px]">
+              <p className="sub-ja mt-2 text-[11px]">
                 このページは進行に合わせて更新されます。
               </p>
             </div>
 
             <Link
               href="/pursuits"
-              className="group flex items-center justify-between border border-[var(--line)] px-4 py-3 transition hover:border-ink/40"
+              className="group flex items-center justify-between rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-4 py-3 transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-muted)]"
             >
-              <span className="font-display text-[9px] tracking-[0.22em] text-mist transition group-hover:text-ink">
-                ALL PURSUITS
+              <span className="font-display text-[11px] text-[var(--text-muted)] transition group-hover:text-[var(--text)]">
+                All pursuits
               </span>
-              <span className="text-mist transition group-hover:-translate-x-1 group-hover:text-ink">
+              <span className="text-[var(--text-muted)] transition group-hover:text-[var(--text)]" aria-hidden>
                 ←
               </span>
             </Link>
