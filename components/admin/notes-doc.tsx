@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useOpenList } from "@/components/admin/notes-shell";
 import { Sortable } from "@/components/admin/sortable";
 import { ACCENT_HEX, STAGES } from "@/lib/display";
 import type { SaveStatus } from "@/components/admin/studio-editor";
@@ -28,6 +28,18 @@ const KINDS: { value: MaterialKind; label: string }[] = [
   { value: "other", label: "其他" },
 ];
 
+type Lang = "zh" | "en" | "ja";
+
+const LANGS: { id: Lang; label: string }[] = [
+  { id: "zh", label: "中" },
+  { id: "en", label: "EN" },
+  { id: "ja", label: "日" },
+];
+
+function langName(lang: Lang) {
+  return lang === "zh" ? "中文" : lang === "en" ? "English" : "日本語";
+}
+
 type Write = (next: StudioSnapshot, mode: "debounce" | "now" | "local") => void;
 type PatchRow = (
   key: "milestones" | "works" | "notes" | "materials",
@@ -35,6 +47,34 @@ type PatchRow = (
   patch: object,
   mode?: "debounce" | "now",
 ) => void;
+
+function localized(lang: Lang, zh: string, en: string | null, ja: string | null) {
+  if (lang === "en") return en ?? "";
+  if (lang === "ja") return ja ?? "";
+  return zh;
+}
+
+function pursuitLangPatch(
+  lang: Lang,
+  base: "title" | "subtitle" | "description" | "progress_note",
+  value: string,
+): Partial<Pursuit> {
+  const stored = lang === "zh" && base === "title" ? value : value.trim() ? value : null;
+  if (lang === "zh") return { [base]: stored };
+  if (lang === "en") return { [`${base}_en`]: stored };
+  return { [`${base}_ja`]: stored };
+}
+
+function langPatch(
+  lang: Lang,
+  base: "title" | "description" | "content",
+  value: string,
+  nullable = false,
+) {
+  const stored = !nullable && lang === "zh" && base === "title" ? value : value.trim() ? value : null;
+  if (lang === "zh") return { [base]: stored };
+  return { [lang === "en" ? `${base}_en` : `${base}_ja`]: stored };
+}
 
 function tempId() {
   return `tmp_${crypto.randomUUID()}`;
@@ -71,7 +111,8 @@ export function NotesDoc({
   renames: { key: string; id: string }[];
 }) {
   const { pursuit } = data;
-  const [locales, setLocales] = useState(true);
+  const [lang, setLang] = useState<Lang>("zh");
+  const openList = useOpenList();
   const [menu, setMenu] = useState(false);
   const [openNote, setOpenNote] = useState<string | null>(null);
   const [openWork, setOpenWork] = useState<string | null>(null);
@@ -106,40 +147,50 @@ export function NotesDoc({
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="flex items-center gap-3 px-5 pt-4 md:px-12">
-        <Link href="/admin" className="text-[18px] text-mist md:hidden" aria-label="返回列表">
-          ←
-        </Link>
+      <div className="flex items-center gap-2 px-3 pt-3 md:px-8">
+        <button
+          type="button"
+          onClick={openList}
+          aria-label="打开目录"
+          className="press grid h-8 w-8 place-items-center rounded-full text-ink md:hidden"
+        >
+          <HairlineIcon name="menu" />
+        </button>
         <StatusLine status={status} uploadLabel={uploadLabel} onRetry={onRetry} />
-        <div className="relative ml-auto flex items-center gap-1">
-          <button
-            type="button"
-            aria-pressed={locales}
-            onClick={() => setLocales((value) => !value)}
-            className={`press rounded-full px-2.5 py-1 text-[13px] ${
-              locales ? "text-ink" : "text-mist"
-            }`}
-          >
-            中 / EN / 日
-          </button>
+        <div className="relative ml-auto flex shrink-0 items-center gap-0.5">
+          <div className="mr-1 flex items-center" role="group" aria-label="语言">
+            {LANGS.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                aria-pressed={lang === item.id}
+                onClick={() => setLang(item.id)}
+                className={`press rounded-full px-2 py-1 text-[13px] ${
+                  lang === item.id ? "text-ink" : "text-mist"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
           <a
             href={`/pursuits/${pursuit.slug}`}
             target="_blank"
             rel="noreferrer"
             aria-label="预览"
-            className="grid h-8 w-8 place-items-center text-[14px] text-mist hover:text-ink"
+            className="press grid h-8 w-8 place-items-center rounded-full text-ink"
           >
-            ↗
+            <HairlineIcon name="preview" />
           </a>
           <IconButton
             label={pursuit.is_published ? "改为草稿" : "发布"}
             pressed={pursuit.is_published}
             onClick={() => patchPursuit({ is_published: !pursuit.is_published }, "now")}
           >
-            {pursuit.is_published ? "●" : "○"}
+            <HairlineIcon name={pursuit.is_published ? "published" : "draft"} />
           </IconButton>
           <IconButton label="更多" pressed={menu} onClick={() => setMenu((value) => !value)}>
-            ···
+            <HairlineIcon name="more" />
           </IconButton>
           {menu ? (
             <MoreMenu
@@ -158,91 +209,53 @@ export function NotesDoc({
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto">
-        <article className="mx-auto w-full max-w-2xl px-6 pb-28 pt-12 md:px-2">
+        <article className="sheet">
           {note ? (
             <NotePage
               note={note}
-              locales={locales}
+              lang={lang}
               onBack={() => setOpenNote(null)}
               onChange={(patch) => patchRow("notes", note.id, patch)}
               onDelete={() => dropRow("notes", note.id)}
             />
           ) : (
             <>
-              <section className="rounded-3xl border border-ink/10 bg-white/40 px-5 py-6 sm:px-7">
-                <h2 className="font-display text-[15px] tracking-[-0.02em] text-ink">简介</h2>
-                <div className="mt-4 border-t border-ink/10 pt-4">
-                  <LangLine
-                    tag="中"
-                    value={pursuit.title}
-                    label="标题"
-                    placeholder="标题"
-                    onChange={(value) => patchPursuit({ title: value })}
-                    className="font-display text-[36px] font-medium leading-[1.12] tracking-[-0.035em] text-ink sm:text-[44px]"
-                  />
-                  {locales ? (
-                    <LocaleLines
-                      en={pursuit.title_en}
-                      ja={pursuit.title_ja}
-                      onEn={(value) => patchPursuit({ title_en: value || null })}
-                      onJa={(value) => patchPursuit({ title_ja: value || null })}
-                    />
-                  ) : null}
-                  <LangLine
-                    tag="中"
-                    multiline
-                    value={pursuit.subtitle ?? ""}
-                    label="简介"
-                    placeholder="简介，回车换行"
-                    onChange={(value) => patchPursuit({ subtitle: value || null })}
-                    className="mt-5 text-[18px] leading-[1.75] text-ink/80"
-                  />
-                  {locales ? (
-                    <LocaleLines
-                      multiline
-                      en={pursuit.subtitle_en}
-                      ja={pursuit.subtitle_ja}
-                      onEn={(value) => patchPursuit({ subtitle_en: value || null })}
-                      onJa={(value) => patchPursuit({ subtitle_ja: value || null })}
-                    />
-                  ) : null}
-                  <LangLine
-                    tag="中"
-                    multiline
-                    value={pursuit.description ?? ""}
-                    label="正文"
-                    placeholder="正文，回车换行"
-                    onChange={(value) => patchPursuit({ description: value || null })}
-                    className="mt-5 min-h-28 text-[17px] leading-[1.8] text-ink/85"
-                  />
-                  {locales ? (
-                    <LocaleLines
-                      multiline
-                      en={pursuit.description_en}
-                      ja={pursuit.description_ja}
-                      onEn={(value) => patchPursuit({ description_en: value || null })}
-                      onJa={(value) => patchPursuit({ description_ja: value || null })}
-                    />
-                  ) : null}
-                  <LangLine
-                    tag="中"
-                    multiline
-                    value={pursuit.progress_note ?? ""}
-                    label="阶段说明"
-                    placeholder="现在走到哪一步"
-                    onChange={(value) => patchPursuit({ progress_note: value || null })}
-                    className="mt-5 text-[15px] leading-[1.75] text-mist"
-                  />
-                  {locales ? (
-                    <LocaleLines
-                      multiline
-                      en={pursuit.progress_note_en}
-                      ja={pursuit.progress_note_ja}
-                      onEn={(value) => patchPursuit({ progress_note_en: value || null })}
-                      onJa={(value) => patchPursuit({ progress_note_ja: value || null })}
-                    />
-                  ) : null}
+              <section className="frame">
+                <div className="frame-head">
+                  <h2 className="type-section">简介</h2>
+                  <p className="type-meta">{langName(lang)}</p>
                 </div>
+                <Line
+                  value={localized(lang, pursuit.title, pursuit.title_en, pursuit.title_ja)}
+                  label={`标题 ${langName(lang)}`}
+                  placeholder="标题"
+                  onChange={(value) => patchPursuit(pursuitLangPatch(lang, "title", value))}
+                  className="type-display text-ink"
+                />
+                <Line
+                  multiline
+                  value={localized(lang, pursuit.subtitle ?? "", pursuit.subtitle_en, pursuit.subtitle_ja)}
+                  label={`简介 ${langName(lang)}`}
+                  placeholder="简介，回车换行"
+                  onChange={(value) => patchPursuit(pursuitLangPatch(lang, "subtitle", value))}
+                  className="type-body mt-3 text-ink/80"
+                />
+                <Line
+                  multiline
+                  value={localized(lang, pursuit.description ?? "", pursuit.description_en, pursuit.description_ja)}
+                  label={`正文 ${langName(lang)}`}
+                  placeholder="正文，回车换行"
+                  onChange={(value) => patchPursuit(pursuitLangPatch(lang, "description", value))}
+                  className="type-body mt-3 text-ink/85"
+                />
+                <Line
+                  multiline
+                  value={localized(lang, pursuit.progress_note ?? "", pursuit.progress_note_en, pursuit.progress_note_ja)}
+                  label={`阶段说明 ${langName(lang)}`}
+                  placeholder="现在走到哪一步"
+                  onChange={(value) => patchPursuit(pursuitLangPatch(lang, "progress_note", value))}
+                  className="type-meta mt-3"
+                />
               </section>
 
               <Block
@@ -278,7 +291,7 @@ export function NotesDoc({
                       node: (
                         <MilestoneLine
                           row={row}
-                          locales={locales}
+                          lang={lang}
                           onChange={(patch) => patchRow("milestones", row.id, patch)}
                           onDelete={() => dropRow("milestones", row.id)}
                         />
@@ -326,7 +339,7 @@ export function NotesDoc({
                         <WorkLine
                           row={row}
                           open={activeWork === row.id}
-                          locales={locales}
+                          lang={lang}
                           onToggle={() => setOpenWork(openWork === row.id ? null : row.id)}
                           onChange={(patch, mode) => patchRow("works", row.id, patch, mode)}
                           onDelete={() => dropRow("works", row.id)}
@@ -422,7 +435,7 @@ export function NotesDoc({
                       node: (
                         <MaterialLine
                           row={row}
-                          locales={locales}
+                          lang={lang}
                           onChange={(patch) => patchRow("materials", row.id, patch)}
                           onDelete={() => dropRow("materials", row.id)}
                         />
@@ -507,56 +520,55 @@ function Line({
   );
 }
 
-function LocaleLines({
-  en,
-  ja,
-  onEn,
-  onJa,
-  multiline = false,
-}: {
-  en: string | null;
-  ja: string | null;
-  onEn: (value: string) => void;
-  onJa: (value: string) => void;
-  multiline?: boolean;
-}) {
+function HairlineIcon({ name }: { name: "menu" | "preview" | "published" | "draft" | "more" }) {
+  const props = {
+    width: 18,
+    height: 18,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.5,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    "aria-hidden": true as const,
+  };
+  if (name === "menu") {
+    return (
+      <svg {...props}>
+        <path d="M4 7h16M4 12h16M4 17h10" />
+      </svg>
+    );
+  }
+  if (name === "preview") {
+    return (
+      <svg {...props}>
+        <path d="M14 5h5v5" />
+        <path d="M19 5l-7 7" />
+        <path d="M17 13v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h5" />
+      </svg>
+    );
+  }
+  if (name === "published") {
+    return (
+      <svg {...props}>
+        <circle cx="12" cy="12" r="7" />
+        <path d="M8.5 12.4l2.2 2.2 4.8-5" />
+      </svg>
+    );
+  }
+  if (name === "draft") {
+    return (
+      <svg {...props}>
+        <circle cx="12" cy="12" r="7" />
+      </svg>
+    );
+  }
   return (
-    <div className="mt-2 space-y-2">
-      <LangLine tag="EN" value={en ?? ""} label="English" placeholder="English" multiline={multiline} onChange={onEn} />
-      <LangLine tag="日" value={ja ?? ""} label="日本語" placeholder="日本語" multiline={multiline} onChange={onJa} />
-    </div>
-  );
-}
-
-function LangLine({
-  tag,
-  value,
-  label,
-  placeholder,
-  onChange,
-  multiline = false,
-  className = "text-[15px] leading-[1.7] text-mist",
-}: {
-  tag: string;
-  value: string;
-  label: string;
-  placeholder: string;
-  onChange: (value: string) => void;
-  multiline?: boolean;
-  className?: string;
-}) {
-  return (
-    <div className="flex items-start gap-3">
-      <span className="w-6 shrink-0 pt-1 font-display text-[11px] text-mist">{tag}</span>
-      <Line
-        multiline={multiline}
-        value={value}
-        label={label}
-        placeholder={placeholder}
-        onChange={onChange}
-        className={className}
-      />
-    </div>
+    <svg {...props}>
+      <circle cx="6" cy="12" r="1" />
+      <circle cx="12" cy="12" r="1" />
+      <circle cx="18" cy="12" r="1" />
+    </svg>
   );
 }
 
@@ -570,9 +582,9 @@ function Block({
   children: ReactNode;
 }) {
   return (
-    <section className="mt-5 rounded-3xl border border-ink/10 bg-white/40 px-5 py-5 sm:px-6">
-      <div className="mb-3 flex items-center justify-between border-b border-ink/10 pb-3">
-        <h2 className="font-display text-[15px] tracking-[-0.02em] text-ink">{title}</h2>
+    <section className="frame">
+      <div className="frame-head">
+        <h2 className="type-section">{title}</h2>
         <button type="button" aria-label={`添加${title}`} onClick={onAdd} className="press grid h-7 w-7 place-items-center rounded-full text-[18px] text-mist">
           +
         </button>
@@ -719,17 +731,17 @@ function MoreMenu({
 
 function MilestoneLine({
   row,
-  locales,
+  lang,
   onChange,
   onDelete,
 }: {
   row: Milestone;
-  locales: boolean;
+  lang: Lang;
   onChange: (patch: Partial<Milestone>) => void;
   onDelete: () => void;
 }) {
   return (
-    <div className="group flex items-start gap-3 py-1.5 pl-5">
+    <div className="group flex items-start gap-3 py-1.5 pl-4">
       <button
         type="button"
         aria-label={row.done ? "标为未完成" : "标为完成"}
@@ -741,20 +753,12 @@ function MilestoneLine({
       />
       <div className="min-w-0 flex-1">
         <Line
-          value={row.title}
-          label="里程碑"
+          value={localized(lang, row.title, row.title_en, row.title_ja)}
+          label={`里程碑 ${langName(lang)}`}
           placeholder="里程碑"
-          onChange={(value) => onChange({ title: value })}
-          className={`text-[17px] ${row.done ? "text-mist line-through" : "text-ink"}`}
+          onChange={(value) => onChange(langPatch(lang, "title", value))}
+          className={`type-body ${row.done ? "text-mist line-through" : "text-ink"}`}
         />
-        {locales ? (
-          <LocaleLines
-            en={row.title_en}
-            ja={row.title_ja}
-            onEn={(value) => onChange({ title_en: value || null })}
-            onJa={(value) => onChange({ title_ja: value || null })}
-          />
-        ) : null}
       </div>
       <button
         type="button"
@@ -771,7 +775,7 @@ function MilestoneLine({
 function WorkLine({
   row,
   open,
-  locales,
+  lang,
   onToggle,
   onChange,
   onDelete,
@@ -779,14 +783,14 @@ function WorkLine({
 }: {
   row: PortfolioItem;
   open: boolean;
-  locales: boolean;
+  lang: Lang;
   onToggle: () => void;
   onChange: (patch: Partial<PortfolioItem>, mode?: "debounce" | "now") => void;
   onDelete: () => void;
   onReplace: (slot: "media" | "poster") => void;
 }) {
   return (
-    <div className="group py-3 pl-5">
+    <div className="group py-3 pl-4">
       <div className="flex items-start gap-4">
         <button type="button" onClick={onToggle} aria-label="展开作品" className="relative h-14 w-14 shrink-0 overflow-hidden bg-ink/[0.04]">
           {row.kind === "image" && row.media_url ? (
@@ -797,39 +801,22 @@ function WorkLine({
         </button>
         <div className="min-w-0 flex-1">
           <Line
-            value={row.title ?? ""}
-            label="作品标题"
+            value={localized(lang, row.title ?? "", row.title_en, row.title_ja)}
+            label={`作品标题 ${langName(lang)}`}
             placeholder="作品"
-            onChange={(value) => onChange({ title: value || null })}
-            className="text-[17px] text-ink"
+            onChange={(value) => onChange(langPatch(lang, "title", value, true))}
+            className="type-body text-ink"
           />
           {open ? (
             <>
               <Line
                 multiline
-                value={row.description ?? ""}
-                label="作品说明"
+                value={localized(lang, row.description ?? "", row.description_en, row.description_ja)}
+                label={`作品说明 ${langName(lang)}`}
                 placeholder="说明，回车换行"
-                onChange={(value) => onChange({ description: value || null })}
-                className="mt-1 text-[14px] leading-[1.7] text-mist"
+                onChange={(value) => onChange(langPatch(lang, "description", value, true))}
+                className="type-meta mt-1"
               />
-              {locales ? (
-                <LocaleLines
-                  en={row.title_en}
-                  ja={row.title_ja}
-                  onEn={(value) => onChange({ title_en: value || null })}
-                  onJa={(value) => onChange({ title_ja: value || null })}
-                />
-              ) : null}
-              {locales ? (
-                <LocaleLines
-                  multiline
-                  en={row.description_en}
-                  ja={row.description_ja}
-                  onEn={(value) => onChange({ description_en: value || null })}
-                  onJa={(value) => onChange({ description_ja: value || null })}
-                />
-              ) : null}
               <Line
                 value={row.media_url}
                 label="作品地址"
@@ -868,12 +855,12 @@ function WorkLine({
 
 function MaterialLine({
   row,
-  locales,
+  lang,
   onChange,
   onDelete,
 }: {
   row: MaterialLink;
-  locales: boolean;
+  lang: Lang;
   onChange: (patch: Partial<MaterialLink>) => void;
   onDelete: () => void;
 }) {
@@ -885,48 +872,31 @@ function MaterialLine({
   const label = KINDS.find((item) => item.value === row.kind)?.label ?? "其他";
 
   return (
-    <div className="group py-2 pl-5">
+    <div className="group py-2 pl-4">
       <div className="flex items-start gap-3">
         <div className="min-w-0 flex-1">
           <Line
-            value={row.title}
-            label="资料标题"
+            value={localized(lang, row.title, row.title_en, row.title_ja)}
+            label={`资料标题 ${langName(lang)}`}
             placeholder="资料"
-            onChange={(value) => onChange({ title: value })}
-            className="text-[17px] text-ink"
+            onChange={(value) => onChange(langPatch(lang, "title", value))}
+            className="type-body text-ink"
           />
           <Line
             value={row.url}
             label="网址"
             placeholder="https://"
             onChange={(value) => onChange({ url: value })}
-            className="text-[13px] text-mist"
+            className="type-meta"
           />
-          {locales ? (
-            <>
-              <LocaleLines
-                en={row.title_en}
-                ja={row.title_ja}
-                onEn={(value) => onChange({ title_en: value || null })}
-                onJa={(value) => onChange({ title_ja: value || null })}
-              />
-              <Line
-                multiline
-                value={row.description ?? ""}
-                label="说明"
-                placeholder="说明，回车换行"
-                onChange={(value) => onChange({ description: value || null })}
-                className="mt-1 text-[14px] leading-[1.7] text-mist"
-              />
-              <LocaleLines
-                multiline
-                en={row.description_en}
-                ja={row.description_ja}
-                onEn={(value) => onChange({ description_en: value || null })}
-                onJa={(value) => onChange({ description_ja: value || null })}
-              />
-            </>
-          ) : null}
+          <Line
+            multiline
+            value={localized(lang, row.description ?? "", row.description_en, row.description_ja)}
+            label={`说明 ${langName(lang)}`}
+            placeholder="说明，回车换行"
+            onChange={(value) => onChange(langPatch(lang, "description", value, true))}
+            className="type-meta mt-1"
+          />
         </div>
         <button type="button" onClick={nextKind} className="text-[12px] text-mist">
           {label}
@@ -946,20 +916,20 @@ function MaterialLine({
 
 function NotePage({
   note,
-  locales,
+  lang,
   onBack,
   onChange,
   onDelete,
 }: {
   note: Note;
-  locales: boolean;
+  lang: Lang;
   onBack: () => void;
   onChange: (patch: Partial<Note>) => void;
   onDelete: () => void;
 }) {
   return (
-    <section className="rounded-3xl border border-ink/10 bg-white/40 px-5 py-6 sm:px-7">
-      <div className="mb-6 flex items-center gap-4 border-b border-ink/10 pb-3 text-[13px] text-mist">
+    <section className="frame">
+      <div className="frame-head text-[13px] text-mist">
         <button type="button" onClick={onBack} className="hover:text-ink">
           ←
         </button>
@@ -973,41 +943,22 @@ function NotePage({
           删除
         </button>
       </div>
+      <p className="type-meta mb-3">{langName(lang)}</p>
       <Line
-        value={note.title}
-        label="笔记标题"
+        value={localized(lang, note.title, note.title_en, note.title_ja)}
+        label={`笔记标题 ${langName(lang)}`}
         placeholder="标题"
-        onChange={(value) => onChange({ title: value })}
-        className="font-display text-[40px] font-medium leading-[1.05] tracking-[-0.035em] text-ink sm:text-[48px]"
+        onChange={(value) => onChange(langPatch(lang, "title", value))}
+        className="type-display text-ink"
       />
-      {locales ? (
-        <LocaleLines
-          en={note.title_en}
-          ja={note.title_ja}
-          onEn={(value) => onChange({ title_en: value || null })}
-          onJa={(value) => onChange({ title_ja: value || null })}
-        />
-      ) : null}
-      <LangLine
-        tag="中"
+      <Line
         multiline
-        value={note.content ?? ""}
-        label="笔记正文"
+        value={localized(lang, note.content ?? "", note.content_en, note.content_ja)}
+        label={`笔记正文 ${langName(lang)}`}
         placeholder="开始写，回车换行"
-        onChange={(value) => onChange({ content: value || null })}
-        className="min-h-40 text-[17px] leading-[1.8] text-ink/85"
+        onChange={(value) => onChange(langPatch(lang, "content", value, true))}
+        className="type-body mt-3 text-ink/85"
       />
-      {locales ? (
-        <div className="mt-3">
-          <LocaleLines
-            multiline
-            en={note.content_en}
-            ja={note.content_ja}
-            onEn={(value) => onChange({ content_en: value || null })}
-            onJa={(value) => onChange({ content_ja: value || null })}
-          />
-        </div>
-      ) : null}
     </section>
   );
 }

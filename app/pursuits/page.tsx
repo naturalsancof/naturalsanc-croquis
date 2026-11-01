@@ -20,7 +20,7 @@ export default async function PursuitsPage() {
           <p className="label">Index — 01</p>
           <p className="label">{String(pursuits.length).padStart(2, "0")} items</p>
         </div>
-        <h1 className="gradient-title mt-6 font-display text-5xl font-medium leading-[1.05] tracking-[-0.035em] sm:text-6xl">
+        <h1 className="gradient-title type-display mt-6">
           追求
         </h1>
         <p className="sub mt-3 uppercase">Pursuits in progress</p>

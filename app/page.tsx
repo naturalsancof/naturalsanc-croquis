@@ -29,12 +29,7 @@ export default async function HomePage() {
               aria-hidden
               className="pointer-events-none absolute left-[8%] top-1/2 h-28 w-[28rem] -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(168,176,240,0.55),rgba(214,190,236,0.15)_45%,transparent_70%)] blur-2xl"
             />
-            <h1
-              className="gradient-title relative select-none whitespace-nowrap px-5 font-display font-medium uppercase leading-[0.86] tracking-[-0.045em] sm:px-8"
-              style={{
-                fontSize: "clamp(64px, 12vw, 168px)",
-              }}
-            >
+            <h1 className="gradient-title type-hero relative select-none whitespace-nowrap px-4 sm:px-8">
               Croquis
             </h1>
           </div>

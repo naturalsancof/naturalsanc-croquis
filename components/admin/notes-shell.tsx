@@ -2,8 +2,14 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useTransition, type ReactNode } from "react";
+import { createContext, useContext, useState, useTransition, type ReactNode } from "react";
 import { createPursuit, signOut } from "@/app/admin/actions";
+
+const OpenListContext = createContext<() => void>(() => {});
+
+export function useOpenList() {
+  return useContext(OpenListContext);
+}
 
 export type SidebarPursuit = {
   id: string;
@@ -22,8 +28,15 @@ export function NotesShell({
   const router = useRouter();
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
+  const [openPath, setOpenPath] = useState(pathname);
   const inDoc =
     pathname.startsWith("/admin/pursuits/") || pathname.startsWith("/admin/account");
+
+  if (pathname !== openPath) {
+    setOpenPath(pathname);
+    setOpen(false);
+  }
 
   const create = () => {
     setError(null);
@@ -42,13 +55,25 @@ export function NotesShell({
 
   return (
     <div className="notes-app fixed inset-0 z-[70] flex h-dvh overflow-hidden text-ink">
+      {inDoc && open ? (
+        <button
+          type="button"
+          aria-label="关闭目录"
+          className="fixed inset-0 z-[75] bg-ink/20 md:hidden"
+          onClick={() => setOpen(false)}
+        />
+      ) : null}
       <aside
-        className={`${
-          inDoc ? "hidden md:flex" : "flex"
-        } h-full min-h-0 w-full shrink-0 flex-col overflow-hidden border-r border-ink/10 md:w-[248px]`}
+        className={
+          inDoc
+            ? `fixed inset-y-0 left-0 z-[80] flex h-dvh w-[min(88vw,17.5rem)] min-h-0 flex-col overflow-hidden border-r border-ink/10 bg-[var(--paper)] transition-transform duration-200 md:static md:z-auto md:h-full md:w-60 md:translate-x-0 ${
+                open ? "translate-x-0" : "-translate-x-full"
+              }`
+            : "flex h-full min-h-0 w-full shrink-0 flex-col overflow-hidden border-r border-ink/10 md:w-60"
+        }
       >
         <div className="flex items-center justify-between px-4 pb-3 pt-6">
-          <p className="font-display text-[20px] tracking-[-0.03em] text-ink">手记</p>
+          <p className="type-section">手记</p>
           <button
             type="button"
             onClick={create}
@@ -68,7 +93,7 @@ export function NotesShell({
                 href={`/admin/pursuits/${item.id}`}
                 aria-current={active ? "page" : undefined}
                 className={`press mb-0.5 block truncate rounded-lg px-3 py-2 text-[15px] leading-snug ${
-                  active ? "bg-white/80 text-ink shadow-[inset_2px_0_0_#6d63ae]" : "text-ink/75"
+                  active ? "bg-white/80 text-ink shadow-[inset_2px_0_0_var(--accent-2)]" : "text-ink/75"
                 }`}
               >
                 <span
@@ -86,13 +111,13 @@ export function NotesShell({
               <div className="mark !h-12 !w-12 !shadow-none" aria-hidden>
                 <span className="!text-[16px]">✕</span>
               </div>
-              <p className="mt-4 font-display text-[18px] text-ink">还没有稿纸</p>
-              <p className="mt-1 text-[13px] leading-relaxed text-mist">点右上角的加号，写第一条。</p>
+              <p className="type-section mt-4">还没有稿纸</p>
+              <p className="type-meta mt-1">点右上角的加号，写第一条。</p>
             </div>
           ) : null}
           {error ? <p className="px-3 pt-2 text-[12px] text-red-700">{error}</p> : null}
         </nav>
-        <div className="mt-auto flex shrink-0 items-center gap-4 border-t border-ink/10 bg-[#f6f3f8] px-4 py-3 text-[12px] text-mist">
+        <div className="mt-auto flex shrink-0 items-center gap-4 border-t border-ink/10 bg-[var(--paper)] px-4 py-3 text-[12px] text-mist">
           <Link href="/admin/account" className="hover:text-ink">
             账号
           </Link>
@@ -107,7 +132,7 @@ export function NotesShell({
         </div>
       </aside>
       <div className={`${inDoc ? "flex" : "hidden md:flex"} min-w-0 flex-1 flex-col`}>
-        {children}
+        <OpenListContext.Provider value={() => setOpen(true)}>{children}</OpenListContext.Provider>
       </div>
     </div>
   );

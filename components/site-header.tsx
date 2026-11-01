@@ -11,10 +11,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 border-b border-ink/10 bg-[#f6f3f8]/80 backdrop-blur-md">
       <div className="relative mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-5 sm:px-8">
         <Link href="/" className="press flex items-center gap-2 rounded-full px-1.5 py-1 text-ink">
-          <span className="mark !h-7 !w-7 !shadow-none" aria-hidden>
-            <span className="!text-[13px]">✕</span>
-          </span>
-          <span className="font-display text-[15px] tracking-[-0.03em]">Croquis</span>
+          <span className="type-section">Croquis</span>
         </Link>
         <nav aria-label="站点" className="flex items-center gap-1">
           {NAV.map((item) => (
