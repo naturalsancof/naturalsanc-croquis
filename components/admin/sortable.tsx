@@ -90,7 +90,7 @@ export function Sortable({
             title="按住拖动排序"
             onPointerDown={(event) => onPointerDown(event, item.id)}
             style={{ touchAction: "none" }}
-            className="absolute -left-1 top-2 z-10 grid h-8 w-5 cursor-grab place-items-center text-[var(--text-soft)] hover:text-[var(--text)]"
+            className="absolute -left-1 top-2 z-10 grid h-8 w-5 cursor-grab place-items-center rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] text-[var(--text-soft)] transition hover:bg-[var(--surface-muted)] hover:text-[var(--text)]"
           >
             <svg
               width="8"

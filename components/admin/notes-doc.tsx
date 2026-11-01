@@ -151,21 +151,23 @@ export function NotesDoc({
           type="button"
           onClick={openList}
           aria-label="打开目录"
-          className="press grid h-8 w-8 place-items-center rounded-[8px] text-[var(--text)] md:hidden"
+          className="press grid h-8 w-8 place-items-center rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] text-[var(--text)] hover:bg-[var(--surface-muted)] md:hidden"
         >
           <HairlineIcon name="menu" />
         </button>
         <StatusLine status={status} uploadLabel={uploadLabel} onRetry={onRetry} />
-        <div className="relative ml-auto flex shrink-0 items-center gap-0.5">
-          <div className="mr-1 flex items-center" role="group" aria-label="语言">
+        <div className="relative ml-auto flex shrink-0 items-center gap-1">
+          <div className="mr-1 flex items-center gap-1" role="group" aria-label="语言">
             {LANGS.map((item) => (
               <button
                 key={item.id}
                 type="button"
                 aria-pressed={lang === item.id}
                 onClick={() => setLang(item.id)}
-                className={`press rounded-[8px] px-2 py-1 text-[13px] ${
-                  lang === item.id ? "text-[var(--text)]" : "text-[var(--text-muted)]"
+                className={`press rounded-[8px] border-[0.5px] px-2 py-1 text-[13px] ${
+                  lang === item.id
+                    ? "border-[var(--border-strong)] bg-[var(--surface-muted)] text-[var(--text)]"
+                    : "border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text)]"
                 }`}
               >
                 {item.label}
@@ -177,7 +179,7 @@ export function NotesDoc({
             target="_blank"
             rel="noreferrer"
             aria-label="预览"
-            className="press grid h-8 w-8 place-items-center rounded-[8px] text-[var(--text)]"
+            className="press grid h-8 w-8 place-items-center rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] text-[var(--text)] hover:bg-[var(--surface-muted)]"
           >
             <HairlineIcon name="preview" />
           </a>
@@ -391,13 +393,13 @@ export function NotesDoc({
                   setOpenNote(id);
                 }}
               >
-                <ul>
+                <ul className="flex flex-col gap-1">
                   {data.notes.map((item) => (
                     <li key={item.id}>
                       <button
                         type="button"
                         onClick={() => setOpenNote(item.id)}
-                        className="block w-full truncate py-1.5 text-left text-[17px] text-[var(--text)] hover:text-[var(--text-muted)]"
+                        className="block w-full truncate rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-left text-[17px] text-[var(--text)] transition hover:bg-[var(--surface-muted)] hover:text-[var(--text-muted)]"
                       >
                         {item.title || "无标题笔记"}
                       </button>
@@ -601,7 +603,7 @@ function Block({
     <section className="frame">
       <div className="frame-head">
         <h2 className="type-section">{title}</h2>
-        <button type="button" aria-label={`添加${title}`} onClick={onAdd} className="press grid h-7 w-7 place-items-center rounded-[8px] text-[var(--text-muted)]">
+        <button type="button" aria-label={`添加${title}`} onClick={onAdd} className="press grid h-7 w-7 place-items-center rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text)]">
           <PlusIcon />
         </button>
       </div>
@@ -627,9 +629,11 @@ function IconButton({
       aria-label={label}
       aria-pressed={pressed}
       onClick={onClick}
-        className={`press grid h-8 min-w-8 place-items-center rounded-[8px] px-1 text-[14px] ${
-        pressed ? "bg-[var(--surface-muted)] text-[var(--text)]" : "text-[var(--text-muted)]"
-      }`}
+        className={`press grid h-8 min-w-8 place-items-center rounded-[8px] border-[0.5px] px-1 text-[14px] ${
+          pressed
+            ? "border-[var(--border-strong)] bg-[var(--surface-muted)] text-[var(--text)]"
+            : "border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text)]"
+        }`}
     >
       {children}
     </button>
@@ -661,7 +665,7 @@ function StatusLine({
     <p role="status" aria-live="polite" className={`min-w-0 truncate text-[12px] ${tone}`}>
       {text}
       {status.kind === "error" ? (
-        <button type="button" onClick={onRetry} className="ml-2 underline">
+        <button type="button" onClick={onRetry} className="ml-2 rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-1.5 py-0.5 underline transition hover:bg-[var(--surface-muted)]">
           重试
         </button>
       ) : null}
@@ -693,7 +697,11 @@ function MoreMenu({
               key={stage.key}
               type="button"
               onClick={() => onChange({ stage: stage.key as Stage }, "now")}
-              className={`text-[14px] ${pursuit.stage === stage.key ? "text-[var(--text)]" : "text-[var(--text-muted)]"}`}
+              className={`rounded-[8px] border-[0.5px] px-2 py-1 text-[14px] transition ${
+                pursuit.stage === stage.key
+                  ? "border-[var(--border-strong)] bg-[var(--surface-muted)] text-[var(--text)]"
+                  : "border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text)]"
+              }`}
             >
               {stage.zh}
             </button>
@@ -713,7 +721,7 @@ function MoreMenu({
           onChange={(event) => onChange({ started_at: event.target.value || null })}
           className="plain-write mt-3 text-[14px] text-[var(--text-muted)]"
         />
-        <button type="button" onClick={onCover} className="mt-4 block text-[14px] text-[var(--text)]">
+        <button type="button" onClick={onCover} className="mt-4 block rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2.5 py-1.5 text-[14px] text-[var(--text)] transition hover:bg-[var(--surface-muted)]">
           {pursuit.cover_url ? "更换封面" : "添加封面"}
         </button>
         {pursuit.cover_url ? (
@@ -721,7 +729,7 @@ function MoreMenu({
             <SafeImage src={pursuit.cover_url} alt="" sizes="96px" />
           </div>
         ) : null}
-        <button type="button" onClick={onDelete} className="mt-5 block text-[13px] text-[var(--danger)]">
+        <button type="button" onClick={onDelete} className="mt-5 block rounded-[8px] border-[0.5px] border-[var(--danger)] bg-[var(--danger-surface)] px-2.5 py-1.5 text-[13px] text-[var(--danger)] transition hover:bg-[var(--surface-muted)]">
           删除这条追求
         </button>
       </div>
@@ -764,7 +772,7 @@ function MilestoneLine({
         type="button"
         aria-label="删除里程碑"
         onClick={onDelete}
-        className="text-[12px] text-[var(--text-muted)] opacity-0 hover:text-[var(--danger)] group-hover:opacity-100 group-focus-within:opacity-100"
+        className="rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2 py-0.5 text-[12px] text-[var(--text-muted)] opacity-0 transition hover:bg-[var(--surface-muted)] hover:text-[var(--danger)] group-hover:opacity-100 group-focus-within:opacity-100"
       >
         删
       </button>
@@ -792,7 +800,7 @@ function WorkLine({
   return (
     <div className="group py-3 pl-4">
       <div className="flex items-start gap-4">
-        <button type="button" onClick={onToggle} aria-label="展开作品" className="relative h-14 w-14 shrink-0 overflow-hidden bg-[var(--surface-muted)]">
+        <button type="button" onClick={onToggle} aria-label="展开作品" className="relative h-14 w-14 shrink-0 overflow-hidden rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface-muted)] transition hover:bg-[var(--surface)]">
           {row.kind === "image" && row.media_url ? (
             <SafeImage src={row.media_url} alt="" sizes="56px" />
           ) : (
@@ -824,15 +832,15 @@ function WorkLine({
                 onChange={(value) => onChange({ media_url: value })}
                 className="mt-2 text-[13px] text-[var(--text-muted)]"
               />
-              <div className="mt-2 flex gap-4 text-[13px] text-[var(--text-muted)]">
-                <button type="button" onClick={() => onChange({ kind: row.kind === "image" ? "audio" : "image" }, "now")}>
+              <div className="mt-2 flex flex-wrap gap-4 text-[13px] text-[var(--text-muted)]">
+                <button type="button" onClick={() => onChange({ kind: row.kind === "image" ? "audio" : "image" }, "now")} className="rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2 py-0.5 transition hover:bg-[var(--surface-muted)] hover:text-[var(--text)]">
                   {row.kind === "image" ? "图片" : "音频"}
                 </button>
-                <button type="button" onClick={() => onReplace("media")}>
+                <button type="button" onClick={() => onReplace("media")} className="rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2 py-0.5 transition hover:bg-[var(--surface-muted)] hover:text-[var(--text)]">
                   换文件
                 </button>
                 {row.kind === "audio" ? (
-                  <button type="button" onClick={() => onReplace("poster")}>
+                  <button type="button" onClick={() => onReplace("poster")} className="rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2 py-0.5 transition hover:bg-[var(--surface-muted)] hover:text-[var(--text)]">
                     海报
                   </button>
                 ) : null}
@@ -844,7 +852,7 @@ function WorkLine({
           type="button"
           aria-label="删除作品"
           onClick={onDelete}
-          className="text-[12px] text-[var(--text-muted)] opacity-0 hover:text-[var(--danger)] group-hover:opacity-100 group-focus-within:opacity-100"
+          className="rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2 py-0.5 text-[12px] text-[var(--text-muted)] opacity-0 transition hover:bg-[var(--surface-muted)] hover:text-[var(--danger)] group-hover:opacity-100 group-focus-within:opacity-100"
         >
           删
         </button>
@@ -898,14 +906,14 @@ function MaterialLine({
             className="type-meta mt-1"
           />
         </div>
-        <button type="button" onClick={nextKind} className="text-[12px] text-[var(--text-muted)]">
+        <button type="button" onClick={nextKind} className="rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2 py-0.5 text-[12px] text-[var(--text-muted)] transition hover:bg-[var(--surface-muted)] hover:text-[var(--text)]">
           {label}
         </button>
         <button
           type="button"
           aria-label="删除资料"
           onClick={onDelete}
-          className="text-[12px] text-[var(--text-muted)] opacity-0 hover:text-[var(--danger)] group-hover:opacity-100 group-focus-within:opacity-100"
+          className="rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2 py-0.5 text-[12px] text-[var(--text-muted)] opacity-0 transition hover:bg-[var(--surface-muted)] hover:text-[var(--danger)] group-hover:opacity-100 group-focus-within:opacity-100"
         >
           删
         </button>
@@ -929,17 +937,17 @@ function NotePage({
 }) {
   return (
     <section className="frame">
-      <div className="frame-head text-[13px] text-[var(--text-muted)]">
-        <button type="button" onClick={onBack} className="hover:text-[var(--text)]">
+      <div className="frame-head gap-2 text-[13px] text-[var(--text-muted)]">
+        <button type="button" onClick={onBack} aria-label="返回" className="rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2 py-0.5 transition hover:bg-[var(--surface-muted)] hover:text-[var(--text)]">
           ←
         </button>
-        <button type="button" onClick={() => onChange({ is_pinned: !note.is_pinned })}>
+        <button type="button" onClick={() => onChange({ is_pinned: !note.is_pinned })} className="rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2 py-0.5 transition hover:bg-[var(--surface-muted)] hover:text-[var(--text)]">
           {note.is_pinned ? "已置顶" : "置顶"}
         </button>
-        <button type="button" onClick={() => onChange({ is_published: !note.is_published })}>
+        <button type="button" onClick={() => onChange({ is_published: !note.is_published })} className="rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2 py-0.5 transition hover:bg-[var(--surface-muted)] hover:text-[var(--text)]">
           {note.is_published ? "公开" : "草稿"}
         </button>
-        <button type="button" onClick={onDelete} className="ml-auto text-[var(--danger)]">
+        <button type="button" onClick={onDelete} className="ml-auto rounded-[8px] border-[0.5px] border-[var(--danger)] bg-[var(--danger-surface)] px-2 py-0.5 text-[var(--danger)] transition hover:bg-[var(--surface-muted)]">
           删除
         </button>
       </div>

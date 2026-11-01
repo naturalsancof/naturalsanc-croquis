@@ -574,7 +574,7 @@ function DetailPanel({
           type="button"
           data-close
           onClick={() => closeRef.current()}
-          className="mb-4 rounded-[8px] px-2 py-1 font-display text-[11px] text-[var(--text-muted)] hover:text-[var(--text)]"
+          className="mb-4 rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2 py-1 font-display text-[11px] text-[var(--text-muted)] transition hover:bg-[var(--surface-muted)] hover:text-[var(--text)]"
         >
           关闭 Esc
         </button>

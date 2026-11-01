@@ -47,7 +47,7 @@ export function SiteHeader() {
             <Link
               key={item.href}
               href={item.href}
-              className="group shrink-0 whitespace-nowrap rounded-[8px] px-2.5 py-2.5 text-center transition hover:bg-[var(--surface-muted)] sm:px-2.5 sm:py-2"
+              className="group shrink-0 whitespace-nowrap rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2.5 py-2.5 text-center transition hover:bg-[var(--surface-muted)] sm:px-2.5 sm:py-2"
             >
               <span className="block font-display text-[12px] text-[var(--text-muted)] transition group-hover:text-[var(--text)] sm:inline sm:text-[11px]">
                 {item.label}

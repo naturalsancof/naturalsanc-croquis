@@ -123,7 +123,7 @@ export function PortfolioGrid({ items }: { items: PortfolioItem[] }) {
           <button
             type="button"
             onClick={close}
-            className="absolute right-5 top-5 grid h-10 w-10 place-items-center rounded-[8px] border-[0.5px] border-[var(--text-inverse-muted)] text-[var(--text-inverse)] transition hover:border-[var(--text-inverse)]"
+            className="absolute right-5 top-5 grid h-10 w-10 place-items-center rounded-[8px] border-[0.5px] border-[var(--border-strong)] bg-[var(--surface-inverse)] text-[var(--text-inverse)] transition hover:border-[var(--text-inverse)]"
             aria-label="关闭"
           >
             <CloseIcon />

@@ -24,7 +24,7 @@ export default async function AccountPage({
 
   return (
     <div className="mx-auto flex h-full w-full max-w-lg flex-col justify-center px-8">
-      <Link href="/admin" className="mb-10 text-[14px] text-[var(--text-muted)] md:hidden">
+      <Link href="/admin" className="mb-10 inline-flex w-fit rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2.5 py-1.5 text-[14px] text-[var(--text-muted)] transition hover:bg-[var(--surface-muted)] hover:text-[var(--text)] md:hidden">
         ←
       </Link>
       <h1 className="text-[22px] font-medium text-[var(--text)]">账号</h1>
@@ -52,7 +52,7 @@ export default async function AccountPage({
           placeholder="再输一次"
           className="plain-write text-[16px]"
         />
-        <button type="submit" className="pt-4 text-[14px] text-[var(--text)]">
+        <button type="submit" className="mt-2 w-fit rounded-[8px] border-[0.5px] border-[var(--accent)] bg-[var(--accent-soft)] px-4 py-2 text-[14px] text-[var(--accent)] transition hover:bg-[var(--surface-muted)]">
           保存
         </button>
       </form>

@@ -166,10 +166,10 @@ export default async function PursuitPage({ params, searchParams }: PageProps) {
                 key={t.key}
                 href={`/pursuits/${pursuit.slug}?tab=${t.key}`}
                 scroll={false}
-                className={`flex w-[76px] items-center justify-center gap-1.5 rounded-[8px] px-1 py-2 font-display text-[11px] transition sm:w-[126px] sm:gap-2 sm:px-2 ${
+                className={`flex w-[76px] items-center justify-center gap-1.5 rounded-[8px] border-[0.5px] px-1 py-2 font-display text-[11px] transition sm:w-[126px] sm:gap-2 sm:px-2 ${
                   active
-                    ? "bg-[var(--surface-inverse)] text-[var(--text-inverse)]"
-                    : "text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text)]"
+                    ? "border-[var(--surface-inverse)] bg-[var(--surface-inverse)] text-[var(--text-inverse)] hover:bg-[var(--text-muted)]"
+                    : "border-[var(--border)] bg-[var(--surface-muted)] text-[var(--text-muted)] hover:bg-[var(--surface)] hover:text-[var(--text)]"
                 }`}
               >
                 {t.label}
@@ -303,7 +303,7 @@ export default async function PursuitPage({ params, searchParams }: PageProps) {
 
             <Link
               href="/pursuits"
-              className="group flex items-center justify-between border-[0.5px] border-[var(--border)] px-4 py-3 transition hover:border-[var(--border-strong)]"
+              className="group flex items-center justify-between rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-4 py-3 transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-muted)]"
             >
               <span className="font-display text-[11px] text-[var(--text-muted)] transition group-hover:text-[var(--text)]">
                 All pursuits

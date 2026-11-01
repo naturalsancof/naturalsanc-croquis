@@ -16,7 +16,7 @@ export default function NotFound() {
 
       <Link
         href="/"
-        className="mt-8 border-[0.5px] border-[var(--text)] bg-[var(--surface-inverse)] px-6 py-3 font-display text-[11px] text-[var(--text-inverse)] transition hover:bg-[var(--surface)] hover:text-[var(--text)]"
+        className="mt-8 rounded-[8px] border-[0.5px] border-[var(--text)] bg-[var(--surface-inverse)] px-6 py-3 font-display text-[11px] text-[var(--text-inverse)] transition hover:bg-[var(--surface)] hover:text-[var(--text)]"
       >
         ← 回到首页
       </Link>

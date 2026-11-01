@@ -86,7 +86,7 @@ export function NotesShell({
               type="button"
               onClick={() => setOpen(false)}
               aria-label="关闭目录"
-              className="press mr-auto ml-3 rounded-[8px] px-2 py-1 text-[12px] text-[var(--text-muted)] md:hidden"
+              className="press mr-auto ml-3 rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-[12px] text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text)] md:hidden"
             >
               关闭
             </button>
@@ -96,12 +96,12 @@ export function NotesShell({
             onClick={create}
             disabled={pending}
             aria-label="新建追求"
-            className="press grid h-8 w-8 place-items-center rounded-[8px] text-[18px] leading-none text-[var(--text-muted)]"
+            className="press grid h-8 w-8 place-items-center rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] text-[18px] leading-none text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text)]"
           >
             +
           </button>
         </div>
-        <nav aria-label="追求列表" className="min-h-0 flex-1 overflow-y-auto px-2 pb-4">
+        <nav aria-label="追求列表" className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-2 pb-4">
           {pursuits.map((item) => {
             const active = pathname === `/admin/pursuits/${item.id}`;
             return (
@@ -109,10 +109,10 @@ export function NotesShell({
                 key={item.id}
                 href={`/admin/pursuits/${item.id}`}
                 aria-current={active ? "page" : undefined}
-                className={`press mb-0.5 block truncate rounded-[8px] px-3 py-2 text-[16px] leading-snug ${
+                className={`press block truncate rounded-[8px] border-[0.5px] px-3 py-2 text-[16px] leading-snug ${
                   active
-                    ? "bg-[var(--surface-muted)] text-[var(--text)]"
-                    : "text-[var(--text-muted)]"
+                    ? "border-[var(--border-strong)] bg-[var(--surface-muted)] text-[var(--text)]"
+                    : "border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text)]"
                 }`}
               >
                 <span
@@ -137,14 +137,14 @@ export function NotesShell({
           {error ? <p className="px-3 pt-2 text-[12px] text-[var(--danger)]">{error}</p> : null}
         </nav>
         <div className="mt-auto flex shrink-0 items-center gap-4 border-t-[0.5px] border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-[12px] text-[var(--text-muted)]">
-          <Link href="/admin/account" className="hover:text-[var(--text)]">
+          <Link href="/admin/account" className="rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2.5 py-1.5 transition hover:bg-[var(--surface-muted)] hover:text-[var(--text)]">
             账号
           </Link>
-          <Link href="/" className="hover:text-[var(--text)]">
+          <Link href="/" className="rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2.5 py-1.5 transition hover:bg-[var(--surface-muted)] hover:text-[var(--text)]">
             网站
           </Link>
           <form action={signOut}>
-            <button type="submit" className="hover:text-[var(--text)]">
+            <button type="submit" className="rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-2.5 py-1.5 transition hover:bg-[var(--surface-muted)] hover:text-[var(--text)]">
               退出
             </button>
           </form>
