@@ -41,11 +41,11 @@ export function NotesShell({
   };
 
   return (
-    <div className="notes-app fixed inset-0 z-[70] flex text-ink">
+    <div className="notes-app fixed inset-0 z-[70] flex h-dvh overflow-hidden text-ink">
       <aside
         className={`${
           inDoc ? "hidden md:flex" : "flex"
-        } w-full shrink-0 flex-col border-r border-ink/10 md:w-[248px]`}
+        } h-full min-h-0 w-full shrink-0 flex-col overflow-hidden border-r border-ink/10 md:w-[248px]`}
       >
         <div className="flex items-center justify-between px-4 pb-3 pt-6">
           <p className="font-display text-[20px] tracking-[-0.03em] text-ink">手记</p>
@@ -92,7 +92,7 @@ export function NotesShell({
           ) : null}
           {error ? <p className="px-3 pt-2 text-[12px] text-red-700">{error}</p> : null}
         </nav>
-        <div className="flex items-center gap-4 border-t border-ink/10 px-4 py-3 text-[12px] text-mist">
+        <div className="mt-auto flex shrink-0 items-center gap-4 border-t border-ink/10 bg-[#f6f3f8] px-4 py-3 text-[12px] text-mist">
           <Link href="/admin/account" className="hover:text-ink">
             账号
           </Link>

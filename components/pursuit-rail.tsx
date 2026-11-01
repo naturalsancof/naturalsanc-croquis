@@ -601,10 +601,10 @@ function DetailPanel({
         </div>
 
         {pursuit.subtitle ? (
-          <p className="mt-5 text-[14px] leading-relaxed text-ink/80">{pursuit.subtitle}</p>
+          <p className="mt-5 whitespace-pre-wrap text-[14px] leading-relaxed text-ink/80">{pursuit.subtitle}</p>
         ) : null}
         {pursuit.description ? (
-          <p className="mt-3 text-[13px] leading-[1.8] text-ink/70">{pursuit.description}</p>
+          <p className="mt-3 whitespace-pre-wrap text-[13px] leading-[1.8] text-ink/70">{pursuit.description}</p>
         ) : null}
         {pursuit.progress_note ? (
           <p className="mt-4 border-l-2 border-[#5b4eb8]/40 pl-4 text-[13px] leading-relaxed text-ink/75">

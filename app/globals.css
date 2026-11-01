@@ -145,6 +145,14 @@ body {
   resize: none;
 }
 
+textarea.plain-write {
+  display: block;
+  overflow: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 .plain-write:focus,
 .plain-write:focus-visible {
   outline: none;

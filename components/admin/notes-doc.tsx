@@ -71,7 +71,7 @@ export function NotesDoc({
   renames: { key: string; id: string }[];
 }) {
   const { pursuit } = data;
-  const [locales, setLocales] = useState(false);
+  const [locales, setLocales] = useState(true);
   const [menu, setMenu] = useState(false);
   const [openNote, setOpenNote] = useState<string | null>(null);
   const [openWork, setOpenWork] = useState<string | null>(null);
@@ -112,13 +112,16 @@ export function NotesDoc({
         </Link>
         <StatusLine status={status} uploadLabel={uploadLabel} onRetry={onRetry} />
         <div className="relative ml-auto flex items-center gap-1">
-          <IconButton
-            label={locales ? "收起多语言" : "多语言"}
-            pressed={locales}
+          <button
+            type="button"
+            aria-pressed={locales}
             onClick={() => setLocales((value) => !value)}
+            className={`press rounded-full px-2.5 py-1 text-[13px] ${
+              locales ? "text-ink" : "text-mist"
+            }`}
           >
-            文
-          </IconButton>
+            中 / EN / 日
+          </button>
           <a
             href={`/pursuits/${pursuit.slug}`}
             target="_blank"
@@ -166,72 +169,81 @@ export function NotesDoc({
             />
           ) : (
             <>
-              <Line
-                value={pursuit.title}
-                label="标题"
-                placeholder="标题"
-                onChange={(value) => patchPursuit({ title: value })}
-                className="font-display text-[40px] font-medium leading-[1.05] tracking-[-0.035em] text-ink sm:text-[48px]"
-              />
-              {locales ? (
-                <LocaleLines
-                  en={pursuit.title_en}
-                  ja={pursuit.title_ja}
-                  onEn={(value) => patchPursuit({ title_en: value || null })}
-                  onJa={(value) => patchPursuit({ title_ja: value || null })}
-                />
-              ) : null}
-              <Line
-                value={pursuit.subtitle ?? ""}
-                label="简介"
-                placeholder="一句简介"
-                onChange={(value) => patchPursuit({ subtitle: value || null })}
-                className="mt-3 text-[18px] text-ink/70"
-              />
-              {locales ? (
-                <LocaleLines
-                  en={pursuit.subtitle_en}
-                  ja={pursuit.subtitle_ja}
-                  onEn={(value) => patchPursuit({ subtitle_en: value || null })}
-                  onJa={(value) => patchPursuit({ subtitle_ja: value || null })}
-                />
-              ) : null}
-              <Line
-                multiline
-                value={pursuit.description ?? ""}
-                label="正文"
-                placeholder="开始写"
-                onChange={(value) => patchPursuit({ description: value || null })}
-                className="mt-8 min-h-24 text-[17px] leading-[1.75] text-ink/85"
-              />
-              {locales ? (
-                <>
-                  <Line
-                    multiline
-                    value={pursuit.description_en ?? ""}
-                    label="正文 English"
-                    placeholder="English"
-                    onChange={(value) => patchPursuit({ description_en: value || null })}
-                    className="mt-4 text-[15px] leading-relaxed text-mist"
+              <section className="rounded-3xl border border-ink/10 bg-white/40 px-5 py-6 sm:px-7">
+                <h2 className="font-display text-[15px] tracking-[-0.02em] text-ink">简介</h2>
+                <div className="mt-4 border-t border-ink/10 pt-4">
+                  <LangLine
+                    tag="中"
+                    value={pursuit.title}
+                    label="标题"
+                    placeholder="标题"
+                    onChange={(value) => patchPursuit({ title: value })}
+                    className="font-display text-[36px] font-medium leading-[1.12] tracking-[-0.035em] text-ink sm:text-[44px]"
                   />
-                  <Line
+                  {locales ? (
+                    <LocaleLines
+                      en={pursuit.title_en}
+                      ja={pursuit.title_ja}
+                      onEn={(value) => patchPursuit({ title_en: value || null })}
+                      onJa={(value) => patchPursuit({ title_ja: value || null })}
+                    />
+                  ) : null}
+                  <LangLine
+                    tag="中"
                     multiline
-                    value={pursuit.description_ja ?? ""}
-                    label="正文 日本語"
-                    placeholder="日本語"
-                    onChange={(value) => patchPursuit({ description_ja: value || null })}
-                    className="mt-2 text-[15px] leading-relaxed text-mist"
+                    value={pursuit.subtitle ?? ""}
+                    label="简介"
+                    placeholder="简介，回车换行"
+                    onChange={(value) => patchPursuit({ subtitle: value || null })}
+                    className="mt-5 text-[18px] leading-[1.75] text-ink/80"
                   />
-                </>
-              ) : null}
-              <Line
-                multiline
-                value={pursuit.progress_note ?? ""}
-                label="阶段说明"
-                placeholder="现在走到哪一步"
-                onChange={(value) => patchPursuit({ progress_note: value || null })}
-                className="mt-6 text-[15px] leading-relaxed text-mist"
-              />
+                  {locales ? (
+                    <LocaleLines
+                      multiline
+                      en={pursuit.subtitle_en}
+                      ja={pursuit.subtitle_ja}
+                      onEn={(value) => patchPursuit({ subtitle_en: value || null })}
+                      onJa={(value) => patchPursuit({ subtitle_ja: value || null })}
+                    />
+                  ) : null}
+                  <LangLine
+                    tag="中"
+                    multiline
+                    value={pursuit.description ?? ""}
+                    label="正文"
+                    placeholder="正文，回车换行"
+                    onChange={(value) => patchPursuit({ description: value || null })}
+                    className="mt-5 min-h-28 text-[17px] leading-[1.8] text-ink/85"
+                  />
+                  {locales ? (
+                    <LocaleLines
+                      multiline
+                      en={pursuit.description_en}
+                      ja={pursuit.description_ja}
+                      onEn={(value) => patchPursuit({ description_en: value || null })}
+                      onJa={(value) => patchPursuit({ description_ja: value || null })}
+                    />
+                  ) : null}
+                  <LangLine
+                    tag="中"
+                    multiline
+                    value={pursuit.progress_note ?? ""}
+                    label="阶段说明"
+                    placeholder="现在走到哪一步"
+                    onChange={(value) => patchPursuit({ progress_note: value || null })}
+                    className="mt-5 text-[15px] leading-[1.75] text-mist"
+                  />
+                  {locales ? (
+                    <LocaleLines
+                      multiline
+                      en={pursuit.progress_note_en}
+                      ja={pursuit.progress_note_ja}
+                      onEn={(value) => patchPursuit({ progress_note_en: value || null })}
+                      onJa={(value) => patchPursuit({ progress_note_ja: value || null })}
+                    />
+                  ) : null}
+                </div>
+              </section>
 
               <Block
                 title="里程碑"
@@ -500,27 +512,49 @@ function LocaleLines({
   ja,
   onEn,
   onJa,
+  multiline = false,
 }: {
   en: string | null;
   ja: string | null;
   onEn: (value: string) => void;
   onJa: (value: string) => void;
+  multiline?: boolean;
 }) {
   return (
-    <div className="mt-1 space-y-1">
+    <div className="mt-2 space-y-2">
+      <LangLine tag="EN" value={en ?? ""} label="English" placeholder="English" multiline={multiline} onChange={onEn} />
+      <LangLine tag="日" value={ja ?? ""} label="日本語" placeholder="日本語" multiline={multiline} onChange={onJa} />
+    </div>
+  );
+}
+
+function LangLine({
+  tag,
+  value,
+  label,
+  placeholder,
+  onChange,
+  multiline = false,
+  className = "text-[15px] leading-[1.7] text-mist",
+}: {
+  tag: string;
+  value: string;
+  label: string;
+  placeholder: string;
+  onChange: (value: string) => void;
+  multiline?: boolean;
+  className?: string;
+}) {
+  return (
+    <div className="flex items-start gap-3">
+      <span className="w-6 shrink-0 pt-1 font-display text-[11px] text-mist">{tag}</span>
       <Line
-        value={en ?? ""}
-        label="English"
-        placeholder="English"
-        onChange={onEn}
-        className="text-[14px] text-mist"
-      />
-      <Line
-        value={ja ?? ""}
-        label="日本語"
-        placeholder="日本語"
-        onChange={onJa}
-        className="text-[14px] text-mist"
+        multiline={multiline}
+        value={value}
+        label={label}
+        placeholder={placeholder}
+        onChange={onChange}
+        className={className}
       />
     </div>
   );
@@ -536,15 +570,14 @@ function Block({
   children: ReactNode;
 }) {
   return (
-    <section className="mt-16">
-      <div className="mb-2 flex items-center justify-between">
-        <h2 className="font-display text-[11px] tracking-[0.2em] text-mist">{title}</h2>
-        <button type="button" aria-label={`添加${title}`} onClick={onAdd} className="text-[18px] text-mist hover:text-ink">
+    <section className="mt-5 rounded-3xl border border-ink/10 bg-white/40 px-5 py-5 sm:px-6">
+      <div className="mb-3 flex items-center justify-between border-b border-ink/10 pb-3">
+        <h2 className="font-display text-[15px] tracking-[-0.02em] text-ink">{title}</h2>
+        <button type="button" aria-label={`添加${title}`} onClick={onAdd} className="press grid h-7 w-7 place-items-center rounded-full text-[18px] text-mist">
           +
         </button>
       </div>
-      <div className="h-px bg-ink/10" />
-      <div className="pt-2">{children}</div>
+      <div>{children}</div>
     </section>
   );
 }
@@ -773,11 +806,12 @@ function WorkLine({
           {open ? (
             <>
               <Line
+                multiline
                 value={row.description ?? ""}
                 label="作品说明"
-                placeholder="说明"
+                placeholder="说明，回车换行"
                 onChange={(value) => onChange({ description: value || null })}
-                className="mt-1 text-[14px] text-mist"
+                className="mt-1 text-[14px] leading-[1.7] text-mist"
               />
               {locales ? (
                 <LocaleLines
@@ -789,6 +823,7 @@ function WorkLine({
               ) : null}
               {locales ? (
                 <LocaleLines
+                  multiline
                   en={row.description_en}
                   ja={row.description_ja}
                   onEn={(value) => onChange({ description_en: value || null })}
@@ -876,13 +911,15 @@ function MaterialLine({
                 onJa={(value) => onChange({ title_ja: value || null })}
               />
               <Line
+                multiline
                 value={row.description ?? ""}
                 label="说明"
-                placeholder="一句说明"
+                placeholder="说明，回车换行"
                 onChange={(value) => onChange({ description: value || null })}
-                className="mt-1 text-[14px] text-mist"
+                className="mt-1 text-[14px] leading-[1.7] text-mist"
               />
               <LocaleLines
+                multiline
                 en={row.description_en}
                 ja={row.description_ja}
                 onEn={(value) => onChange({ description_en: value || null })}
@@ -921,8 +958,8 @@ function NotePage({
   onDelete: () => void;
 }) {
   return (
-    <div>
-      <div className="mb-8 flex items-center gap-4 text-[13px] text-mist">
+    <section className="rounded-3xl border border-ink/10 bg-white/40 px-5 py-6 sm:px-7">
+      <div className="mb-6 flex items-center gap-4 border-b border-ink/10 pb-3 text-[13px] text-mist">
         <button type="button" onClick={onBack} className="hover:text-ink">
           ←
         </button>
@@ -951,35 +988,27 @@ function NotePage({
           onJa={(value) => onChange({ title_ja: value || null })}
         />
       ) : null}
-      <Line
+      <LangLine
+        tag="中"
         multiline
         value={note.content ?? ""}
         label="笔记正文"
-        placeholder="开始写"
+        placeholder="开始写，回车换行"
         onChange={(value) => onChange({ content: value || null })}
-        className="mt-8 min-h-40 text-[17px] leading-[1.75] text-ink/85"
+        className="min-h-40 text-[17px] leading-[1.8] text-ink/85"
       />
       {locales ? (
-        <>
-          <Line
+        <div className="mt-3">
+          <LocaleLines
             multiline
-            value={note.content_en ?? ""}
-            label="笔记 English"
-            placeholder="English"
-            onChange={(value) => onChange({ content_en: value || null })}
-            className="mt-4 text-[15px] leading-relaxed text-mist"
+            en={note.content_en}
+            ja={note.content_ja}
+            onEn={(value) => onChange({ content_en: value || null })}
+            onJa={(value) => onChange({ content_ja: value || null })}
           />
-          <Line
-            multiline
-            value={note.content_ja ?? ""}
-            label="笔记 日本語"
-            placeholder="日本語"
-            onChange={(value) => onChange({ content_ja: value || null })}
-            className="mt-2 text-[15px] leading-relaxed text-mist"
-          />
-        </>
+        </div>
       ) : null}
-    </div>
+    </section>
   );
 }
 
