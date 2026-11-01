@@ -15,6 +15,10 @@
     "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Hiragino Kaku Gothic ProN",
     "Yu Gothic", "YuGothic", "Meiryo", "Noto Sans CJK SC", "Noto Sans CJK JP",
     system-ui, sans-serif;
+  /* 区块标题：宋体 / 明朝，中日英衬线同一气质。 */
+  --font-song: "Songti SC", "Songti TC", "STSong", "SimSun", "Noto Serif CJK SC",
+    "Source Han Serif SC", "Hiragino Mincho ProN", "Yu Mincho", "MS PMincho",
+    "Iowan Old Style", Palatino, Georgia, serif;
 
   --color-ink: #141419;
   --color-paper: #141419;
@@ -222,10 +226,10 @@ textarea.plain-write {
 }
 
 .type-section {
-  font-family: var(--font-body);
+  font-family: var(--font-song);
   font-weight: 600;
   font-size: 1.0625rem;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.04em;
   line-height: 1.3;
   color: var(--ink);
 }
