@@ -54,26 +54,26 @@ export function NotesShell({
   };
 
   return (
-    <div className="notes-app fixed inset-0 z-[70] flex h-dvh overflow-hidden text-ink">
-      {inDoc && open ? (
-        <button
-          type="button"
-          aria-label="关闭目录"
-          className="fixed inset-0 z-[75] bg-ink/20 md:hidden"
-          onClick={() => setOpen(false)}
-        />
-      ) : null}
+    <div className="notes-app fixed inset-x-0 bottom-0 top-14 z-[40] flex overflow-hidden text-ink">
       <aside
         className={
           inDoc
-            ? `fixed inset-y-0 left-0 z-[80] flex h-dvh w-[min(88vw,17.5rem)] min-h-0 flex-col overflow-hidden border-r border-ink/10 bg-[var(--paper)] transition-transform duration-200 md:static md:z-auto md:h-full md:w-60 md:translate-x-0 ${
-                open ? "translate-x-0" : "-translate-x-full"
-              }`
+            ? `${open ? "flex" : "hidden"} fixed inset-0 z-[80] h-dvh w-full min-h-0 flex-col overflow-hidden bg-[var(--paper)] md:static md:z-auto md:flex md:h-full md:w-60 md:shrink-0 md:border-r md:border-ink/10`
             : "flex h-full min-h-0 w-full shrink-0 flex-col overflow-hidden border-r border-ink/10 md:w-60"
         }
       >
         <div className="flex items-center justify-between px-4 pb-3 pt-6">
           <p className="type-section">手记</p>
+          {inDoc ? (
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-label="关闭目录"
+              className="press mr-auto ml-3 rounded-full px-2 py-1 text-[13px] text-mist md:hidden"
+            >
+              关闭
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={create}
@@ -131,7 +131,7 @@ export function NotesShell({
           </form>
         </div>
       </aside>
-      <div className={`${inDoc ? "flex" : "hidden md:flex"} min-w-0 flex-1 flex-col`}>
+      <div className={`${inDoc ? "flex w-full" : "hidden md:flex"} relative z-[1] min-w-0 flex-1 flex-col`}>
         <OpenListContext.Provider value={() => setOpen(true)}>{children}</OpenListContext.Provider>
       </div>
     </div>
