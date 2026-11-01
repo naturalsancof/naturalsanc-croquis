@@ -11,7 +11,7 @@ export default function AboutPage() {
     <div className="pb-10">
       <p className="label">About — 关于</p>
 
-      <h1 className="gradient-title mt-8 max-w-3xl text-[34px] font-semibold leading-[1.15] tracking-[-0.02em] sm:text-[46px]">
+      <h1 className="gradient-title mt-8 max-w-3xl font-display text-[34px] font-medium leading-[1.2] tracking-[-0.03em] sm:text-[48px]">
         先把事情做出来，
         <br />
         再决定它值不值得留下。

@@ -47,14 +47,14 @@ export function NotesShell({
           inDoc ? "hidden md:flex" : "flex"
         } w-full shrink-0 flex-col border-r border-ink/10 md:w-[248px]`}
       >
-        <div className="flex items-center justify-between px-4 pb-2 pt-5">
-          <p className="font-display text-[10px] tracking-[0.22em] text-mist">追求</p>
+        <div className="flex items-center justify-between px-4 pb-3 pt-6">
+          <p className="font-display text-[20px] tracking-[-0.03em] text-ink">手记</p>
           <button
             type="button"
             onClick={create}
             disabled={pending}
             aria-label="新建追求"
-            className="grid h-8 w-8 place-items-center text-[20px] leading-none text-mist hover:text-ink"
+            className="press grid h-8 w-8 place-items-center rounded-full text-[20px] leading-none text-ink/70"
           >
             +
           </button>
@@ -67,8 +67,8 @@ export function NotesShell({
                 key={item.id}
                 href={`/admin/pursuits/${item.id}`}
                 aria-current={active ? "page" : undefined}
-                className={`mb-0.5 block truncate rounded-lg px-3 py-2 text-[15px] ${
-                  active ? "bg-ink/[0.05] text-ink" : "text-ink/75 hover:bg-ink/[0.03]"
+                className={`press mb-0.5 block truncate rounded-lg px-3 py-2 text-[15px] leading-snug ${
+                  active ? "bg-white/80 text-ink shadow-[inset_2px_0_0_#6d63ae]" : "text-ink/75"
                 }`}
               >
                 <span
@@ -82,7 +82,13 @@ export function NotesShell({
             );
           })}
           {pursuits.length === 0 ? (
-            <p className="px-3 py-6 text-[13px] text-mist">还没有追求。</p>
+            <div className="px-3 py-8">
+              <div className="mark !h-12 !w-12 !shadow-none" aria-hidden>
+                <span className="!text-[16px]">✕</span>
+              </div>
+              <p className="mt-4 font-display text-[18px] text-ink">还没有稿纸</p>
+              <p className="mt-1 text-[13px] leading-relaxed text-mist">点右上角的加号，写第一条。</p>
+            </div>
           ) : null}
           {error ? <p className="px-3 pt-2 text-[12px] text-red-700">{error}</p> : null}
         </nav>

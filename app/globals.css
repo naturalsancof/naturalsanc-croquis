@@ -6,10 +6,10 @@
    ============================================================ */
 
 @theme {
-  --font-display: ui-monospace, "Cascadia Mono", "SFMono-Regular", Menlo, Consolas,
-    "Liberation Mono", monospace;
-  --font-body: -apple-system, "Segoe UI", "PingFang SC", "Hiragino Sans GB",
-    "Microsoft YaHei", system-ui, sans-serif;
+  --font-display: var(--font-fraunces), "Iowan Old Style", Palatino, "Songti SC",
+    "Noto Serif SC", "Source Han Serif SC", serif;
+  --font-body: var(--font-figtree), "Avenir Next", "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", sans-serif;
 
   --color-ink: #141419;
   --color-paper: #141419;
@@ -39,6 +39,9 @@ html {
 body {
   color: var(--color-ink);
   font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.65;
+  letter-spacing: -0.011em;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -54,16 +57,17 @@ body {
   inset: 0;
   z-index: -2;
   background:
-    radial-gradient(880px 420px at 8% -12%, rgb(186 198 236 / 0.28), transparent 62%),
-    radial-gradient(720px 380px at 100% -8%, rgb(214 196 232 / 0.22), transparent 60%),
-    linear-gradient(180deg, #f7f5f8 0%, #f4f1f6 100%);
+    radial-gradient(920px 520px at 6% -8%, rgb(176 188 245 / 0.42), transparent 62%),
+    radial-gradient(760px 460px at 96% 0%, rgb(214 188 236 / 0.34), transparent 58%),
+    radial-gradient(640px 420px at 70% 110%, rgb(186 214 226 / 0.28), transparent 60%),
+    linear-gradient(180deg, #f6f3f8 0%, #f3eef5 100%);
 }
 
 .paper-bg::after {
   content: "";
   position: absolute;
   inset: 0;
-  opacity: 0.035;
+  opacity: 0.055;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
@@ -74,22 +78,25 @@ body {
   z-index: -2;
   pointer-events: none;
   background:
-    radial-gradient(880px 420px at 8% -12%, rgb(186 198 236 / 0.28), transparent 62%),
-    radial-gradient(720px 380px at 100% -8%, rgb(214 196 232 / 0.22), transparent 60%),
-    linear-gradient(180deg, #f7f5f8 0%, #f4f1f6 100%);
+    radial-gradient(920px 520px at 6% -8%, rgb(176 188 245 / 0.42), transparent 62%),
+    radial-gradient(760px 460px at 96% 0%, rgb(214 188 236 / 0.34), transparent 58%),
+    radial-gradient(640px 420px at 70% 110%, rgb(186 214 226 / 0.28), transparent 60%),
+    linear-gradient(180deg, #f6f3f8 0%, #f3eef5 100%);
 }
 
 .page-grid::after {
   content: "";
   position: absolute;
   inset: 0;
-  opacity: 0.035;
+  opacity: 0.055;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 /* ---------- 排版 ---------- */
 .font-display {
   font-family: var(--font-display);
+  font-optical-sizing: auto;
+  letter-spacing: -0.03em;
 }
 
 .kicker,
@@ -149,9 +156,61 @@ body {
 }
 
 .notes-app {
+  position: relative;
   background:
-    radial-gradient(720px 360px at 0% 0%, rgb(186 198 236 / 0.22), transparent 64%),
-    #f7f5f8;
+    radial-gradient(640px 380px at 0% 0%, rgb(176 188 245 / 0.34), transparent 62%),
+    radial-gradient(520px 320px at 100% 100%, rgb(214 196 232 / 0.22), transparent 64%),
+    #f6f3f8;
+}
+
+.notes-app > * {
+  position: relative;
+  z-index: 1;
+}
+
+.notes-app::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 999px;
+  border: 1px solid rgb(20 20 25 / 0.14);
+  background:
+    radial-gradient(circle at 35% 30%, rgb(255 255 255 / 0.9), transparent 55%),
+    radial-gradient(circle at 70% 70%, rgb(176 168 230 / 0.35), transparent 60%);
+  box-shadow: 0 18px 40px -28px rgb(80 60 140 / 0.55);
+}
+
+.mark span {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  line-height: 1;
+  color: rgb(20 20 25 / 0.55);
+}
+
+.press {
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    transform 160ms ease,
+    box-shadow 180ms ease;
+}
+
+.press:hover {
+  background-color: rgb(20 20 25 / 0.045);
+}
+
+.press:active {
+  transform: scale(0.98);
 }
 
 .skeleton {
@@ -209,14 +268,19 @@ body {
   overflow: hidden;
   border-radius: 28px;
   background: #101014;
-  box-shadow: 0 0 0 1px rgb(20 20 25 / 0.08);
+  box-shadow:
+    0 0 0 1px rgb(20 20 25 / 0.08),
+    0 22px 48px -30px rgb(90 70 150 / 0.35);
   transition:
     transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1),
     box-shadow 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .tile:hover {
-  transform: none;
+  transform: translateY(-3px);
+  box-shadow:
+    0 0 0 1px rgb(20 20 25 / 0.12),
+    0 28px 56px -28px rgb(90 70 150 / 0.42);
 }
 
 /* 侧边卡片的玻璃膜：右侧被「折射」出一点高光 */
@@ -241,7 +305,9 @@ body {
   border-radius: 28px;
   background: #101014;
   transform: rotate(var(--tilt, 0deg));
-  box-shadow: 0 0 0 1px rgb(20 20 25 / 0.08);
+  box-shadow:
+    0 0 0 1px rgb(20 20 25 / 0.08),
+    0 22px 48px -30px rgb(90 70 150 / 0.35);
   transition:
     transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1),
     box-shadow 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -249,7 +315,10 @@ body {
 }
 
 .poster:hover {
-  transform: rotate(0deg);
+  transform: rotate(0deg) translateY(-4px);
+  box-shadow:
+    0 0 0 1px rgb(20 20 25 / 0.12),
+    0 28px 56px -28px rgb(90 70 150 / 0.42);
 }
 
 .poster-cap {
@@ -378,7 +447,9 @@ body {
   .poster,
   .tile,
   .poster:hover,
-  .tile:hover {
+  .tile:hover,
+  .press,
+  .press:active {
     transition: none;
     transform: none;
   }

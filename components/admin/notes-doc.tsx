@@ -171,7 +171,7 @@ export function NotesDoc({
                 label="标题"
                 placeholder="标题"
                 onChange={(value) => patchPursuit({ title: value })}
-                className="text-[34px] font-semibold tracking-[-0.03em] text-ink sm:text-[42px]"
+                className="font-display text-[40px] font-medium leading-[1.05] tracking-[-0.035em] text-ink sm:text-[48px]"
               />
               {locales ? (
                 <LocaleLines
@@ -566,8 +566,8 @@ function IconButton({
       aria-label={label}
       aria-pressed={pressed}
       onClick={onClick}
-      className={`grid h-8 min-w-8 place-items-center px-1 text-[14px] ${
-        pressed ? "text-ink" : "text-mist hover:text-ink"
+        className={`press grid h-8 min-w-8 place-items-center rounded-full px-1 text-[14px] ${
+        pressed ? "bg-white/80 text-ink shadow-[inset_0_0_0_1px_rgba(20,20,25,0.12)]" : "text-mist"
       }`}
     >
       {children}
@@ -941,7 +941,7 @@ function NotePage({
         label="笔记标题"
         placeholder="标题"
         onChange={(value) => onChange({ title: value })}
-        className="text-[34px] font-semibold tracking-[-0.03em] text-ink sm:text-[42px]"
+        className="font-display text-[40px] font-medium leading-[1.05] tracking-[-0.035em] text-ink sm:text-[48px]"
       />
       {locales ? (
         <LocaleLines

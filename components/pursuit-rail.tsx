@@ -359,7 +359,15 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
 
   if (n === 0) {
     return (
-      <p className="py-24 text-center text-sm text-mist">还没有已发布的追求。</p>
+      <div className="grid flex-1 place-items-center py-16 text-center">
+        <div>
+          <div className="mark mx-auto" aria-hidden>
+            <span>✕</span>
+          </div>
+          <p className="mt-5 font-display text-[22px] text-ink">还是空白的稿纸</p>
+          <p className="mt-1 text-[14px] text-mist">发布一条追求之后，会在这里排开。</p>
+        </div>
+      </div>
     );
   }
 
@@ -399,7 +407,7 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
                 }
                 setSelected(p);
               }}
-              className="absolute left-1/2 top-1/2 block rounded-[28px] text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3c4ec4]"
+              className="group absolute left-1/2 top-1/2 block rounded-[28px] text-left transition-[filter] duration-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3c4ec4]"
               style={{
                 width: size.w,
                 height: size.h,
@@ -410,14 +418,14 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
                 {nf(i + 1)} / {p.slug.replace(/-/g, "_").toUpperCase()}
               </span>
 
-              <span className="relative block h-full w-full overflow-hidden rounded-[28px] bg-[#101014] shadow-[0_0_0_1px_rgba(20,20,25,0.08)]">
+              <span className="relative block h-full w-full overflow-hidden rounded-[28px] bg-[#101014] shadow-[0_0_0_1px_rgba(255,255,255,0.35),0_24px_50px_-28px_rgba(70,50,130,0.45)]">
                 {p.cover_url ? (
                   <Image
                     src={p.cover_url}
                     alt=""
                     fill
                     sizes="320px"
-                    className="object-cover"
+                    className="object-cover transition duration-700 ease-out group-hover:scale-[1.035] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                     draggable={false}
                     priority={i < 3}
                   />
@@ -581,7 +589,9 @@ function DetailPanel({
             <p className="font-display text-[9px] tracking-[0.2em] text-mist">
               {pursuit.slug.replace(/-/g, "_").toUpperCase()} · {stage.zh}
             </p>
-            <h2 className="mt-2 text-2xl text-ink">{pursuit.title}</h2>
+            <h2 className="mt-2 font-display text-[28px] font-medium leading-tight tracking-[-0.03em] text-ink">
+              {pursuit.title}
+            </h2>
             {pursuit.title_en ? (
               <p className="mt-1 font-display text-[10px] tracking-[0.16em] text-mist">
                 {pursuit.title_en}
