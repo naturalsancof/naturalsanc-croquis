@@ -215,8 +215,8 @@ textarea.plain-write {
 /* 全站同一套字号、细线和间距。首页空心巨字是唯一的例外。 */
 .type-display {
   font-family: var(--font-body);
-  font-weight: 600;
-  letter-spacing: -0.025em;
+  font-weight: 400;
+  letter-spacing: -0.02em;
   line-height: 1.12;
   font-size: clamp(2rem, 6vw, 3rem);
 }
