@@ -24,18 +24,14 @@ export default async function HomePage() {
             marginRight: "calc(50% - 50vw)",
           }}
         >
-          <p
-            className="select-none whitespace-nowrap px-5 font-extrabold uppercase leading-[0.9] tracking-[-0.055em] sm:px-8"
+          <h1
+            className="gradient-title select-none whitespace-nowrap px-5 font-extrabold uppercase leading-[0.86] tracking-[-0.055em] sm:px-8"
             style={{
-              fontSize: "clamp(64px, 16vw, 240px)",
-              marginTop: "-0.3em",
-              color: "transparent",
-              WebkitTextStroke: "clamp(1.5px, 0.22vw, 3px) rgba(20,20,25,0.72)",
+              fontSize: "clamp(64px, 14vw, 200px)",
             }}
-            aria-label="Croquis"
           >
             Croquis
-          </p>
+          </h1>
         </div>
 
         <div

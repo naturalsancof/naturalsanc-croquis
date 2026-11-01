@@ -13,7 +13,7 @@
 
   --color-ink: #141419;
   --color-paper: #141419;
-  --color-mist: #6f6b78;
+  --color-mist: #534f5c;
 
   --color-cyan: #2e7f8a;
   --color-magenta: #a8456b;
@@ -54,9 +54,9 @@ body {
   inset: 0;
   z-index: -2;
   background:
-    radial-gradient(1200px 800px at 12% 0%, #e9e1f7 0%, transparent 55%),
-    radial-gradient(900px 700px at 88% 8%, #f7e6ea 0%, transparent 55%),
-    radial-gradient(1100px 850px at 50% 105%, #e7e4f4 0%, transparent 62%),
+    radial-gradient(980px 560px at 8% -8%, rgb(176 196 255 / 0.55), transparent 62%),
+    radial-gradient(860px 520px at 92% 0%, rgb(206 184 255 / 0.42), transparent 58%),
+    radial-gradient(900px 640px at 50% 108%, rgb(186 214 230 / 0.38), transparent 62%),
     linear-gradient(180deg, #f7f2f6 0%, #f6f1f5 45%, #ece9f4 100%);
 }
 
@@ -75,9 +75,9 @@ body {
   z-index: -2;
   pointer-events: none;
   background:
-    radial-gradient(1200px 800px at 12% 0%, #e9e1f7 0%, transparent 55%),
-    radial-gradient(900px 700px at 88% 8%, #f7e6ea 0%, transparent 55%),
-    radial-gradient(1100px 850px at 50% 105%, #e7e4f4 0%, transparent 62%),
+    radial-gradient(980px 560px at 8% -8%, rgb(176 196 255 / 0.55), transparent 62%),
+    radial-gradient(860px 520px at 92% 0%, rgb(206 184 255 / 0.42), transparent 58%),
+    radial-gradient(900px 640px at 50% 108%, rgb(186 214 230 / 0.38), transparent 62%),
     linear-gradient(180deg, #f7f2f6 0%, #f6f1f5 45%, #ece9f4 100%);
 }
 
@@ -119,6 +119,33 @@ body {
   text-shadow: none;
 }
 
+.gradient-title {
+  background-image: linear-gradient(105deg, #24315f 0%, #5b4eb8 48%, #1f6d7c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.skeleton {
+  background-image: linear-gradient(
+    100deg,
+    rgb(255 255 255 / 0.35) 20%,
+    rgb(214 206 240 / 0.85) 42%,
+    rgb(255 255 255 / 0.35) 64%
+  );
+  background-size: 220% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
 /* ---------- 卡片 ---------- */
 /* 公开页的模块：不画白底、不描边，直接落在纸面上 */
 .panel {
@@ -152,7 +179,7 @@ body {
 .tile {
   display: block;
   overflow: hidden;
-  border-radius: 14px;
+  border-radius: 28px;
   background: #101014;
   box-shadow:
     0 34px 60px -38px rgb(20 20 25 / 0.55),
@@ -163,7 +190,7 @@ body {
 }
 
 .tile:hover {
-  transform: translateY(-6px);
+  transform: translateY(-3px);
   box-shadow:
     0 46px 70px -40px rgb(20 20 25 / 0.55),
     0 10px 24px -14px rgb(20 20 25 / 0.3);
@@ -174,7 +201,7 @@ body {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  border-radius: 6px;
+  border-radius: 28px;
   opacity: var(--glass, 0);
   mix-blend-mode: screen;
   background:
@@ -188,7 +215,7 @@ body {
   position: relative;
   display: block;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: 28px;
   background: #101014;
   transform: rotate(var(--tilt, 0deg));
   box-shadow:
@@ -201,7 +228,7 @@ body {
 }
 
 .poster:hover {
-  transform: rotate(0deg) translateY(-10px);
+  transform: rotate(0deg) translateY(-4px);
   box-shadow:
     0 48px 70px -38px rgb(20 20 25 / 0.55),
     0 10px 22px -12px rgb(20 20 25 / 0.25);
@@ -309,7 +336,7 @@ body {
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -317,15 +344,25 @@ body {
   }
 }
 
+:focus-visible {
+  outline: 2px solid #3c4ec4;
+  outline-offset: 3px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
-  .rise {
+  .rise,
+  .skeleton {
     animation: none !important;
   }
-  .poster {
+  .poster,
+  .tile,
+  .poster:hover,
+  .tile:hover {
     transition: none;
+    transform: none;
   }
 }
 

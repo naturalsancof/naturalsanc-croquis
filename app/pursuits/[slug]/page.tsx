@@ -129,7 +129,7 @@ export default async function PursuitPage({ params, searchParams }: PageProps) {
               {stage.en} · {stage.zh}
             </span>
 
-            <h1 className="mt-5 text-[38px] font-semibold leading-[1.02] tracking-[-0.03em] text-ink sm:text-[54px]">
+            <h1 className="gradient-title mt-5 text-[38px] font-semibold leading-[1.02] tracking-[-0.03em] sm:text-[54px]">
               {pursuit.title}
             </h1>
 

@@ -25,20 +25,23 @@ export function SiteHeader() {
         </Link>
 
         {/* 手机上跟桌面同一套：中文 + 英文、44px 高可点区域 */}
-        <nav className="ml-auto flex items-center gap-1 sm:ml-0 sm:gap-4 md:absolute md:left-1/2 md:-translate-x-1/2 md:gap-8">
+        <nav
+          aria-label="站点"
+          className="ml-auto flex items-center gap-1 rounded-full border border-white/80 bg-white/60 px-1.5 py-1 shadow-[0_10px_30px_-22px_rgba(70,60,140,0.65)] backdrop-blur-md sm:ml-0 sm:gap-1 md:absolute md:left-1/2 md:-translate-x-1/2"
+        >
           {NAV.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="group shrink-0 whitespace-nowrap rounded-md px-2.5 py-2.5 text-center transition hover:bg-white/60 sm:px-2.5 sm:py-2"
+              className="group shrink-0 whitespace-nowrap rounded-full px-3 py-2 text-center transition hover:bg-white sm:px-3.5"
             >
               <span className="block font-display text-[12px] tracking-[0.06em] text-ink/75 transition group-hover:text-ink sm:inline sm:text-[10px] sm:tracking-[0.2em] sm:text-mist">
                 {item.label}
               </span>
-              <span className="mt-0.5 block font-display text-[7px] tracking-[0.2em] text-mist/60 transition group-hover:text-mist sm:mt-0 sm:ml-1 sm:inline sm:text-[10px] sm:tracking-[0.2em] sm:text-mist">
+              <span className="mt-0.5 block font-display text-[7px] tracking-[0.2em] text-mist transition group-hover:text-ink sm:mt-0 sm:ml-1 sm:inline sm:text-[10px] sm:tracking-[0.2em]">
                 {item.en}
               </span>
-              <span className="mt-1 hidden text-[9px] text-mist/60 md:block">
+              <span className="mt-1 hidden text-[9px] text-mist md:block">
                 {item.ja}
               </span>
             </Link>

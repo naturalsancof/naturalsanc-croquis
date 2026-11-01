@@ -1,156 +1,104 @@
 "use client";
 
 import {
-  useCallback,
   useEffect,
   useRef,
-  useState,
-  useTransition,
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from "react";
-import { reorderRows } from "@/app/admin/actions";
 
 type Item = { id: string; node: ReactNode };
 
 /**
- * 拖拽排序容器，用 Pointer Events 实现：鼠标、触屏、手写笔都能拖。
- * 子项由服务端渲染后作为 node 传进来，这里只负责顺序和落库。
+ * 受控的拖拽排序。顺序由父组件保存，松手时再提交。
+ * 拖拽手柄单独接收手势，输入框仍可正常点选和滚动。
  */
 export function Sortable({
-  table,
   items,
   grid = false,
+  onReorder,
 }: {
-  table: string;
   items: Item[];
   grid?: boolean;
+  onReorder: (ids: string[], phase: "move" | "commit") => void;
 }) {
-  const [order, setOrder] = useState<Item[]>(items);
-  const latest = useRef<Item[]>(items);
-  const [dragging, setDragging] = useState<string | null>(null);
-  const [pending, startTransition] = useTransition();
-
-  const dragId = useRef<string | null>(null);
+  const itemsRef = useRef(items);
   const moved = useRef(false);
+  const dragId = useRef<string | null>(null);
 
-  // props 变了（保存后重新渲染）就同步本地顺序；按 React 推荐的
-  // 「渲染期间调整 state」写法，避免 effect 里 setState 造成二次渲染
-  const [prevItems, setPrevItems] = useState<Item[]>(items);
-  if (items !== prevItems) {
-    setPrevItems(items);
-    setOrder(items);
-  }
-
-  const apply = useCallback((next: Item[]) => {
-    latest.current = next;
-    setOrder(next);
-  }, []);
-
-  // 服务端重新渲染后同步一份「最新顺序」，供松手时提交
   useEffect(() => {
-    latest.current = order;
-  }, [order]);
+    itemsRef.current = items;
+  }, [items]);
 
-  const commit = useCallback(
-    (next: Item[]) => {
-      startTransition(async () => {
-        await reorderRows(
-          table,
-          next.map((i) => i.id),
-        );
-      });
-    },
-    [table],
-  );
-
-  const moveTo = useCallback(
-    (fromId: string, toId: string) => {
-      const from = order.findIndex((i) => i.id === fromId);
-      const to = order.findIndex((i) => i.id === toId);
-      if (from < 0 || to < 0 || from === to) return;
-      const next = [...order];
-      const [item] = next.splice(from, 1);
-      next.splice(to, 0, item);
-      apply(next);
-    },
-    [apply, order],
-  );
+  const moveTo = (fromId: string, toId: string, phase: "move" | "commit") => {
+    const order = itemsRef.current.map((item) => item.id);
+    const from = order.indexOf(fromId);
+    const to = order.indexOf(toId);
+    if (from < 0 || to < 0 || from === to) return;
+    const next = [...order];
+    const [id] = next.splice(from, 1);
+    next.splice(to, 0, id);
+    onReorder(next, phase);
+  };
 
   const onPointerDown = (
-    e: ReactPointerEvent<HTMLButtonElement>,
+    event: ReactPointerEvent<HTMLButtonElement>,
     id: string,
   ) => {
-    if (e.button !== 0) return;
-    e.preventDefault();
-
+    if (event.button !== 0) return;
+    event.preventDefault();
     dragId.current = id;
     moved.current = false;
-    setDragging(id);
 
     const onMove = (ev: PointerEvent) => {
       if (!dragId.current) return;
-      moved.current = true;
       const el = document.elementFromPoint(ev.clientX, ev.clientY);
       const target = el?.closest<HTMLElement>("[data-sortable-id]");
       const targetId = target?.dataset.sortableId;
-      if (targetId && targetId !== dragId.current) {
-        moveTo(dragId.current, targetId);
-      }
+      if (!targetId || targetId === dragId.current) return;
+      moved.current = true;
+      moveTo(dragId.current, targetId, "move");
     };
 
     const onUp = () => {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", onUp);
-
-      const id = dragId.current;
+      const current = dragId.current;
       dragId.current = null;
-      setDragging(null);
-
-      if (moved.current && id) commit(latest.current);
+      if (moved.current && current) {
+        onReorder(
+          itemsRef.current.map((item) => item.id),
+          "commit",
+        );
+      }
       moved.current = false;
     };
 
-    window.addEventListener("pointermove", onMove, { passive: false });
+    window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onUp);
     window.addEventListener("pointercancel", onUp);
   };
 
   return (
-    <div
-      className={`${grid ? "grid gap-4 sm:grid-cols-2 xl:grid-cols-3" : "space-y-2.5"} ${
-        pending ? "opacity-70" : ""
-      } transition-opacity`}
-    >
-      {order.map((item) => (
-        <div
-          key={item.id}
-          data-sortable-id={item.id}
-          className={`relative rounded-xl transition-all duration-200 ${
-            dragging === item.id
-              ? "z-10 scale-[1.01] opacity-70 ring-1 ring-cyan/60"
-              : ""
-          }`}
-        >
+    <div className={grid ? "grid gap-4 sm:grid-cols-2 xl:grid-cols-3" : "space-y-3"}>
+      {items.map((item) => (
+        <div key={item.id} data-sortable-id={item.id} className="relative">
           <button
             type="button"
-            data-drag-handle
-            onPointerDown={(e) => onPointerDown(e, item.id)}
-            title="拖拽排序（手指也可以按住拖）"
             aria-label="拖拽排序"
+            title="按住拖动排序"
+            onPointerDown={(event) => onPointerDown(event, item.id)}
             style={{ touchAction: "none" }}
-            className={`absolute -left-1.5 top-2 z-10 flex h-9 w-6 cursor-grab items-center justify-center rounded-md border border-[var(--line)] bg-[#0a0b0d]/90 text-mist/40 backdrop-blur transition hover:border-cyan/40 hover:text-cyan active:cursor-grabbing ${
-              dragging === item.id ? "border-cyan/60 text-cyan" : ""
-            }`}
+            className="absolute left-2 top-3 z-10 grid h-11 w-8 cursor-grab place-items-center rounded-lg border border-[var(--line)] bg-white/90 text-mist active:cursor-grabbing"
           >
-            <svg width="8" height="14" viewBox="0 0 8 14" fill="currentColor">
-              <circle cx="2" cy="2" r="1.2" />
-              <circle cx="6" cy="2" r="1.2" />
-              <circle cx="2" cy="7" r="1.2" />
-              <circle cx="6" cy="7" r="1.2" />
-              <circle cx="2" cy="12" r="1.2" />
-              <circle cx="6" cy="12" r="1.2" />
+            <svg width="8" height="14" viewBox="0 0 8 14" fill="currentColor" aria-hidden>
+              <circle cx="2" cy="2" r="1.15" />
+              <circle cx="6" cy="2" r="1.15" />
+              <circle cx="2" cy="7" r="1.15" />
+              <circle cx="6" cy="7" r="1.15" />
+              <circle cx="2" cy="12" r="1.15" />
+              <circle cx="6" cy="12" r="1.15" />
             </svg>
           </button>
           {item.node}
