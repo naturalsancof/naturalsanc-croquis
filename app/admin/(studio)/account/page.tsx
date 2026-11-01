@@ -24,13 +24,13 @@ export default async function AccountPage({
 
   return (
     <div className="mx-auto flex h-full w-full max-w-lg flex-col justify-center px-8">
-      <Link href="/admin" className="mb-10 text-[14px] text-mist md:hidden">
+      <Link href="/admin" className="mb-10 text-[14px] text-[var(--text-muted)] md:hidden">
         ←
       </Link>
-      <h1 className="text-[34px] font-semibold tracking-[-0.03em] text-ink">账号</h1>
-      <p className="mt-2 text-[14px] text-mist">{user.email}</p>
-      {saved === "1" ? <p className="mt-6 text-[13px] text-mist">密码已更新</p> : null}
-      {msg ? <p className="mt-6 text-[13px] text-red-700">{msg}</p> : null}
+      <h1 className="text-[22px] font-medium text-[var(--text)]">账号</h1>
+      <p className="mt-2 text-[14px] text-[var(--text-muted)]">{user.email}</p>
+      {saved === "1" ? <p className="mt-6 text-[13px] text-[var(--text-muted)]">密码已更新</p> : null}
+      {msg ? <p className="mt-6 text-[13px] text-[var(--danger)]">{msg}</p> : null}
       <form action={changePassword} className="mt-10 space-y-4">
         <input
           type="password"
@@ -40,7 +40,7 @@ export default async function AccountPage({
           autoComplete="new-password"
           aria-label="新密码"
           placeholder="新密码"
-          className="plain-write text-[17px]"
+          className="plain-write text-[16px]"
         />
         <input
           type="password"
@@ -50,9 +50,9 @@ export default async function AccountPage({
           autoComplete="new-password"
           aria-label="再输一次"
           placeholder="再输一次"
-          className="plain-write text-[17px]"
+          className="plain-write text-[16px]"
         />
-        <button type="submit" className="pt-4 text-[14px] text-ink">
+        <button type="submit" className="pt-4 text-[14px] text-[var(--text)]">
           保存
         </button>
       </form>

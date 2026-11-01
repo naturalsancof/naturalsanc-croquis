@@ -7,7 +7,7 @@ import type {
 } from "react";
 
 export const inputCls =
-  "w-full rounded-lg border border-[var(--line)] bg-white/60 px-3 py-2 text-sm text-ink outline-none transition placeholder:text-mist/30 focus:border-cyan/50 focus:ring-1 focus:ring-cyan/30";
+  "w-full rounded-[8px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-[14px] text-[var(--text)] outline-none transition placeholder:text-[var(--text-soft)] focus:border-[var(--accent)]";
 
 export function Field({
   label,
@@ -23,9 +23,9 @@ export function Field({
   return (
     <label className={`block ${className}`}>
       <span className="mb-1.5 flex items-baseline gap-2">
-        <span className="text-[12px] text-mist/80">{label}</span>
+        <span className="text-[12px] text-[var(--text-muted)]">{label}</span>
         {hint ? (
-          <span className="font-display text-[9px] tracking-[0.12em] text-mist/35">
+          <span className="font-display text-[11px] text-[var(--text-soft)]">
             {hint}
           </span>
         ) : null}
@@ -43,7 +43,7 @@ export function Textarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
       {...props}
-      className={`${inputCls} min-h-[80px] leading-relaxed ${props.className ?? ""}`}
+      className={`${inputCls} min-h-[80px] leading-[1.7] ${props.className ?? ""}`}
     />
   );
 }
@@ -66,15 +66,15 @@ export function Btn({
 } & ButtonHTMLAttributes<HTMLButtonElement>) {
   const styles =
     variant === "primary"
-      ? "border-cyan/50 bg-cyan/10 text-cyan hover:bg-cyan/20"
+      ? "border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)] hover:bg-[var(--surface-muted)]"
       : variant === "danger"
-        ? "border-red-500/30 text-red-300/80 hover:border-red-500/60 hover:bg-red-500/10"
-        : "border-[var(--line)] text-mist hover:border-white/25 hover:text-ink";
+        ? "border-[var(--danger)] bg-[var(--danger-surface)] text-[var(--danger)] hover:bg-[var(--surface-muted)]"
+        : "border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--border-strong)] hover:text-[var(--text)]";
 
   return (
     <button
       {...rest}
-      className={`cursor-pointer rounded-lg border px-3.5 py-2 font-display text-[10px] tracking-[0.16em] uppercase transition ${styles} ${rest.className ?? ""}`}
+      className={`cursor-pointer rounded-[8px] border-[0.5px] px-3.5 py-2 font-display text-[11px] transition ${styles} ${rest.className ?? ""}`}
     >
       {children}
     </button>
@@ -93,16 +93,16 @@ export function AdminCard({
   children: ReactNode;
 }) {
   return (
-    <section className="panel-solid p-5 sm:p-7">
+    <section className="panel-solid">
       <div className="mb-5 flex items-baseline justify-between gap-3">
         <div className="flex items-baseline gap-3">
-          <span className="font-display text-[10px] tracking-[0.28em] text-cyan/70">
+          <span className="font-display text-[11px] text-[var(--accent)]">
             {index}
           </span>
-          <h2 className="text-[15px] text-ink">{title}</h2>
+          <h2 className="text-[18px] font-medium text-[var(--text)]">{title}</h2>
         </div>
         {hint ? (
-          <span className="font-display text-[9px] tracking-[0.2em] text-mist/35">
+          <span className="font-display text-[11px] text-[var(--text-soft)]">
             {hint}
           </span>
         ) : null}
@@ -115,8 +115,8 @@ export function AdminCard({
 export function SavedBanner({ show }: { show: boolean }) {
   if (!show) return null;
   return (
-    <div className="mb-4 flex items-center gap-2 rounded-lg border border-lime/30 bg-lime/10 px-3 py-2 text-[12px] text-lime/90">
-      <span className="h-1.5 w-1.5 rounded-full bg-lime shadow-[0_0_8px_#93a477]" />
+    <div className="mb-4 flex items-center gap-2 rounded-[8px] border-[0.5px] border-[var(--success)] bg-[var(--success-surface)] px-3 py-2 text-[12px] text-[var(--success)]">
+      <span className="h-1.5 w-1.5 rounded-full bg-[var(--success)]" aria-hidden />
       已保存
     </div>
   );
@@ -134,8 +134,11 @@ const ERROR_TEXT: Record<string, string> = {
 export function ErrorBanner({ code }: { code?: string }) {
   if (!code) return null;
   return (
-    <div className="mb-4 flex items-start gap-2 rounded-lg border border-red-500/25 bg-red-500/[0.06] px-3 py-2 text-[12px] text-red-500/90">
-      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-500/70" />
+    <div className="mb-4 flex items-start gap-2 rounded-[8px] border-[0.5px] border-[var(--danger)] bg-[var(--danger-surface)] px-3 py-2 text-[12px] text-[var(--danger)]">
+      <span
+        className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--danger)]"
+        aria-hidden
+      />
       {ERROR_TEXT[code] ?? "没有保存成功，请再试一次。"}
     </div>
   );

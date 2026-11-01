@@ -25,12 +25,12 @@ export default async function HomePage() {
           }}
         >
           <h1
-            className="select-none whitespace-nowrap px-5 font-extrabold uppercase leading-[0.9] tracking-[-0.055em] sm:px-8"
+            className="select-none whitespace-nowrap px-5 font-medium leading-[0.9] tracking-[-0.04em] sm:px-8"
             style={{
               fontSize: "clamp(64px, 16vw, 240px)",
               marginTop: "-0.3em",
-              color: "transparent",
-              WebkitTextStroke: "clamp(1.5px, 0.22vw, 3px) rgba(20,20,25,0.72)",
+              color: "var(--transparent)",
+              WebkitTextStroke: "clamp(1.5px, 0.22vw, 3px) var(--text)",
             }}
             aria-label="Croquis"
           >
@@ -47,9 +47,9 @@ export default async function HomePage() {
         >
           <p className="label shrink-0">
             Naturalsanc
-            <span className="hidden sm:inline"> — Personal Digital Studio</span>
+            <span className="hidden sm:inline"> — Personal digital studio</span>
           </p>
-          <span className="h-px flex-1 bg-ink/10" />
+          <span className="h-[0.5px] flex-1 bg-[var(--border)]" />
           <p className="label hidden shrink-0 sm:block">素描 / 草稿 / 進行中</p>
         </div>
 

@@ -9,7 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { ACCENT_HEX, STAGES, stageIndex } from "@/lib/display";
+import { STAGES, stageIndex } from "@/lib/display";
 import { railWheelDecision, railWheelDelta } from "@/lib/rail-wheel";
 import type { Pursuit } from "@/lib/types";
 
@@ -19,6 +19,23 @@ function wrap(pos: number, n: number) {
   let p = ((pos % n) + n) % n;
   if (p > n / 2) p -= n;
   return p;
+}
+
+function CrossMark() {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.2"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
+      <path d="M4 4l12 12M16 4L4 16" />
+    </svg>
+  );
 }
 
 type Mode = "idle" | "drag" | "inertia" | "settle";
@@ -107,15 +124,9 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
         nearestDist = dist;
         nearest = i;
       }
-      const scale = Math.max(0.86, 1 - dist * 0.04);
-      const rotY = reduceMotion.current ? 0 : Math.max(-8, Math.min(8, -pos * 4));
+      const scale = Math.max(0.9, 1 - dist * 0.03);
       const opacity = Math.max(0.62, 1 - dist * 0.1);
-      const far = Math.max(0, dist - 1);
-      const blur = reduceMotion.current ? 0 : Math.min(2.5, far * 1.4);
-      const filterStr = blur < 0.25 ? "none" : `blur(${blur.toFixed(1)}px)`;
-      if (el.style.filter !== filterStr) el.style.filter = filterStr;
-      el.style.setProperty("--glass", String(Math.min(0.55, far * 0.4)));
-      el.style.transform = `translate3d(calc(-50% + ${pos * step}px), -50%, 0) perspective(1400px) rotateY(${rotY}deg) scale(${scale})`;
+      el.style.transform = `translate3d(calc(-50% + ${pos * step}px), -50%, 0) scale(${scale})`;
       el.style.opacity = String(opacity);
       el.style.zIndex = String(100 - Math.round(dist * 10));
       el.style.pointerEvents = dist > 2.6 ? "none" : "auto";
@@ -362,10 +373,10 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
       <div className="grid flex-1 place-items-center py-16 text-center">
         <div>
           <div className="mark mx-auto" aria-hidden>
-            <span>✕</span>
+            <CrossMark />
           </div>
-          <p className="type-section mt-5 text-[20px]">还是空白的稿纸</p>
-          <p className="mt-1 text-[14px] text-mist">发布一条追求之后，会在这里排开。</p>
+          <p className="type-section mt-5">还是空白的稿纸</p>
+          <p className="mt-1 text-[13px] text-[var(--text-muted)]">发布一条追求之后，会在这里排开。</p>
         </div>
       </div>
     );
@@ -384,13 +395,12 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerCancel}
         onKeyDown={onKeyDown}
-        className={`relative min-h-[260px] w-full flex-1 cursor-grab select-none overflow-hidden focus-visible:outline-[#3c4ec4] active:cursor-grabbing ${
-          selected ? "pointer-events-none opacity-40 blur-[1px]" : ""
-        } transition-[opacity,filter] duration-500 motion-reduce:transition-none`}
+        className={`relative min-h-[260px] w-full flex-1 cursor-grab select-none overflow-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus)] active:cursor-grabbing ${
+          selected ? "pointer-events-none opacity-40" : ""
+        } transition-opacity duration-500 motion-reduce:transition-none`}
         style={{ touchAction: "pan-y", overscrollBehaviorX: "contain" }}
       >
         {pursuits.map((p, i) => {
-          const accent = ACCENT_HEX[p.accent];
           return (
             <button
               key={p.id}
@@ -407,36 +417,33 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
                 }
                 setSelected(p);
               }}
-              className="group absolute left-1/2 top-1/2 block rounded-[6px] text-left transition-[filter] duration-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3c4ec4]"
+              className="group absolute left-1/2 top-1/2 block rounded-[8px] text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--focus)]"
               style={{
                 width: size.w,
                 height: size.h,
-                willChange: "transform, opacity",
               }}
             >
               <span className="label absolute -top-[18px] left-0 right-0 truncate">
-                {nf(i + 1)} / {p.slug.replace(/-/g, "_").toUpperCase()}
+                {nf(i + 1)} / {p.slug.replace(/-/g, "_")}
               </span>
 
-              <span className="relative block h-full w-full overflow-hidden rounded-[6px] bg-[#101014] shadow-[0_36px_70px_-44px_rgba(20,20,25,0.5),0_10px_26px_-18px_rgba(20,20,25,0.28)]">
+              <span className="relative block h-full w-full overflow-hidden rounded-[12px] border-[0.5px] border-[var(--border)] bg-[var(--surface-muted)]">
                 {p.cover_url ? (
                   <Image
                     src={p.cover_url}
                     alt=""
                     fill
                     sizes="320px"
-                    className="object-cover transition duration-700 ease-out group-hover:scale-[1.035] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                    className="object-cover"
                     draggable={false}
                     priority={i < 3}
                   />
                 ) : (
-                  <span className="absolute inset-0 bg-gradient-to-br from-[#2a2a33] to-[#101014]" />
+                  <span className="absolute inset-0 bg-[var(--surface-muted)]" />
                 )}
-                <span className="glass-veil" aria-hidden />
-                <span className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-black/10" />
                 <span
-                  className="absolute left-3 top-3 h-1.5 w-1.5 rounded-full"
-                  style={{ background: accent }}
+                  className="absolute left-3 top-3 h-1.5 w-1.5 rounded-full bg-[var(--accent)]"
+                  aria-hidden
                 />
                 <span className="sr-only">{p.title}</span>
               </span>
@@ -447,13 +454,13 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
 
       <div className="mt-3 w-full">
         <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
-          <div className="mx-auto mb-3 h-px w-40 bg-ink/12">
-            <div ref={progressRef} className="h-px bg-ink/60" style={{ width: "0%" }} />
+          <div className="mx-auto mb-3 h-[0.5px] w-40 bg-[var(--border)]">
+            <div ref={progressRef} className="h-[0.5px] bg-[var(--text)]" style={{ width: "0%" }} />
           </div>
-          <div className="flex items-end justify-between border-t border-[var(--line)] pt-3">
+          <div className="flex items-end justify-between border-t-[0.5px] border-[var(--border)] pt-3">
             <p className="label flex items-center gap-2">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-ink/45" />
-              CROQUIS / {nf(pursuits.length)}
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent)]" aria-hidden />
+              Croquis / {nf(pursuits.length)}
             </p>
             <p
               ref={labelRef}
@@ -547,8 +554,7 @@ function DetailPanel({
         shown ? "opacity-100" : "opacity-0"
       } motion-reduce:transition-none`}
       style={{
-        background: "rgb(244 240 250 / 0.46)",
-        backdropFilter: "blur(10px)",
+        background: "var(--media-scrim)",
         transition: "opacity 220ms ease",
       }}
       onClick={() => closeRef.current()}
@@ -557,7 +563,7 @@ function DetailPanel({
       aria-label={pursuit.title}
     >
       <div
-        className="relative w-full max-w-2xl rounded-2xl border border-ink/10 bg-white/80 p-6 text-ink backdrop-blur-md sm:p-8"
+        className="relative w-full max-w-2xl rounded-[12px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] p-6 text-[var(--text)] sm:p-8"
         onClick={(e) => e.stopPropagation()}
         style={{
           transform: shown ? "translateY(0)" : "translateY(10px)",
@@ -568,14 +574,14 @@ function DetailPanel({
           type="button"
           data-close
           onClick={() => closeRef.current()}
-          className="mb-4 rounded-full px-2 py-1 font-display text-[10px] tracking-[0.18em] text-mist hover:text-ink"
+          className="mb-4 rounded-[8px] px-2 py-1 font-display text-[11px] text-[var(--text-muted)] hover:text-[var(--text)]"
         >
-          关闭 ESC
+          关闭 Esc
         </button>
 
         <div className="flex items-start gap-4">
           {pursuit.cover_url ? (
-            <span className="relative hidden h-24 w-20 shrink-0 overflow-hidden rounded-md sm:block">
+            <span className="relative hidden h-24 w-20 shrink-0 overflow-hidden rounded-[8px] sm:block">
               <Image
                 src={pursuit.cover_url}
                 alt={`${pursuit.title} 的封面`}
@@ -586,14 +592,14 @@ function DetailPanel({
             </span>
           ) : null}
           <div className="min-w-0 flex-1">
-            <p className="font-display text-[9px] tracking-[0.2em] text-mist">
-              {pursuit.slug.replace(/-/g, "_").toUpperCase()} · {stage.zh}
+            <p className="font-display text-[11px] text-[var(--text-muted)]">
+              {pursuit.slug.replace(/-/g, "_")} · {stage.zh}
             </p>
-            <h2 className="mt-2 text-[24px] font-semibold leading-tight tracking-[-0.02em] text-ink">
+            <h2 className="mt-2 text-[18px] font-medium leading-[1.3] text-[var(--text)]">
               {pursuit.title}
             </h2>
             {pursuit.title_en ? (
-              <p className="mt-1 font-display text-[10px] tracking-[0.16em] text-mist">
+              <p className="mt-1 font-display text-[11px] text-[var(--text-muted)]">
                 {pursuit.title_en}
               </p>
             ) : null}
@@ -601,24 +607,24 @@ function DetailPanel({
         </div>
 
         {pursuit.subtitle ? (
-          <p className="mt-5 whitespace-pre-wrap text-[14px] leading-relaxed text-ink/80">{pursuit.subtitle}</p>
+          <p className="mt-5 whitespace-pre-wrap text-base leading-[1.7] text-[var(--text-muted)]">{pursuit.subtitle}</p>
         ) : null}
         {pursuit.description ? (
-          <p className="mt-3 whitespace-pre-wrap text-[13px] leading-[1.8] text-ink/70">{pursuit.description}</p>
+          <p className="mt-3 whitespace-pre-wrap text-[13px] leading-[1.7] text-[var(--text-muted)]">{pursuit.description}</p>
         ) : null}
         {pursuit.progress_note ? (
-          <p className="mt-4 border-l-2 border-[#5b4eb8]/40 pl-4 text-[13px] leading-relaxed text-ink/75">
+          <p className="mt-4 border-l-[0.5px] border-[var(--accent)] pl-4 text-[13px] leading-[1.7] text-[var(--text-muted)]">
             {pursuit.progress_note}
           </p>
         ) : null}
 
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-ink/10 pt-4">
-          <p className="text-[12px] text-mist">
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t-[0.5px] border-[var(--border)] pt-4">
+          <p className="text-[12px] text-[var(--text-muted)]">
             {stage.zh} · {pursuit.started_at ?? "未填开始日期"}
           </p>
           <Link
             href={`/pursuits/${pursuit.slug}`}
-            className="inline-flex items-center rounded-full bg-ink px-4 py-2 text-[12px] text-white hover:bg-ink/85"
+            className="inline-flex items-center rounded-[8px] bg-[var(--surface-inverse)] px-4 py-2 text-[12px] text-[var(--text-inverse)] hover:bg-[var(--text-muted)]"
           >
             进入这个追求
           </Link>

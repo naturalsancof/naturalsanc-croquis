@@ -1,6 +1,24 @@
 import { STAGES, stageIndex } from "@/lib/display";
 import type { Milestone, Pursuit } from "@/lib/types";
 
+function CheckIcon() {
+  return (
+    <svg
+      width="9"
+      height="9"
+      viewBox="0 0 12 12"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M2.5 6.2l2.2 2.2 4.8-4.8" />
+    </svg>
+  );
+}
+
 export function ProgressPanel({
   pursuit,
   milestones,
@@ -9,30 +27,30 @@ export function ProgressPanel({
   milestones: Milestone[];
 }) {
   const idx = stageIndex(pursuit.stage);
-  // 圆点画在每段中间，进度条也要落到「当前阶段那个点」上，两者才对得齐
+  // Dots sit at the midpoint of each segment; the bar lands on the current one.
   const pct = ((idx + 0.5) / STAGES.length) * 100;
   const doneCount = milestones.filter((m) => m.done).length;
 
   return (
     <div>
       <div className="relative pt-1">
-        <div className="relative h-[2px] w-full bg-ink/10">
+        <div className="relative h-[0.5px] w-full bg-[var(--border)]">
           <div
-            className="absolute inset-y-0 left-0 transition-all duration-700"
-            style={{
-              width: `${pct}%`,
-              background: "var(--accent)",
-            }}
+            className="absolute inset-y-0 left-0 bg-[var(--accent)]"
+            style={{ width: `${pct}%` }}
           />
           {STAGES.map((s, i) => (
             <span
               key={s.key}
-              className="absolute top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 transition"
+              className="absolute top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full border-[0.5px]"
               style={{
                 left: `${((i + 0.5) / STAGES.length) * 100}%`,
-                background: i <= idx ? "var(--accent)" : "#f4eff4",
-                borderColor: i <= idx ? "var(--accent)" : "rgb(20 20 25 / 0.2)",
+                background:
+                  i <= idx ? "var(--accent)" : "var(--surface)",
+                borderColor:
+                  i <= idx ? "var(--accent)" : "var(--border-strong)",
               }}
+              aria-hidden
             />
           ))}
         </div>
@@ -42,17 +60,19 @@ export function ProgressPanel({
             <div key={s.key} className="min-w-0">
               <p
                 className="truncate text-[13px]"
-                style={{ color: i <= idx ? "#141419" : "rgb(20 20 25 / 0.4)" }}
+                style={{
+                  color: i <= idx ? "var(--text)" : "var(--text-soft)",
+                }}
               >
                 {s.zh}
               </p>
               <p
-                className="mt-1 truncate font-display text-[8px] tracking-[0.18em]"
+                className="mt-1 truncate font-display text-[11px]"
                 style={{
-                  color: i === idx ? "var(--accent)" : "rgb(20 20 25 / 0.28)",
+                  color: i === idx ? "var(--accent)" : "var(--text-soft)",
                 }}
               >
-                {s.en.toUpperCase()}
+                {s.en}
               </p>
             </div>
           ))}
@@ -60,11 +80,8 @@ export function ProgressPanel({
       </div>
 
       {pursuit.progress_note ? (
-        <div
-          className="mt-7 border-l-2 pl-4"
-          style={{ borderColor: "var(--accent)" }}
-        >
-          <p className="text-[15px] leading-relaxed text-ink/85">
+        <div className="mt-7 border-l-[0.5px] border-[var(--accent)] pl-4">
+          <p className="text-base leading-[1.7] text-[var(--text)]">
             {pursuit.progress_note}
           </p>
           {pursuit.progress_note_en ? (
@@ -78,9 +95,9 @@ export function ProgressPanel({
 
       {milestones.length > 0 ? (
         <div className="mt-8">
-          <div className="mb-3 flex items-center justify-between border-b border-[var(--line)] pb-2">
+          <div className="mb-3 flex items-center justify-between border-b-[0.5px] border-[var(--border)] pb-2">
             <span className="label">Milestones</span>
-            <span className="font-display text-[9px] tracking-[0.2em] text-mist">
+            <span className="font-display text-[11px] text-[var(--text-muted)]">
               {doneCount} / {milestones.length}
             </span>
           </div>
@@ -88,31 +105,31 @@ export function ProgressPanel({
             {milestones.map((m) => (
               <li
                 key={m.id}
-                className="flex items-start gap-3 border-b border-[var(--line)] py-2.5 last:border-0"
+                className="flex items-start gap-3 border-b-[0.5px] border-[var(--border)] py-2.5 last:border-0"
               >
                 <span
-                  className="mt-[3px] grid h-3.5 w-3.5 shrink-0 place-items-center border text-[8px]"
+                  className="mt-[3px] grid h-3.5 w-3.5 shrink-0 place-items-center border-[0.5px]"
                   style={{
                     borderColor: m.done
                       ? "var(--accent)"
-                      : "rgb(20 20 25 / 0.25)",
-                    background: m.done ? "var(--accent)" : "transparent",
-                    color: m.done ? "#fff" : "transparent",
+                      : "var(--border-strong)",
+                    background: m.done ? "var(--accent)" : "var(--transparent)",
+                    color: m.done ? "var(--accent-contrast)" : "var(--transparent)",
                   }}
                   aria-hidden
                 >
-                  ✓
+                  <CheckIcon />
                 </span>
                 <span className="min-w-0">
                   <span
-                    className={`block text-sm ${
-                      m.done ? "text-ink/45 line-through" : "text-ink"
+                    className={`block text-base ${
+                      m.done ? "text-[var(--text-soft)] line-through" : "text-[var(--text)]"
                     }`}
                   >
                     {m.title}
                   </span>
                   {m.title_en || m.title_ja ? (
-                    <span className="sub mt-0.5 block text-[10px]">
+                    <span className="sub mt-0.5 block text-[11px]">
                       {[m.title_en, m.title_ja].filter(Boolean).join(" · ")}
                     </span>
                   ) : null}

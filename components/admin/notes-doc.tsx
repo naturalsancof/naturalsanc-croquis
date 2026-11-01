@@ -4,11 +4,10 @@ import Image from "next/image";
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { useOpenList } from "@/components/admin/notes-shell";
 import { Sortable } from "@/components/admin/sortable";
-import { ACCENT_HEX, STAGES } from "@/lib/display";
+import { STAGES } from "@/lib/display";
 import type { SaveStatus } from "@/components/admin/studio-editor";
 import type { StudioSnapshot } from "@/lib/studio-diff";
 import type {
-  Accent,
   MaterialKind,
   MaterialLink,
   MediaKind,
@@ -32,7 +31,7 @@ type Lang = "zh" | "en" | "ja";
 
 const LANGS: { id: Lang; label: string }[] = [
   { id: "zh", label: "中" },
-  { id: "en", label: "EN" },
+  { id: "en", label: "En" },
   { id: "ja", label: "日" },
 ];
 
@@ -152,7 +151,7 @@ export function NotesDoc({
           type="button"
           onClick={openList}
           aria-label="打开目录"
-          className="press grid h-8 w-8 place-items-center rounded-full text-ink md:hidden"
+          className="press grid h-8 w-8 place-items-center rounded-[8px] text-[var(--text)] md:hidden"
         >
           <HairlineIcon name="menu" />
         </button>
@@ -165,8 +164,8 @@ export function NotesDoc({
                 type="button"
                 aria-pressed={lang === item.id}
                 onClick={() => setLang(item.id)}
-                className={`press rounded-full px-2 py-1 text-[13px] ${
-                  lang === item.id ? "text-ink" : "text-mist"
+                className={`press rounded-[8px] px-2 py-1 text-[13px] ${
+                  lang === item.id ? "text-[var(--text)]" : "text-[var(--text-muted)]"
                 }`}
               >
                 {item.label}
@@ -178,7 +177,7 @@ export function NotesDoc({
             target="_blank"
             rel="noreferrer"
             aria-label="预览"
-            className="press grid h-8 w-8 place-items-center rounded-full text-ink"
+            className="press grid h-8 w-8 place-items-center rounded-[8px] text-[var(--text)]"
           >
             <HairlineIcon name="preview" />
           </a>
@@ -230,7 +229,7 @@ export function NotesDoc({
                   label={`标题 ${langName(lang)}`}
                   placeholder="标题"
                   onChange={(value) => patchPursuit(pursuitLangPatch(lang, "title", value))}
-                  className="type-display text-ink"
+                  className="type-display text-[var(--text)]"
                 />
                 <Line
                   multiline
@@ -238,7 +237,7 @@ export function NotesDoc({
                   label={`简介 ${langName(lang)}`}
                   placeholder="简介，回车换行"
                   onChange={(value) => patchPursuit(pursuitLangPatch(lang, "subtitle", value))}
-                  className="type-body mt-3 text-ink/80"
+                  className="type-body mt-3 text-[var(--text-muted)]"
                 />
                 <Line
                   multiline
@@ -246,7 +245,7 @@ export function NotesDoc({
                   label={`正文 ${langName(lang)}`}
                   placeholder="正文，回车换行"
                   onChange={(value) => patchPursuit(pursuitLangPatch(lang, "description", value))}
-                  className="type-body mt-3 text-ink/85"
+                  className="type-body mt-3 text-[var(--text-muted)]"
                 />
                 <Line
                   multiline
@@ -398,7 +397,7 @@ export function NotesDoc({
                       <button
                         type="button"
                         onClick={() => setOpenNote(item.id)}
-                        className="block w-full truncate py-1.5 text-left text-[17px] text-ink hover:text-ink/60"
+                        className="block w-full truncate py-1.5 text-left text-[17px] text-[var(--text)] hover:text-[var(--text-muted)]"
                       >
                         {item.title || "无标题笔记"}
                       </button>
@@ -572,6 +571,23 @@ function HairlineIcon({ name }: { name: "menu" | "preview" | "published" | "draf
   );
 }
 
+function PlusIcon() {
+  return (
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 12 12"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.2"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
+      <path d="M6 2v8M2 6h8" />
+    </svg>
+  );
+}
+
 function Block({
   title,
   onAdd,
@@ -585,8 +601,8 @@ function Block({
     <section className="frame">
       <div className="frame-head">
         <h2 className="type-section">{title}</h2>
-        <button type="button" aria-label={`添加${title}`} onClick={onAdd} className="press grid h-7 w-7 place-items-center rounded-full text-[18px] text-mist">
-          +
+        <button type="button" aria-label={`添加${title}`} onClick={onAdd} className="press grid h-7 w-7 place-items-center rounded-[8px] text-[var(--text-muted)]">
+          <PlusIcon />
         </button>
       </div>
       <div>{children}</div>
@@ -611,8 +627,8 @@ function IconButton({
       aria-label={label}
       aria-pressed={pressed}
       onClick={onClick}
-        className={`press grid h-8 min-w-8 place-items-center rounded-full px-1 text-[14px] ${
-        pressed ? "bg-white/80 text-ink shadow-[inset_0_0_0_1px_rgba(20,20,25,0.12)]" : "text-mist"
+        className={`press grid h-8 min-w-8 place-items-center rounded-[8px] px-1 text-[14px] ${
+        pressed ? "bg-[var(--surface-muted)] text-[var(--text)]" : "text-[var(--text-muted)]"
       }`}
     >
       {children}
@@ -640,7 +656,7 @@ function StatusLine({
           : status.warning
             ? status.warning
             : "已保存");
-  const tone = status.kind === "error" ? "text-red-700" : "text-mist";
+  const tone = status.kind === "error" ? "text-[var(--danger)]" : "text-[var(--text-muted)]";
   return (
     <p role="status" aria-live="polite" className={`min-w-0 truncate text-[12px] ${tone}`}>
       {text}
@@ -669,34 +685,18 @@ function MoreMenu({
   return (
     <>
       <button type="button" aria-label="关闭菜单" className="fixed inset-0 z-20 cursor-default" onClick={onClose} />
-      <div className="absolute right-0 top-9 z-30 w-64 border border-ink/10 bg-[#f7f5f8]/95 p-4 backdrop-blur-md">
-        <p className="font-display text-[10px] tracking-[0.18em] text-mist">阶段</p>
+      <div className="absolute right-0 top-9 z-30 w-64 rounded-[12px] border-[0.5px] border-[var(--border)] bg-[var(--surface)] p-4">
+        <p className="font-display text-[11px] text-[var(--text-muted)]">阶段</p>
         <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
           {STAGES.map((stage) => (
             <button
               key={stage.key}
               type="button"
               onClick={() => onChange({ stage: stage.key as Stage }, "now")}
-              className={`text-[14px] ${pursuit.stage === stage.key ? "text-ink" : "text-mist"}`}
+              className={`text-[14px] ${pursuit.stage === stage.key ? "text-[var(--text)]" : "text-[var(--text-muted)]"}`}
             >
               {stage.zh}
             </button>
-          ))}
-        </div>
-        <div className="mt-4 flex gap-2">
-          {(Object.keys(ACCENT_HEX) as Accent[]).map((accent) => (
-            <button
-              key={accent}
-              type="button"
-              aria-label={accent}
-              aria-pressed={pursuit.accent === accent}
-              onClick={() => onChange({ accent }, "now")}
-              className="h-3.5 w-3.5 rounded-full"
-              style={{
-                background: ACCENT_HEX[accent],
-                boxShadow: pursuit.accent === accent ? "0 0 0 1px #141419" : "none",
-              }}
-            />
           ))}
         </div>
         <Line
@@ -704,16 +704,16 @@ function MoreMenu({
           label="网址片段"
           placeholder="网址"
           onChange={(value) => onChange({ slug: value })}
-          className="mt-4 text-[14px] text-mist"
+          className="mt-4 text-[14px] text-[var(--text-muted)]"
         />
         <input
           type="date"
           aria-label="开始日期"
           value={pursuit.started_at ?? ""}
           onChange={(event) => onChange({ started_at: event.target.value || null })}
-          className="plain-write mt-3 text-[14px] text-mist"
+          className="plain-write mt-3 text-[14px] text-[var(--text-muted)]"
         />
-        <button type="button" onClick={onCover} className="mt-4 block text-[14px] text-ink">
+        <button type="button" onClick={onCover} className="mt-4 block text-[14px] text-[var(--text)]">
           {pursuit.cover_url ? "更换封面" : "添加封面"}
         </button>
         {pursuit.cover_url ? (
@@ -721,7 +721,7 @@ function MoreMenu({
             <SafeImage src={pursuit.cover_url} alt="" sizes="96px" />
           </div>
         ) : null}
-        <button type="button" onClick={onDelete} className="mt-5 block text-[13px] text-red-700">
+        <button type="button" onClick={onDelete} className="mt-5 block text-[13px] text-[var(--danger)]">
           删除这条追求
         </button>
       </div>
@@ -747,8 +747,8 @@ function MilestoneLine({
         aria-label={row.done ? "标为未完成" : "标为完成"}
         aria-pressed={row.done}
         onClick={() => onChange({ done: !row.done })}
-        className={`mt-1.5 h-3.5 w-3.5 shrink-0 rounded-full border ${
-          row.done ? "border-ink bg-ink" : "border-ink/30"
+        className={`mt-1.5 h-3.5 w-3.5 shrink-0 rounded-[8px] border-[0.5px] ${
+          row.done ? "border-[var(--text)] bg-[var(--text)]" : "border-[var(--border-strong)]"
         }`}
       />
       <div className="min-w-0 flex-1">
@@ -757,14 +757,14 @@ function MilestoneLine({
           label={`里程碑 ${langName(lang)}`}
           placeholder="里程碑"
           onChange={(value) => onChange(langPatch(lang, "title", value))}
-          className={`type-body ${row.done ? "text-mist line-through" : "text-ink"}`}
+          className={`type-body ${row.done ? "text-[var(--text-muted)] line-through" : "text-[var(--text)]"}`}
         />
       </div>
       <button
         type="button"
         aria-label="删除里程碑"
         onClick={onDelete}
-        className="text-[12px] text-mist opacity-0 hover:text-red-700 group-hover:opacity-100 group-focus-within:opacity-100"
+        className="text-[12px] text-[var(--text-muted)] opacity-0 hover:text-[var(--danger)] group-hover:opacity-100 group-focus-within:opacity-100"
       >
         删
       </button>
@@ -792,11 +792,11 @@ function WorkLine({
   return (
     <div className="group py-3 pl-4">
       <div className="flex items-start gap-4">
-        <button type="button" onClick={onToggle} aria-label="展开作品" className="relative h-14 w-14 shrink-0 overflow-hidden bg-ink/[0.04]">
+        <button type="button" onClick={onToggle} aria-label="展开作品" className="relative h-14 w-14 shrink-0 overflow-hidden bg-[var(--surface-muted)]">
           {row.kind === "image" && row.media_url ? (
             <SafeImage src={row.media_url} alt="" sizes="56px" />
           ) : (
-            <span className="grid h-full place-items-center text-[12px] text-mist">音</span>
+            <span className="grid h-full place-items-center text-[12px] text-[var(--text-muted)]">音</span>
           )}
         </button>
         <div className="min-w-0 flex-1">
@@ -805,7 +805,7 @@ function WorkLine({
             label={`作品标题 ${langName(lang)}`}
             placeholder="作品"
             onChange={(value) => onChange(langPatch(lang, "title", value, true))}
-            className="type-body text-ink"
+            className="type-body text-[var(--text)]"
           />
           {open ? (
             <>
@@ -822,9 +822,9 @@ function WorkLine({
                 label="作品地址"
                 placeholder="https://"
                 onChange={(value) => onChange({ media_url: value })}
-                className="mt-2 text-[13px] text-mist"
+                className="mt-2 text-[13px] text-[var(--text-muted)]"
               />
-              <div className="mt-2 flex gap-4 text-[13px] text-mist">
+              <div className="mt-2 flex gap-4 text-[13px] text-[var(--text-muted)]">
                 <button type="button" onClick={() => onChange({ kind: row.kind === "image" ? "audio" : "image" }, "now")}>
                   {row.kind === "image" ? "图片" : "音频"}
                 </button>
@@ -844,7 +844,7 @@ function WorkLine({
           type="button"
           aria-label="删除作品"
           onClick={onDelete}
-          className="text-[12px] text-mist opacity-0 hover:text-red-700 group-hover:opacity-100 group-focus-within:opacity-100"
+          className="text-[12px] text-[var(--text-muted)] opacity-0 hover:text-[var(--danger)] group-hover:opacity-100 group-focus-within:opacity-100"
         >
           删
         </button>
@@ -880,7 +880,7 @@ function MaterialLine({
             label={`资料标题 ${langName(lang)}`}
             placeholder="资料"
             onChange={(value) => onChange(langPatch(lang, "title", value))}
-            className="type-body text-ink"
+            className="type-body text-[var(--text)]"
           />
           <Line
             value={row.url}
@@ -898,14 +898,14 @@ function MaterialLine({
             className="type-meta mt-1"
           />
         </div>
-        <button type="button" onClick={nextKind} className="text-[12px] text-mist">
+        <button type="button" onClick={nextKind} className="text-[12px] text-[var(--text-muted)]">
           {label}
         </button>
         <button
           type="button"
           aria-label="删除资料"
           onClick={onDelete}
-          className="text-[12px] text-mist opacity-0 hover:text-red-700 group-hover:opacity-100 group-focus-within:opacity-100"
+          className="text-[12px] text-[var(--text-muted)] opacity-0 hover:text-[var(--danger)] group-hover:opacity-100 group-focus-within:opacity-100"
         >
           删
         </button>
@@ -929,8 +929,8 @@ function NotePage({
 }) {
   return (
     <section className="frame">
-      <div className="frame-head text-[13px] text-mist">
-        <button type="button" onClick={onBack} className="hover:text-ink">
+      <div className="frame-head text-[13px] text-[var(--text-muted)]">
+        <button type="button" onClick={onBack} className="hover:text-[var(--text)]">
           ←
         </button>
         <button type="button" onClick={() => onChange({ is_pinned: !note.is_pinned })}>
@@ -939,7 +939,7 @@ function NotePage({
         <button type="button" onClick={() => onChange({ is_published: !note.is_published })}>
           {note.is_published ? "公开" : "草稿"}
         </button>
-        <button type="button" onClick={onDelete} className="ml-auto text-red-700">
+        <button type="button" onClick={onDelete} className="ml-auto text-[var(--danger)]">
           删除
         </button>
       </div>
@@ -949,7 +949,7 @@ function NotePage({
         label={`笔记标题 ${langName(lang)}`}
         placeholder="标题"
         onChange={(value) => onChange(langPatch(lang, "title", value))}
-        className="type-display text-ink"
+        className="type-display text-[var(--text)]"
       />
       <Line
         multiline
@@ -957,7 +957,7 @@ function NotePage({
         label={`笔记正文 ${langName(lang)}`}
         placeholder="开始写，回车换行"
         onChange={(value) => onChange(langPatch(lang, "content", value, true))}
-        className="type-body mt-3 text-ink/85"
+        className="type-body mt-3 text-[var(--text-muted)]"
       />
     </section>
   );
