@@ -364,7 +364,7 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
           <div className="mark mx-auto" aria-hidden>
             <span>✕</span>
           </div>
-          <p className="mt-5 font-display text-[22px] text-ink">还是空白的稿纸</p>
+          <p className="type-section mt-5 text-[20px]">还是空白的稿纸</p>
           <p className="mt-1 text-[14px] text-mist">发布一条追求之后，会在这里排开。</p>
         </div>
       </div>
@@ -407,18 +407,18 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
                 }
                 setSelected(p);
               }}
-              className="group absolute left-1/2 top-1/2 block rounded-[28px] text-left transition-[filter] duration-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3c4ec4]"
+              className="group absolute left-1/2 top-1/2 block rounded-[6px] text-left transition-[filter] duration-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3c4ec4]"
               style={{
                 width: size.w,
                 height: size.h,
                 willChange: "transform, opacity",
               }}
             >
-              <span className="absolute -top-[18px] left-0 right-0 truncate font-display text-[8px] uppercase tracking-[0.2em] text-mist">
+              <span className="label absolute -top-[18px] left-0 right-0 truncate">
                 {nf(i + 1)} / {p.slug.replace(/-/g, "_").toUpperCase()}
               </span>
 
-              <span className="relative block h-full w-full overflow-hidden rounded-[28px] bg-[#101014] shadow-[0_0_0_1px_rgba(255,255,255,0.35),0_24px_50px_-28px_rgba(70,50,130,0.45)]">
+              <span className="relative block h-full w-full overflow-hidden rounded-[6px] bg-[#101014] shadow-[0_36px_70px_-44px_rgba(20,20,25,0.5),0_10px_26px_-18px_rgba(20,20,25,0.28)]">
                 {p.cover_url ? (
                   <Image
                     src={p.cover_url}
@@ -445,7 +445,7 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
         })}
       </div>
 
-      <div className="mt-4 w-full">
+      <div className="mt-3 w-full">
         <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
           <div className="mx-auto mb-3 h-px w-40 bg-ink/12">
             <div ref={progressRef} className="h-px bg-ink/60" style={{ width: "0%" }} />
@@ -458,7 +458,7 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
             <p
               ref={labelRef}
               aria-live="polite"
-              className="font-display text-[9px] uppercase tracking-[0.24em] text-mist"
+              className="label max-w-[45%] truncate text-center"
             >
               {pursuits[0]?.title ?? ""}
             </p>
@@ -557,7 +557,7 @@ function DetailPanel({
       aria-label={pursuit.title}
     >
       <div
-        className="relative w-full max-w-2xl rounded-[28px] border border-ink/10 bg-white/80 p-6 text-ink backdrop-blur-md sm:p-8"
+        className="relative w-full max-w-2xl rounded-2xl border border-ink/10 bg-white/80 p-6 text-ink backdrop-blur-md sm:p-8"
         onClick={(e) => e.stopPropagation()}
         style={{
           transform: shown ? "translateY(0)" : "translateY(10px)",
@@ -575,7 +575,7 @@ function DetailPanel({
 
         <div className="flex items-start gap-4">
           {pursuit.cover_url ? (
-            <span className="relative hidden h-24 w-20 shrink-0 overflow-hidden rounded-2xl sm:block">
+            <span className="relative hidden h-24 w-20 shrink-0 overflow-hidden rounded-md sm:block">
               <Image
                 src={pursuit.cover_url}
                 alt={`${pursuit.title} 的封面`}
@@ -589,7 +589,7 @@ function DetailPanel({
             <p className="font-display text-[9px] tracking-[0.2em] text-mist">
               {pursuit.slug.replace(/-/g, "_").toUpperCase()} · {stage.zh}
             </p>
-            <h2 className="mt-2 font-display text-[28px] font-medium leading-tight tracking-[-0.03em] text-ink">
+            <h2 className="mt-2 text-[24px] font-semibold leading-tight tracking-[-0.02em] text-ink">
               {pursuit.title}
             </h2>
             {pursuit.title_en ? (

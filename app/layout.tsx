@@ -1,20 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import { Figtree, Fraunces } from "next/font/google";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
-
-const display = Fraunces({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-fraunces",
-});
-
-const body = Figtree({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-figtree",
-});
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -45,11 +32,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="zh-CN"
-      className={`${display.variable} ${body.variable} h-full`}
-      data-scroll-behavior="smooth"
-    >
+    <html lang="zh-CN" className="h-full" data-scroll-behavior="smooth">
       <body className="flex min-h-dvh flex-col">
         <div className="page-grid" aria-hidden />
         <SiteHeader />

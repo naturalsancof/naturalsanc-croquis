@@ -8,7 +8,7 @@ export default function AdminHome() {
         <div className="mark mx-auto" aria-hidden>
           <span>✕</span>
         </div>
-        <h1 className="mt-6 font-display text-[32px] leading-tight tracking-[-0.03em] text-ink">
+        <h1 className="mt-6 text-[28px] font-semibold leading-tight tracking-[-0.02em] text-ink">
           从一条空白开始
         </h1>
         <p className="mt-2 text-[15px] leading-relaxed text-mist">

@@ -24,15 +24,18 @@ export default async function HomePage() {
             marginRight: "calc(50% - 50vw)",
           }}
         >
-          <div className="relative">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute left-[8%] top-1/2 h-28 w-[28rem] -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(168,176,240,0.55),rgba(214,190,236,0.15)_45%,transparent_70%)] blur-2xl"
-            />
-            <h1 className="gradient-title type-hero relative select-none whitespace-nowrap px-4 sm:px-8">
-              Croquis
-            </h1>
-          </div>
+          <h1
+            className="select-none whitespace-nowrap px-5 font-extrabold uppercase leading-[0.9] tracking-[-0.055em] sm:px-8"
+            style={{
+              fontSize: "clamp(64px, 16vw, 240px)",
+              marginTop: "-0.3em",
+              color: "transparent",
+              WebkitTextStroke: "clamp(1.5px, 0.22vw, 3px) rgba(20,20,25,0.72)",
+            }}
+            aria-label="Croquis"
+          >
+            Croquis
+          </h1>
         </div>
 
         <div
@@ -42,10 +45,12 @@ export default async function HomePage() {
             marginRight: "calc(50% - 50vw)",
           }}
         >
-          <p className="font-display text-[15px] tracking-[-0.02em] text-ink/70">
-            个人数字工作室
+          <p className="label shrink-0">
+            Naturalsanc
+            <span className="hidden sm:inline"> — Personal Digital Studio</span>
           </p>
           <span className="h-px flex-1 bg-ink/10" />
+          <p className="label hidden shrink-0 sm:block">素描 / 草稿 / 進行中</p>
         </div>
 
         <div
