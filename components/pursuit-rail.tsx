@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { ACCENT_HEX, STAGES, stageIndex } from "@/lib/display";
+import { railWheelDecision, railWheelDelta } from "@/lib/rail-wheel";
 import type { Pursuit } from "@/lib/types";
 
 const nf = (n: number) => String(n).padStart(2, "0");
@@ -316,21 +317,30 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
     if (!el) return;
 
     const onWheel = (e: WheelEvent) => {
-      const absX = Math.abs(e.deltaX);
-      const absY = Math.abs(e.deltaY);
-      const horizontal = e.shiftKey || absX > absY;
-      if (!horizontal) return;
-      const delta = absX > absY ? e.deltaX : e.deltaY;
-      if (Math.abs(delta) < 1) return;
+      const coarse = window.matchMedia("(pointer: coarse)").matches;
+      if (
+        railWheelDecision({
+          deltaX: e.deltaX,
+          deltaY: e.deltaY,
+          shiftKey: e.shiftKey,
+          ctrlKey: e.ctrlKey,
+          metaKey: e.metaKey,
+          coarsePointer: coarse,
+          cardCount: n,
+        }) === "ignore"
+      ) {
+        return;
+      }
       e.preventDefault();
       if (drag.current.tracking) return;
+      const delta = railWheelDelta(e.deltaX, e.deltaY);
       const base = mode.current === "settle" ? targetRef.current : Math.round(offset.current);
-      goTo(Math.max(base - 3, Math.min(base + 3, base + delta / (step * 1.15))));
+      goTo(Math.max(base - 4, Math.min(base + 4, base + delta / (step * 0.9))));
     };
 
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
-  }, [step, goTo]);
+  }, [step, goTo, n]);
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (selected) return;
@@ -400,7 +410,7 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
                 {nf(i + 1)} / {p.slug.replace(/-/g, "_").toUpperCase()}
               </span>
 
-              <span className="relative block h-full w-full overflow-hidden rounded-[28px] bg-[#101014] shadow-[0_28px_60px_-40px_rgba(40,30,80,0.45)]">
+              <span className="relative block h-full w-full overflow-hidden rounded-[28px] bg-[#101014] shadow-[0_0_0_1px_rgba(20,20,25,0.08)]">
                 {p.cover_url ? (
                   <Image
                     src={p.cover_url}
@@ -427,13 +437,7 @@ export function PursuitRail({ pursuits }: { pursuits: Pursuit[] }) {
         })}
       </div>
 
-      <div className="relative z-10 -mt-2 flex justify-center" aria-hidden>
-        <div className="grid h-12 w-12 place-items-center rounded-2xl border border-white/70 bg-white/60 shadow-[0_14px_30px_-18px_rgba(70,60,140,0.45)] backdrop-blur-sm">
-          <span className="font-display text-[16px] leading-none text-ink/45">✕</span>
-        </div>
-      </div>
-
-      <div className="mt-3 w-full">
+      <div className="mt-4 w-full">
         <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
           <div className="mx-auto mb-3 h-px w-40 bg-ink/12">
             <div ref={progressRef} className="h-px bg-ink/60" style={{ width: "0%" }} />
@@ -545,7 +549,7 @@ function DetailPanel({
       aria-label={pursuit.title}
     >
       <div
-        className="relative w-full max-w-2xl rounded-[28px] border border-white/70 bg-white/75 p-6 text-ink shadow-[0_30px_80px_-36px_rgba(70,60,140,0.45)] backdrop-blur-xl sm:p-8"
+        className="relative w-full max-w-2xl rounded-[28px] border border-ink/10 bg-white/80 p-6 text-ink backdrop-blur-md sm:p-8"
         onClick={(e) => e.stopPropagation()}
         style={{
           transform: shown ? "translateY(0)" : "translateY(10px)",

@@ -81,7 +81,7 @@ export function Sortable({
   };
 
   return (
-    <div className={grid ? "grid gap-4 sm:grid-cols-2 xl:grid-cols-3" : "space-y-3"}>
+    <div className={grid ? "grid gap-8 sm:grid-cols-2" : ""}>
       {items.map((item) => (
         <div key={item.id} data-sortable-id={item.id} className="relative">
           <button
@@ -90,7 +90,7 @@ export function Sortable({
             title="按住拖动排序"
             onPointerDown={(event) => onPointerDown(event, item.id)}
             style={{ touchAction: "none" }}
-            className="absolute left-2 top-3 z-10 grid h-11 w-8 cursor-grab place-items-center rounded-lg border border-[var(--line)] bg-white/90 text-mist active:cursor-grabbing"
+            className="absolute -left-1 top-2 z-10 grid h-8 w-5 cursor-grab place-items-center text-ink/20 hover:text-ink/60"
           >
             <svg width="8" height="14" viewBox="0 0 8 14" fill="currentColor" aria-hidden>
               <circle cx="2" cy="2" r="1.15" />

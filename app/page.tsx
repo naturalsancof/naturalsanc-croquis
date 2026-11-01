@@ -25,9 +25,9 @@ export default async function HomePage() {
           }}
         >
           <h1
-            className="gradient-title select-none whitespace-nowrap px-5 font-extrabold uppercase leading-[0.86] tracking-[-0.055em] sm:px-8"
+            className="gradient-title select-none whitespace-nowrap px-5 font-semibold uppercase leading-[0.9] tracking-[-0.045em] sm:px-8"
             style={{
-              fontSize: "clamp(64px, 14vw, 200px)",
+              fontSize: "clamp(56px, 11vw, 148px)",
             }}
           >
             Croquis
@@ -41,12 +41,8 @@ export default async function HomePage() {
             marginRight: "calc(50% - 50vw)",
           }}
         >
-          <p className="label">
-            Naturalsanc
-            <span className="hidden sm:inline"> — Personal Digital Studio</span>
-          </p>
+          <p className="text-[13px] text-mist">个人数字工作室</p>
           <span className="h-px flex-1 bg-ink/10" />
-          <p className="label hidden sm:block">素描 / 草稿 / 進行中</p>
         </div>
 
         <div

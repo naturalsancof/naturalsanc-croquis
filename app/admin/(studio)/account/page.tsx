@@ -1,5 +1,5 @@
+import Link from "next/link";
 import { changePassword } from "@/app/admin/actions";
-import { Btn, Field, Input } from "@/components/admin/ui";
 import { requireStudioAdmin } from "@/lib/supabase/session";
 
 export const metadata = { title: "账号 · Studio" };
@@ -23,56 +23,39 @@ export default async function AccountPage({
           : null;
 
   return (
-    <div className="pb-14">
-      <div className="max-w-xl">
-        <p className="kicker">Studio — Account</p>
-        <h1 className="mt-3 font-display text-2xl tracking-tight text-ink">账号</h1>
-        <p className="mt-2 font-display text-[11px] tracking-[0.12em] text-mist/70">
-          {user.email}
-        </p>
-
-        <div className="panel-solid mt-6 p-5 sm:p-7">
-          <h2 className="text-[15px] text-ink">改密码</h2>
-          <p className="mt-1 text-[12px] text-mist/70">改完立刻生效，下次登录用新密码。</p>
-
-          {saved === "1" ? (
-            <p className="mt-4 rounded-lg border border-lime/30 bg-lime/10 px-3 py-2 text-[12px] text-lime/90">
-              密码已更新
-            </p>
-          ) : null}
-          {msg ? (
-            <p className="mt-4 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-[12px] text-red-700">
-              {msg}
-            </p>
-          ) : null}
-
-          <form action={changePassword} className="mt-5 space-y-4">
-            <Field label="新密码" hint="至少 8 位">
-              <Input
-                type="password"
-                name="password"
-                required
-                minLength={8}
-                autoComplete="new-password"
-              />
-            </Field>
-            <Field label="再输一次">
-              <Input
-                type="password"
-                name="confirm"
-                required
-                minLength={8}
-                autoComplete="new-password"
-              />
-            </Field>
-            <Btn type="submit">保存新密码</Btn>
-          </form>
-        </div>
-
-        <p className="mt-5 text-[11px] leading-relaxed text-mist/60">
-          忘了密码也没关系：去 Supabase Dashboard → Authentication → Users，找到这个邮箱，可以重置。
-        </p>
-      </div>
+    <div className="mx-auto flex h-full w-full max-w-lg flex-col justify-center px-8">
+      <Link href="/admin" className="mb-10 text-[14px] text-mist md:hidden">
+        ←
+      </Link>
+      <h1 className="text-[34px] font-semibold tracking-[-0.03em] text-ink">账号</h1>
+      <p className="mt-2 text-[14px] text-mist">{user.email}</p>
+      {saved === "1" ? <p className="mt-6 text-[13px] text-mist">密码已更新</p> : null}
+      {msg ? <p className="mt-6 text-[13px] text-red-700">{msg}</p> : null}
+      <form action={changePassword} className="mt-10 space-y-4">
+        <input
+          type="password"
+          name="password"
+          required
+          minLength={8}
+          autoComplete="new-password"
+          aria-label="新密码"
+          placeholder="新密码"
+          className="plain-write text-[17px]"
+        />
+        <input
+          type="password"
+          name="confirm"
+          required
+          minLength={8}
+          autoComplete="new-password"
+          aria-label="再输一次"
+          placeholder="再输一次"
+          className="plain-write text-[17px]"
+        />
+        <button type="submit" className="pt-4 text-[14px] text-ink">
+          保存
+        </button>
+      </form>
     </div>
   );
 }
